@@ -572,13 +572,17 @@ ggsave(file = "./OUTPUT/OS_age_comp_CB_240516.png", width = 6.5, height = 8, uni
 ```
 
 ```{r juvenile abund}
-#uv_dat <- read_excel("./data/SIS - Data - OSOYOOS - 24.01.12.xlsx", sheet = "Juvenile Data") #presmolt (was 23.09.26.xlsx)
-juv_dat <- read_excel("./data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
-#Pre-smolt abundance
-j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>% #grabbing the appropriate columns from the excel file
-  dplyr::select(s_year = `Smolt Migration Year`, no_smolt = `...6`) %>% 
-  mutate_at("no_smolt", as.numeric) %>% #selecting columns and converting no_smolt to numeric
-  filter(s_year >=1998, s_year <= last_year)                                                    
+#uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.01.12.xlsx", sheet = "Juvenile Data") #presmolt (was 23.09.26.xlsx)
+#uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
+# juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.05.13.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
+# #Pre-smolt abundance
+# j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>% #grabbing the appropriate columns from the excel file
+#   dplyr::select(s_year = `Smolt Migration Year`, no_smolt = `...6`) %>% 
+#   mutate_at("no_smolt", as.numeric) %>% #selecting columns and converting no_smolt to numeric
+#   filter(s_year >=1998, s_year <= last_year)                                                    
+# # write.csv(j_dat,  "../data/juv_dat_xlsx_240516.csv")    # if juv data imported, re-write to CSV  # comment out for GitHub
+
+j_dat <- read.csv("../data/juv_dat_xlsx_240516.csv")    # replaces import data from SIS-OSO xlsx workbook # keep for GitHub [240510]
 
 ```
 
