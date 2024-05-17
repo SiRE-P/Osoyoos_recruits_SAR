@@ -532,6 +532,8 @@ ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+
   ylab("Ocean age proportion")+
   xlab("Return year")
 
+ggsave("../output/age_composition.png", width = 6.5, height = 4)
+
 ```
 
 ```{r juvenile abund}
