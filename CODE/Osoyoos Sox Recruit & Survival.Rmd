@@ -510,64 +510,27 @@ write.csv(recruits, "../output/OS_recruits_HS_240516.csv")
 ```  
 ```{r age composition}
 
-age_dat <- read.csv("../data/age_comp_23.04.25.csv")                             #  sox age by return year based on deadpitch vs Fryer
-ac_best <- read.csv("../data/age_comp_best.csv")                                 # "best" sox age composition by return year, smolt year, ocean age
+age_data <- read_xlsx("../DATA/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Data at Age")
 
-#Age composition of adult returns
-#       a_dat <- age_dat %>% 
-ocean_age_dat <- age_dat %>% 
-  mutate  (return_year = ret_year)    %>%
-  mutate  (o_age = ret_year - s_year) %>%                                       # calculating ocean age
-  group_by(o_age, return_year, ret_year,  s_year) %>% 
-  summarize(ac_fryr = sum(ac_fryer, na.rm = F),                                 #summarizing by unique ocean age/return year combinations
-            ac_sire = sum(ac_sire,  na.rm = F))
+age_data.df <- age_data %>% dplyr::select(return_year = `Return Year`, prop_Fryer = `Age Comp (Fryer)`, prop_SIRE = `Age Comp (SIRE)`, Age, best_source = `Best Source`) %>% 
+  mutate(ocean_age = str_sub(Age, start = -1)) %>% 
+  group_by(return_year, ocean_age, best_source) %>% 
+  summarise(prop_Fryer = sum(prop_Fryer, na.rm = TRUE), prop_SIRE = sum(prop_SIRE, na.rm = TRUE)) %>% 
+  mutate(best_age_prop = ifelse(best_source == "CRITFC", prop_Fryer, prop_SIRE))
 
-acbest <- ac_best %>% 
-  mutate  (return_year = ret_year) %>%
-  pivot_longer(names_to = "age", values_to = "ac_best", cols = c(2:7)) %>%      #converting data to long format
-  mutate(o_age = as.numeric(stri_sub(age, 5, 5)),                               #creating ocean age column from Gilbert-Rich ages
-         s_year = ret_year - o_age) %>%                                         #calculating smolt year
-  dplyr::select(o_age, ret_year, s_year, ac_best) %>% 
-         group_by(o_age, ret_year, s_year) %>% 
-  summarize(ac_best = sum(ac_best, na.rm = F))                                  #summarizing by unique ocean age/return year combinations
+age_data.df %>% 
+  group_by(return_year) %>% 
+  summarise(total = sum(prop_SIRE)) %>% 
+  arrange(total)
 
-# write.csv(acbest,"../output/age_comp_acbest_240516.csv")                       #shows age comp in acbest add up to 100% by return year
-
-a_dat<- left_join(ocean_age_dat, acbest, by = c("o_age", "ret_year", "s_year")) #combining the age composition dataframes
-# write.csv(a_dat_tmp,"../output/age_comp_a_dat_tmp_240516.csv") 
-
-# fixes wrong assignment of age data source to ac_best
-# a_dat[a_dat_tmp$o_age==2 & a_dat_tmp$s_year==2000, 6] <- 0.539                ### what is this for? probably a programmatic fix for data that later got fixed.
-
-# write.csv(a_dat,"../output/age_comp_a_dat_240516.csv") 
-
-#creating a long format dataframe of proportion of return by smolt year and ocean age for plotting purposes
-adat <- a_dat %>% dplyr::select(s_year, o_age, ac_best, ac_fryr, ac_sire) %>% 
-  group_by(s_year, o_age) %>% summarize(ac_fryr = sum(ac_fryr),
-                                 ac_sire = sum(ac_sire),
-                                 ac_best = sum(ac_best)) %>% 
-  pivot_longer(cols = starts_with("ac_"),
-               names_to = "source",
-               values_to = "proportion")
-
-write.csv(adat,"../output/age_comp_adat_240516.csv") 
-
-#plotting age composition
-ggplot(adat %>% filter(s_year > 1997), aes())+
-  geom_point(aes(x = s_year, y = proportion, size = source, colour = source, alpha = source))+
-  geom_line(aes(x = s_year, y = proportion, linewidth = source, colour = source, alpha = source))+
-  scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
-  scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
-  scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
-  scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
-  scale_x_continuous(breaks = c(seq(from = 1985, to = 2021, by = 4)))+
-  facet_wrap(~o_age, ncol = 1)+
-# labs(x = "Smolt year", y = "Proportion of smolts")
-  labs(x = "Smolt year", y = "Proportion of Adults")+
-  theme_bw()
-
-#saving the plot
-ggsave(file = "./OUTPUT/OS_age_comp_CB_240516.png", width = 6.5, height = 8, units = "in")
+ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+
+  geom_point(data = age_data.df %>% ungroup() %>% dplyr::select(return_year, best_source) %>% unique(), aes(x = return_year, y = -0.01, color = best_source), size = 3, pch = 15)+
+  geom_area(aes(fill = ocean_age))+
+  scale_fill_viridis_d("ocean age")+
+  scale_color_manual(values = c("red", "dodgerblue", "black"), "source")+
+  coord_cartesian(expand = FALSE)+
+  ylab("Ocean age proportion")+
+  xlab("Return year")
 
 ```
 
