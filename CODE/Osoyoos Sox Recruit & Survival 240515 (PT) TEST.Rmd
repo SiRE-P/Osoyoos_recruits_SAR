@@ -1,0 +1,622 @@
+```{r setup, include=FALSE}
+
+#####
+# title:  "Osoyoos Sockeye Recruitment Estimation"
+# author: "Colin Bailey, Patrick Thompson, Howard Stiff"
+# date:   '2024-03-12'
+# output: html_document
+# update: 240124 - revisions to CB's program, replacing 16-to-24-hr BON dam count models with single predictive model
+# update: 240124 - included GAM model for imputation of missing 2011 spawn grd sub-stock ratios
+# update: 240214 - included GAM model imputation of missing H-O:N-O ratios in 2016 and 2019
+# update: 240218 - detailed code documentation added
+# update: 240221 - estimate OSO stray rates from spawn grd data in 2009, 2010, 2012; calculate estimates of total annual returns of Skaha Sockeye
+# update: 240322 - change predictive model for 16-to-24-hr BON dam counts to a negative binomial model because response variable (difference) is over-dispersed counts
+# update: 240227 - 240306 - estimate weighted mean stray rate (~4.6%) for SKA-origin fish staying in the lower Ok River from H-O data in 2018 and 2020, and apply to applicable years.
+# update: 240312 - sets SIS-Data-OSOYOOS 24.02.12.xlsx as input file (was v24.01.12.xlsx prior) for returns data and AUC data; no differences in final WRITE stmt output. 
+# update: 240408 - recalculates OSO -> SKA and SKA -> OSO stray rates, taking into account the estimated strays. OSO N-O estimates changed by <1% and only in years 2012+.
+# update: 240416 - CB review of program; fix for apparent negative proportion N-O in 2011 affecting GAM model
+# update: 240426 - fixed bug in filter stmt in chunk {r oso vs ska} that allowed multiple 2011 records (ie filter stmt was disabled in 240416)
+# update: 240510 - prep program for csv inputs only (for ultimate upload to GitHub
+# update: 240515 - 
+# update: TO DO  - incorporate RY2022 and 2023 data to extend mar-surv time-series to SY2021
+#####
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(readxl)
+library(stringi)
+library(ggrepel)
+library(mgcv)
+library(MASS)
+library(splines)
+library(scales)
+library(ggpubr)       # for adding text boxes with regression coefficients to plots
+library(patchwork)
+
+last_year <- 2021     # current last year of returns data handled or available 
+```
+
+###{r setwd}
+# setwd("C:/Users/thompsonpa/Downloads/R")                                                                             # <-- reset for user directory
+#setwd("C:/DFO-MPO/OneDrive/OneDrive - DFO-MPO/Sockeye Index Stocks/Okanagan/Osoyoos/SAR Analysis/PROGRAMS/R/DATA")     # <-- reset for user directory
+###
+
+```{r functions}
+cv_gam_loo <- function(data, formula, seed = 123) {
+  # Get the number of observations
+  n <- nrow(data)
+  
+  # Create a vector to hold the cross-validated errors
+  mse <- numeric(n)
+  
+  # Loop over the observations
+  for(i in 1:n){
+    # Split the data into training and testing sets
+    train_data <- data[-i, ]  # all but the ith observation
+    test_data <- data[i, , drop = FALSE]  # only the ith observation
+    
+    # Fit the model on the training data
+    suppressWarnings(model <- gam(formula, data = train_data, family = binomial(link = "logit")))
+    
+    # Predict on the test data in response space
+    suppressWarnings(predictions_response <- predict(model, newdata = test_data, type = "response"))
+    
+    # Compute the observed values in response space
+    observed_response <- test_data[[as.character(formula[[2]])]]
+    
+    # Compute the errors
+    mse[i] <- (observed_response - predictions_response)^2
+  }
+  
+  # Compute the average errors
+  mean_mse <- mean(mse)
+  
+  # Return the average errors
+  return(mean_mse)
+}
+
+```
+
+```{r import returns}
+# RETURNS DATA : early code importing SIS XLSX worksheet "Sockeye Returns Data" replaced with read.csv of workbook's filtered columns [240510]
+#         NOTE : if relevant changes are ever made to SIS worksheet, then uncomment out xlsx import statements and write statement & rerun chunk & program
+#                OR: alternatively, leave all statements uncommented (for data changes in SIS) until final execution and then comment out for upload to GitHub
+
+#returns_data<- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Sockeye Returns Data") %>%   # assign to latest SIS workbook - now obsolete
+# returns_data <- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.05.13.xlsx", sheet = "Sockeye Returns Data") %>%   # latest SIS workbook - update to Total Harvest (all fisheries) below BON
+# janitor::clean_names()                                                                                                 # (which is 24.05.13.xlsx as of 240515)
+# returns_select <- returns_data %>%                                                                                     # input BON dam counts, Snake abund., d/s harvest & stock composition %
+# filter(!is.na(return_year), return_year <= last_year) %>%
+# dplyr::select(return_year, tot_bonn_16hr = total_sox_bonn_16_hour, total_sockeye_snake, ok_stock_comp_percent_best, total_comm_harvest_below_bonn)
+# write.csv(returns_select,"../data/returns_select_SIS240212_xlsx_240516.csv")                                          # if SIS xlsx data imported, re-write to CSV
+
+returns_select <- read.csv("../DATA/returns_select_SIS240212_xlsx_240516.csv")                                        # replaces import data from SIS workbook [240510]
+
+```
+
+```{r bonn 16 to 24 hr count adjustment}  
+# estimate 16 to 24 hr count relationship at Bonneville dam, utilizing all years of available data as input to a single model
+
+# linear_eqn_f <- function(x,y) {                # stolen function to be called from ggplot to add linear reg stats to plots...
+#   m <- lm(y ~ x)                               # but it's not working... 
+#   as.character(as.expression(substitute(
+#   italic(y) == a + b %.% italic(x) * "," ~~ italic(r)^2 ~ "=" ~ r2,
+#     list(a = format(coef(m)[1], digits = 4),
+#          b = format(coef(m)[2], digits = 4),
+#          r2 = format(summary(m)$r.squared, digits = 3))
+#   )))}
+
+bonn_16_v_24 <- read.csv("../data/Bonneville_16_v_24.csv")              # input data for years with 24 and 16 hour sockeye counts at Bonneville Dam
+bonn_16_v_24 <- bonn_16_v_24 %>%                                       # BON has two fish ladders: Bradford (OR) and Washington (WA)
+  mutate(tot_16 = ifelse(!is.na(tot_16), tot_16, bradford_16hr + washington_16hr),
+         tot_24 = ifelse(!is.na(tot_24), tot_24, bradford_24hr + washington_24hr)) %>% 
+  dplyr::select(ret_year, tot_16, tot_24) %>% 
+  mutate(diff = tot_24 - tot_16) %>%                                   # derive response variable = difference between 16 and 24-hr counts
+  arrange(ret_year)
+                 
+bonn_model <- glm.nb((diff) ~ log(tot_16), data = bonn_16_v_24, link = "log") # predictive model: diff as func of log(16-hr counts); link=log applies only to response var
+
+corrbonn <- corrr::correlate(log(bonn_16_v_24$tot_16), y = log(bonn_16_v_24$diff))    # r = 0.98 
+stats_txt = "ln(Y) = -4.89 + 1.15 * ln(X); r = 0.98; deviance = 18.2"                 # stats to annotate regression plot   
+
+tot16_seq <- data.frame(tot_16 = seq(min(bonn_16_v_24$tot_16), max(bonn_16_v_24$tot_16), length= 100))   # makes a sequence to predict over so we can get the line in the plot
+
+bonn_pred_seq <- data.frame(tot_16 = tot16_seq, 
+                      diff = predict(bonn_model, newdata = tot16_seq, type = "response"))                # type = "response" reverts to the scale of original data
+
+ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+
+  geom_point()+
+# geom_smooth(method = "glm.nb", color="gray", se=TRUE) +                      
+  geom_line(data = bonn_pred_seq, color="red", linewidth=1, linetype=1) +
+  geom_point(colour="black", size=2.5)+
+# geom_jitter(height=1) +
+  geom_label_repel(aes(label = ret_year), fill = "white", colour = "black", size = 3)+ #, nudge_y = 5, nudge_x = -80)+
+  geom_text(x=0, y=35, label=stats_txt, hjust="inward", size=4) +
+  labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+
+  ylab("24 hr - 16 hr Count Difference (1000s)")+
+  xlab("16 hr Count (1000s)")+
+  theme_bw()+
+
+ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
+  geom_line(data = bonn_pred_seq, color = "red", linewidth = 1.0)+                                  # PT's predictive regression line
+# geom_smooth(method = "lm", se=TRUE, alpha = 0.5, color = "white", linewidth = 0.01)+              # alternative line option
+  geom_point(colour="black", size=2.5)+
+  geom_label_repel(aes(label = ret_year), fill = "white", color = "black", size = 3, nudge_y = 50, nudge_x = -80)+
+  labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+
+  ylab("24 hr Count (1000s)")+
+  xlab("16 hr Count (1000s)")+
+  theme_bw()+
+  
+  plot_annotation(tag_levels = 'A')+                                            # put A and B on Figure
+  plot_layout(nrow = 2)                                                         # stack figures
+
+```  
+
+```{r proportion hatch and natch}  
+# estimates of hatchery numbers      ### NOTE: initial ok_riv_deadpitch import from XLSX should be commented out for final GitHub version. ###
+
+# ok_riv_deadpitch <- readxl::read_xlsx("./data/OSO_SOX_deadpitch_data_tidy 23.11.30.xlsx") %>%  # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
+#   janitor::clean_names()                                                                       # detection of thermal marks                                # comment out for GitHub
+# write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240516.csv")                        # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
+ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240516.csv")                        # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
+
+#pen_channel_deadpitch <-read.csv("../data/skaha_deadpitch_tidy_240208.csv") %>%                # deadpitch for Pen channel fish with thermal mark data 
+pen_channel_deadpitch <- read.csv("../data/skaha_deadpitch_tidy_240227.csv") %>%                # deadpitch version with 26 obs in Section "Skaha Beach" chngd to Pen channel  
+  janitor::clean_names() %>%                                                                   #           (i.e., 26 SK records in 2016: 25N-O, 1H-O)
+  filter(location == "penticton channel") %>%                                                
+  mutate(location = "Penticton Channel")
+
+shingle_deadpitch <- read.csv("../data/shingle_deadpitch.csv") %>%                              # deadpitch for Shingle Ck fish with thermal marks 
+  janitor::clean_names()
+
+deadpitch_low_mid <- ok_riv_deadpitch %>%                           # process lower and middle Ok River data...
+  filter(fish == "sockeye") %>%        
+  filter(section != "Penticton Channel") %>%                        # remove redundant Pen channel data 2017-18 as that is dup in Penticton dataset
+  filter(thermal_mark != "NA") %>%                                
+  filter(thermal_mark != "Unknown") %>%                             # removing all rows where thermal mark is NA or Unknown
+  dplyr::select(year, thermal_mark, section) %>% 
+  mutate(section = ifelse(section == "Lower Okanagan", "Lower Ok River", "Middle Ok River")) %>% 
+  group_by(year, section) %>% 
+  summarize(n_natural = sum(thermal_mark == "Natural"), n = n()) %>% 
+  mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
+  mutate(osoyoos_stocked = ifelse(year %in% c(2013), TRUE, FALSE)) %>%   # year where BOTH Osoyoos and Skaha were stocked, approx evenly
+                                                                    # NOTE: all H-O fish released in 2012 & 2013 were into Osoyoos; <-- not sure if that is handled (or needs to be?) in this procedure!!?
+  arrange(section, year)
+
+deadpitch_pen <- pen_channel_deadpitch %>%                          # process upper Ok River (Pen Channel) deadpitch data...
+  filter(fish == "sockeye") %>%                                     # Check whether this captures "Sockeye" too [not necessary, all lower case]
+  filter(thermal != "NA") %>% 
+  filter(thermal != "unknown") %>%                                  # remove all rows where thermal mark is unknown
+  dplyr::select(year, thermal, section = location) %>% 
+  group_by(year, section) %>% 
+  summarize(n_natural = sum(thermal == "natural"), n = n()) %>% 
+  mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
+  mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))       # H-O fry released into both Osoyoos and Skaha lakes in 2013
+
+deadpitch_shingle <- shingle_deadpitch %>%                          # process Shingle Creek (upper Ok River trib) data...
+  filter(fish == "Sockeye") %>%                                     # Check whether this captures "sockeye" too [not necessary, all title case]
+  filter(hatchery != "NA") %>% 
+  filter(hatchery  != "unknown") %>%                                # removing all rows where thermal mark is NA or unknown
+  dplyr::select(year, hatchery, section = okr_section) %>% 
+  group_by(year, section) %>% 
+  summarize(n_natural = sum(hatchery == "natural"), n = n()) %>% 
+  mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
+  mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))       # H-O fry released into both Osoyoos and Skaha lakes in 2013
+  
+deadpitch <- bind_rows(deadpitch_low_mid, deadpitch_pen, deadpitch_shingle) %>% arrange (section, year)   # combine deadpitch data
+
+#run cross validation to determine df of year spline
+cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 3))
+cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 4))
+cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 5))
+cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 6))
+#lowest mean square error is for model with 4 df on spline
+
+cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 3))
+cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 4))
+cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 5))
+cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 6))
+#lowest mean square error is for model with 5 df on spline
+
+# fit gam to impute missing values
+pnat_low_m <- gam(p_nat ~ bs(year, 4), data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013),  family = binomial(link = "logit"))
+pnat_mid_m <- gam(p_nat ~ bs(year, 5), data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), family = binomial(link = "logit"))
+### NOTE: to be clear, Osoyoos was stocked with H-O fish in 2012 and 2013 also, returning primarily in 2015 and 2016 (in addition to 2013)...
+
+ggplot(deadpitch, aes(x = year, y = p_nat))+
+  geom_point(aes(color = osoyoos_stocked))+
+  geom_line(data = data.frame(section = "Lower Ok River", year = 2007:last_year, 
+                              p_nat = predict(pnat_low_m, data.frame(year = 2007:last_year, osoyoos_stocked = FALSE), type = "response")))+
+  geom_line(data = data.frame(section = "Middle Ok River", year = 2009:last_year, 
+                              p_nat = predict(pnat_mid_m, data.frame(year = 2009:last_year, osoyoos_stocked = FALSE), type = "response")))+
+  facet_wrap(~section)
+
+#add in imputed values
+prop_natural <- bind_rows(deadpitch %>% mutate(type = "sampled"), 
+                data.frame(year = 2019, section = "Lower Ok River", type = "imputed", 
+                           p_nat = predict(pnat_low_m, data.frame(year = 2019, osoyoos_stocked = FALSE), type = "response")),
+                data.frame(year = c(2016, 2019), section = "Middle Ok River", type = "imputed", 
+                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016, 2019), osoyoos_stocked = FALSE), type = "response"))) %>% 
+                arrange(section, year)
+
+ggplot(prop_natural, aes(x = year, y = p_nat))+
+  geom_point(aes(color = type))+
+  geom_line()+
+  facet_wrap(~section)+
+  scale_x_continuous(breaks = c(seq(from = 2000, to = 2022, by = 2)))
+
+#prop_natural_oso <- prop_natural %>%                                           #get just prop natural osoyoos
+#  filter(section == "Lower Ok River")
+```  
+
+```{r oso vs ska}  
+# osoyoos vs. skaha data     ### NOTE: initial AUC_data_Import import from XLSX should be commented out for final GitHub version. ###
+
+# AUC_data_Import <- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                               # comment out for GitHub
+#   janitor::clean_names()                                                                                                                                      # comment out for GitHub  
+# write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240516.csv")                        # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
+AUC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_240516.csv")                        # replaces AUC data from SIS xlsx workbook                       # keep for GitHub [240510]
+
+AUC_data <- AUC_data_Import %>% 
+  dplyr::select(rearing_lake, spawning_location, year, spawning_nerkids, percent_35cm_fl) %>% 
+  filter(year <= last_year) %>% 
+  filter(year != 2011)        # removing 2011 which was previously imputed, but using sub-optimal methods [240221]
+
+spawning_location <- AUC_data %>% 
+  mutate(prop_sock = 1 - percent_35cm_fl, total_sockeye = spawning_nerkids * prop_sock) %>% 
+  group_by(year, rearing_lake, spawning_location) %>% 
+  summarise(total_sockeye = sum(total_sockeye, na.rm = TRUE)) %>% 
+  mutate(rearing_lake = ifelse(spawning_location == "Middle Ok River", "Skaha", rearing_lake)) %>% # changing this to Skaha based on direction from H. Stiff. 
+  arrange (rearing_lake, spawning_location, year)
+  # mutate is "assigning the spawners in middle channel to rearing lake of origin for purposes of calculating OSO vs SKA proportion" [PT 240221]
+  # So mutate assignment is correct as specified [HS 240221]
+
+prop_oso_strays_by_year <- spawning_location %>%          # calculate OSO stray rate based on years where no SKA N-O returns exist (2009-2012)
+  filter(year > 2008, year < 2013) %>%                    # N-O fish in mid-OkR from 2009-2012 MUST be OSO strays, since dam prevented SKA to spawn <2011
+  filter(spawning_location != "Penticton Channel") %>%    # omit Pen Chan data from calculation of proportion OSO strays
+  left_join(prop_natural %>% dplyr::select(year, spawning_location = section, p_nat)) %>% 
+  mutate(natural_sockeye = total_sockeye * p_nat) %>% 
+  group_by(year) %>%                                      # for true stray rate, include OSO strays in the denominator [PT 240411]
+  summarise(strays = natural_sockeye[spawning_location == "Middle Ok River"],lower_river = natural_sockeye[spawning_location == "Lower Ok River"], prop_oso_strays = strays/(lower_river + strays)) %>% 
+# summarise(strays = natural_sockeye[spawning_location == "Middle Ok River"],lower_river = natural_sockeye[spawning_location == "Lower Ok River"], prop_oso_strays = strays/lower_river) %>% 
+  mutate(spawning_location = "Lower Ok River")
+
+prop_oso_strays_mean <- sum(prop_oso_strays_by_year$strays)/sum(prop_oso_strays_by_year$lower_river)    # weighted mean stray rate (across available years) = ~6%
+
+prop_oso_strays <- prop_oso_strays_by_year %>% 
+  dplyr::select(-strays, -lower_river) %>% 
+  bind_rows(data.frame(spawning_location = "Lower Ok River", year = 2013:last_year,            # apply mean stray rate to later years (was 2013:2021)
+                       prop_oso_strays = prop_oso_strays_mean))
+```  
+
+```{r ska strays} 
+
+###  H-O fish in lower-OkR from 2018-2021 likely SKA or OKA strays, from which we can calc annual -- and weighted Multi-Yr avg -- "SKA stray rate" relative to total H-O on all SGs 
+
+#    PLT - calculate proportion of all HO in lower river in each year
+prop_ska_strays_by_year <- prop_natural %>% 
+  filter(year >=2018, year <= 2020) %>%                                                    # based on 2018 and 2020 only (2019 insufficient data)
+  mutate(rearing_lake = ifelse(section == "Lower Ok River", "Osoyoos", "Skaha")) %>% 
+  group_by(year, rearing_lake) %>% 
+  summarise(lake_HO = sum(n-n_natural)) %>% 
+  spread(key = rearing_lake, value = lake_HO) %>% 
+  mutate(prop_ska_strays = Osoyoos/(Skaha + Osoyoos)) %>% 
+  filter(!is.na(Osoyoos))
+
+wmean_ska_stray_prop <- sum(prop_ska_strays_by_year$Osoyoos)/(sum(prop_ska_strays_by_year$Skaha) + sum(prop_ska_strays_by_year$Osoyoos))  # ~4.1% 
+
+prop_ska_strays <- prop_ska_strays_by_year %>%                                             # get year-specific SKA stray rates (for 2018 and 2020)
+  dplyr::select(-Osoyoos, -Skaha) %>% 
+  bind_rows(data.frame(year = c(2012:2017,2019,2021:last_year),                            # apply mean stray rate to other years (was 2012:2021)
+                       prop_ska_strays = wmean_ska_stray_prop)) %>%
+  arrange(year)
+
+```
+
+```{r prop_nat_origin after strays} 
+
+spawning_table <- spawning_location %>%                                                    # populate Spawning Table from count of spawners in...   
+  left_join(prop_natural %>% dplyr::select(year, spawning_location = section, p_nat)) %>%  # ...lower (Osoyoos) and upper (Skaha) sections of the river
+  mutate(p_nat = ifelse(is.na(p_nat) & rearing_lake == "Osoyoos", 1, p_nat)) %>%           # apply proportion N-O to OSO spawners 
+  filter(spawning_location != "Shingle Creek") %>%                                         # omit Shingle Creek because of low numbers & data quality
+  mutate(natural_sockeye = total_sockeye * p_nat) %>%                                      # calculate N-O abund based on proportion N-O  
+  group_by(rearing_lake, year) %>% 
+  summarise(total_sockeye = sum(total_sockeye), natural_sockeye = sum(natural_sockeye))    # aggregate by rearing lake
+  
+stray_correct <- function(obs_focal, obs_other, stray_focal, stray_other){
+  ((stray_other - 1) * obs_focal + stray_other * obs_other)/(stray_focal + stray_other - 1)}
+
+spawning_totals_no2011 <- spawning_table %>%                                               # tabulate spawning ground data (total sox, prop. natural, strays, etc) by year
+  dplyr::select(-natural_sockeye) %>% 
+  spread(key = rearing_lake, value = total_sockeye, fill = 0) %>% 
+  rename(oso_total = Osoyoos, ska_total = Skaha) %>% 
+  left_join(spawning_table %>% 
+  dplyr::select(-total_sockeye) %>% 
+  spread(key = rearing_lake, value = natural_sockeye, fill = 0) %>%
+  rename(oso_nat = Osoyoos, ska_nat = Skaha)) %>%                                          # assign Osoyoos to oso_nat & Skaha to ska_nat vars 
+  left_join(prop_oso_strays %>% dplyr::select(-spawning_location)) %>%                     # merge oso stray proportions and
+  mutate(prop_oso_strays = ifelse(is.na(prop_oso_strays), 0, prop_oso_strays)) %>%         # set proportion to zero where NA
+  left_join(prop_ska_strays) %>%                                                           # merge ska stray proportions and
+  mutate(prop_ska_strays = ifelse(is.na(prop_ska_strays), 0, prop_ska_strays)) %>%         # set proportion to zero where NA
+# mutate(oso_strays = min(oso_nat * prop_oso_strays, ska_nat)) %>%                         # this sets OSO strays to zero! ### not necessary but probably good practice to ensure that the strays don't exceed the total number of fish in the pop
+# mutate(ska_strays = min(ska_nat * prop_ska_strays, oso_nat)) %>%                         # this sets SKA strays to zero! ### not necessary but probably good practice to ensure that the strays don't exceed the total number of fish in the pop
+# mutate(oso_strays = oso_nat * prop_oso_strays) %>%                                       # simplified OSO stray calculation
+# mutate(ska_strays = ska_nat * prop_ska_strays) %>%                                       # simplified SKA stray calculation
+# mutate(oso_nat_origin = oso_nat - ska_strays + oso_strays) %>%                           # calculate total osoyoos origin natural fish
+# mutate(ska_nat_origin = ska_nat - oso_strays + ska_strays) %>%                           # calculate total skaha origin natural fish
+  mutate(oso_nat_origin = stray_correct(oso_nat, ska_nat, prop_oso_strays, prop_ska_strays)) %>%   # estimate OSO N-O taking into account OSO->SKA and SKA->OSO stray rates                        
+  mutate(ska_nat_origin = stray_correct(ska_nat, oso_nat, prop_ska_strays, prop_oso_strays)) %>%   # estimate SKA N-O taking into account OSO->SKA and SKA->OSO stray rates 
+  mutate(oso_strays = oso_nat_origin * prop_oso_strays) %>%                                      
+  mutate(ska_strays = ska_nat_origin * prop_ska_strays) %>%
+  mutate(prop_oso_origin_nat = oso_nat_origin/(oso_total + ska_total)) %>%
+  mutate(prop_ska_origin_nat = ska_nat_origin/(oso_total + ska_total))
+
+### HS: not sure if this helps or is necessary. so commenting out CB's fixes for a "negative number" [240426]
+### CB: giving 2011 a value > 0 so GAM with the binomial distribution being used to impute 2011 can have an input value that isn't negative
+### spawning_totals[spawning_totals$year %in% c(2011), 9]  <- c(rep(0, 1))                     # set ska_nat_origin = 0 (instead of -1,478 which was due to stray rate) [HS 240416]
+### spawning_totals[spawning_totals$year %in% c(2011), 13] <- c(rep(0.0000000001, 1))          # set prop_ska_origin_nat = 0 or so [CB 240416]
+
+### HS: these plots are captured in last step in this chunk, so commented out here [240426]
+# spawning_totals %>% 
+#   ggplot(aes(x = year, y = prop_ska_origin_nat))+
+#   geom_point()+
+#   geom_line()+
+#   geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
+#   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))
+# 
+# spawning_totals %>% 
+#   ggplot(aes(x = year, y = prop_oso_origin_nat))+
+#   geom_point()+
+#   geom_line()+
+#   geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
+#   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))
+
+#fit gam to impute missing 2011 data
+#perform cross validation to determine appropriate df on year spline
+#filtering out early years where the proportion is 1
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 3))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 4))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 5))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 6))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 7))
+#6 df gives lowest mean square error
+
+#filtering out early years where the proportion is 0
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 3))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 4))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 5))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 6))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 7))
+#4 df gives lowest mean square error
+
+
+prop_oso_natural_m <- gam(prop_oso_origin_nat ~ bs(year, 6), data = spawning_totals_no2011 %>% filter(year > 2006), family = binomial(link = "logit"))  # OSO imputation model
+prop_ska_natural_m <- gam(prop_ska_origin_nat ~ bs(year, 4), data = spawning_totals_no2011 %>% filter(year > 2010), family = binomial(link = "logit"))  # SKA imputation model
+
+spawning_totals <- bind_rows(spawning_totals_no2011 %>% mutate(prop_natural_origin_type = "sampled"), 
+                              data.frame(prop_oso_origin_nat = predict(prop_oso_natural_m, data.frame(year = 2011), type = "response"), 
+                                         prop_ska_origin_nat = predict(prop_ska_natural_m, data.frame(year = 2011), type = "response"),
+                                         year = 2011, prop_natural_origin_type = "imputed")) %>% 
+                   arrange(year)
+
+spawning_totals %>% 
+  ggplot(aes(x = year, y = prop_oso_origin_nat, color = prop_natural_origin_type))+
+# geom_line()+
+  #geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
+  geom_point(size=2)+
+  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2)))
+
+spawning_totals %>%                                                                      # plot proportion OSO N-O
+  ggplot(aes(x = year, y = prop_ska_origin_nat, color = prop_natural_origin_type))+
+# geom_line()+
+  #geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
+  geom_point(size=2)+
+  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2)))
+
+write.csv(spawning_totals, "../output/Spawning_Totals_HS_240516.csv")
+
+```  
+
+```{r oso recruitment}  
+#calculate recruits    
+bonn_pred <- data.frame(year = returns_select$return_year, 
+             bonn_24hr  = returns_select$tot_bonn_16hr + predict(bonn_model,    # use known 24-hr counts instead of estimates where they exist (i.e., 1994-2000, 2002, 2013-2022)
+                          data.frame(tot_16 = returns_select$tot_bonn_16hr), 
+                          type = "response"))                                    
+
+bonn_merge <- bonn_pred %>%                                                     # ...get predicted BON 24-hr estimates and..
+  dplyr::select(return_year=year, bonn_24hr_est=bonn_24hr) %>%                  # rename variables...
+  left_join(bonn_16_v_24 %>% dplyr::select(return_year=ret_year, tot_24)) %>%   # merge in actual 24-hr counts from bonn_16_v_24..
+  mutate(bonn_24hr = round(ifelse(is.na(tot_24), bonn_24hr_est, tot_24 ),0))    # and assign actual tot_24s to bonn_24hr count for available return_years, predictive estimates otherwise
+                                           
+# ggplot(bonn_merge, aes(x = return_year, y = bonn_24hr)) +
+#        geom_line(color="blue", linewidth = 0.1) 
+# ggplot(bonn_merge, aes(x = return_year, y = bonn_24hr_est)) +
+#        geom_line(color="red", linewidth = 0.1) 
+#   scale_x_continuous(breaks = c(seq(from = 2000, to = 2022, by = 4)))
+
+oso_recruits <- returns_select %>% 
+# left_join(bonn_pred  %>% dplyr::select(return_year = year, bonn_dam_est = bonn_24hr)) %>%           # Bonn 24-hr estimates using predicted values for all years...
+  left_join(bonn_merge %>% dplyr::select(return_year,        bonn_dam_est = bonn_24hr)) %>%           # Bonn 24-hr counts where available & estimates where not [24.05.01 (HS)}
+  left_join(spawning_totals %>% dplyr::rename(return_year = year)) %>% 
+  mutate(prop_oso_origin_nat  = ifelse(is.na(prop_oso_origin_nat ), 1, round(prop_oso_origin_nat,3))) %>% 
+  mutate(prop_ska_origin_nat  = ifelse(is.na(prop_ska_origin_nat ), 0, round(prop_ska_origin_nat,3))) %>% 
+  mutate(total_comm_harvest_below_bonn =                                                              # this var is actually ALL harvest below BON (REC, COMM, TREATY) - data update (Ryan Lothrop WDFW May 2024)
+         ifelse(is.na(total_comm_harvest_below_bonn), 0, total_comm_harvest_below_bonn))              # set missing harvest to 0
+                                                                                                      # revisit decision to set harvest=0 when NA  
+oso_recruits.df <- oso_recruits %>% 
+  mutate(columbia = round(bonn_dam_est - total_sockeye_snake + total_comm_harvest_below_bonn,0)) %>%           # total SK to mouth of Columbia
+  mutate(okanagan = round(columbia * ok_stock_comp_percent_best,0)) %>%                                        # Ok-bound SK at mouth of Columbia
+  mutate(oso_origin_nat_returns = round(okanagan * prop_oso_origin_nat,0)) %>%                                 # OSO N-O abundance
+  mutate(ska_origin_nat_returns = round(okanagan * prop_ska_origin_nat,0)) %>%                                 # SKA N-O abundance
+  mutate(hatchery_returns = round(okanagan - oso_origin_nat_returns - ska_origin_nat_returns,0)) %>%           # SKA H-O abundance
+  mutate(prop_oso_strays = round(prop_oso_strays,3)) %>%
+  mutate(prop_ska_strays = round(prop_ska_strays,3)) %>%                                                       # round off column data... 
+  mutate(oso_total = round(oso_total,0)) %>%
+  mutate(ska_total = round(ska_total,0)) %>%
+  mutate(oso_nat = round(oso_nat,0)) %>%
+  mutate(ska_nat = round(ska_nat,0)) %>%
+  mutate(oso_nat_origin = round(oso_nat_origin,0)) %>%
+  mutate(ska_nat_origin = round(ska_nat_origin,0)) %>%
+  mutate(oso_total = round(oso_total,0)) %>%
+  mutate(ska_total = round(ska_total,0)) %>%
+  mutate(oso_strays = round(oso_strays,0)) %>%
+  mutate(ska_strays = round(ska_strays,0)) 
+  
+oso_recruits.df %>%                                                                                   # facet plots
+  filter(return_year > 1984) %>% 
+  dplyr::select(return_year, columbia, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns) %>% 
+# dplyr::select(return_year, columbia, okanagan, osoyoos_origin_returns, osoyoos_origin_returns_no_strays, 
+#               osoyoos_natural_origin_no_strays, skaha_origin_returns) %>% 
+  gather(key = population, value = sockeye, -return_year) %>% 
+  ggplot(aes(x = return_year, y = sockeye))+
+  geom_line()+
+  scale_x_continuous(breaks = c(seq(from = 1985, to = 2025, by = 5)))+
+# scale_y_continuous(labels = scales::label_comma(trim = TRUE))+
+  scale_y_continuous(labels = label_number(suffix = "", scale = 1e-3))+
+  ylab(label = "Sockeye (thousands)")+
+  xlab(label = "Return Year") +
+# title(main="Sockeye Abundance (x1000) by Return Year",xlab=NULL, ylab=NULL)+
+  facet_wrap(~population, ncol=1)
+
+write.csv(oso_recruits.df, file = "../output/recruits_deterministic_240516.csv")                       # output recruitment data
+
+#CB: mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns
+pre_fwmt  <- mean(oso_recruits.df[oso_recruits.df$return_year %in% c(1977:2007),]$oso_origin_nat_returns)/1000
+post_fwmt <- mean(oso_recruits.df[oso_recruits.df$return_year %in% c(2008:last_year),]$oso_origin_nat_returns)/1000
+
+#CB: plotting recruits through time
+oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000))+
+  geom_line(linewidth = 0.5)+
+  geom_point(size = 2)+
+  geom_segment(aes(x = 1977,   xend = 2007.5, y = pre_fwmt,  yend = pre_fwmt),  colour = "red",       linewidth = 1.0, linetype = 3)+ # CB: this is for the option of adding the pre- and current freshwater management tools era to compare mean recruits between the two time periods
+  geom_segment(aes(x = 2007.5, xend = 2021,   y = post_fwmt, yend = post_fwmt), colour = "darkgreen", linewidth = 1.0, linetype = 3)+
+  geom_hline(yintercept = mean(oso_recruits.df$oso_origin_nat_returns)/1000,    colour = "blue",      linewidth = 1.0, linetype = 2)+
+  scale_y_continuous(breaks = c(0, 100, 200, 300, 400),
+                     minor_breaks = c(50, 150, 250, 350))+
+  scale_x_continuous(breaks = c(seq(from = 1976, to = last_year, by = 4)))+
+  labs(title="Osoyoos Sockeye Recruits", subtitle = "by Return Year", x="", y = "Sockeye Recruit Abundance (1000s)")+
+  theme_bw()
+# theme_classic()
+
+ggsave(file = "./output/OS_recruits_CB_240516.png", width = 6, height = 3, units = "in") # CB: this saves the plot
+
+
+#CB: creating a timeseries of return year and number of total okanagan and osoyoos & skaha sub-stock recruits, and writing this to a CSV file
+recruits <- oso_recruits.df %>% dplyr::select(return_year, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns)
+write.csv(recruits, "../output/OS_recruits_HS_240516.csv")
+
+```  
+```{r age composition}
+
+age_dat <- read.csv("../data/age_comp_23.04.25.csv")                             #  sox age by return year based on deadpitch vs Fryer
+ac_best <- read.csv("../data/age_comp_best.csv")                                 # "best" sox age composition by return year, smolt year, ocean age
+
+#Age composition of adult returns
+#       a_dat <- age_dat %>% 
+ocean_age_dat <- age_dat %>% 
+  mutate  (return_year = ret_year)    %>%
+  mutate  (o_age = ret_year - s_year) %>%                                       # calculating ocean age
+  group_by(o_age, return_year, ret_year,  s_year) %>% 
+  summarize(ac_fryr = sum(ac_fryer, na.rm = F),                                 #summarizing by unique ocean age/return year combinations
+            ac_sire = sum(ac_sire,  na.rm = F))
+
+acbest <- ac_best %>% 
+  mutate  (return_year = ret_year) %>%
+  pivot_longer(names_to = "age", values_to = "ac_best", cols = c(2:7)) %>%      #converting data to long format
+  mutate(o_age = as.numeric(stri_sub(age, 5, 5)),                               #creating ocean age column from Gilbert-Rich ages
+         s_year = ret_year - o_age) %>%                                         #calculating smolt year
+  dplyr::select(o_age, ret_year, s_year, ac_best) %>% 
+         group_by(o_age, ret_year, s_year) %>% 
+  summarize(ac_best = sum(ac_best, na.rm = F))                                  #summarizing by unique ocean age/return year combinations
+
+# write.csv(acbest,"../output/age_comp_acbest_240516.csv")                       #shows age comp in acbest add up to 100% by return year
+
+a_dat<- left_join(ocean_age_dat, acbest, by = c("o_age", "ret_year", "s_year")) #combining the age composition dataframes
+# write.csv(a_dat_tmp,"../output/age_comp_a_dat_tmp_240516.csv") 
+
+# fixes wrong assignment of age data source to ac_best
+# a_dat[a_dat_tmp$o_age==2 & a_dat_tmp$s_year==2000, 6] <- 0.539                ### what is this for? probably a programmatic fix for data that later got fixed.
+
+# write.csv(a_dat,"../output/age_comp_a_dat_240516.csv") 
+
+#creating a long format dataframe of proportion of return by smolt year and ocean age for plotting purposes
+adat <- a_dat %>% dplyr::select(s_year, o_age, ac_best, ac_fryr, ac_sire) %>% 
+  group_by(s_year, o_age) %>% summarize(ac_fryr = sum(ac_fryr),
+                                 ac_sire = sum(ac_sire),
+                                 ac_best = sum(ac_best)) %>% 
+  pivot_longer(cols = starts_with("ac_"),
+               names_to = "source",
+               values_to = "proportion")
+
+write.csv(adat,"../output/age_comp_adat_240516.csv") 
+
+#plotting age composition
+ggplot(adat %>% filter(s_year > 1997), aes())+
+  geom_point(aes(x = s_year, y = proportion, size = source, colour = source, alpha = source))+
+  geom_line(aes(x = s_year, y = proportion, linewidth = source, colour = source, alpha = source))+
+  scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
+  scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
+  scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
+  scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
+  scale_x_continuous(breaks = c(seq(from = 1985, to = 2021, by = 4)))+
+  facet_wrap(~o_age, ncol = 1)+
+# labs(x = "Smolt year", y = "Proportion of smolts")
+  labs(x = "Smolt year", y = "Proportion of Adults")+
+  theme_bw()
+
+#saving the plot
+ggsave(file = "./OUTPUT/OS_age_comp_CB_240516.png", width = 6.5, height = 8, units = "in")
+
+```
+
+```{r juvenile abund}
+#uv_dat <- read_excel("./data/SIS - Data - OSOYOOS - 24.01.12.xlsx", sheet = "Juvenile Data") #presmolt (was 23.09.26.xlsx)
+juv_dat <- read_excel("./data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
+#Pre-smolt abundance
+j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>% #grabbing the appropriate columns from the excel file
+  dplyr::select(s_year = `Smolt Migration Year`, no_smolt = `...6`) %>% 
+  mutate_at("no_smolt", as.numeric) %>% #selecting columns and converting no_smolt to numeric
+  filter(s_year >=1998, s_year <= last_year)                                                    
+
+```
+
+```{r marine survival}
+
+#calculating marine survival by age composition source 
+#radat <- left_join(recruit %>% dplyr::select(ret_year, oso_sox_mouth = recruit_os), a_dat, by = "ret_year") %>% #joining the recruitment dataframe with the age composition data frame ***NOTE that oso_sox mouth here is the number of osoyoos recruits, not the total number of sockeye of all stocks below Bonneville
+radat  <- left_join(oso_recruits.df %>% dplyr::select(return_year, oso_sox_mouth = oso_origin_nat_returns), a_dat, by = "return_year") %>% #joining the recruitment dataframe with the age composition data frame ***NOTE that oso_sox mouth here is the number of osoyoos recruits, not the total number of sockeye of all stocks below Bonneville
+  mutate(sox_age_fry  = oso_sox_mouth * ac_fryr, #calculating the number of recruits according to each age composition source
+         sox_age_sire = oso_sox_mouth * ac_sire,
+         sox_age_best = oso_sox_mouth * ac_best) %>% 
+  group_by(s_year) %>% summarize(oso_sox_fry = sum(sox_age_fry), #summing the recruits by smolt year
+                                 oso_sox_sire = sum(sox_age_sire),
+                                 oso_sox_best = sum(sox_age_best)) %>% 
+  left_join(., j_dat, by = "s_year") %>% #joining the juvenile dataframe
+  filter(s_year > 1997) %>% #removing all years prior to 1998
+  mutate(fry_surv = oso_sox_fry / no_smolt, #calculating marine survival
+         sire_surv = oso_sox_sire / no_smolt,
+         best_surv = oso_sox_best / no_smolt) %>%
+  dplyr::select(s_year, fry_surv, sire_surv, best_surv) %>% #streamlining the dataset to the relevant columns
+  pivot_longer(cols = ends_with("_surv"), #arranging the data to long format for plotting
+               names_to = "source",
+               values_to = "survival")
+
+#plotting marine survival
+ggplot(radat, aes(x = s_year, y = survival, colour = source))+
+  geom_point(aes(size = source, alpha = source))+
+  geom_line(aes(linewidth = source, alpha = source))+
+  scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
+  scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
+  scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
+  scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
+  labs(x = "Smolt year", y = "Survival (proportion)")+
+  geom_hline(yintercept = sum(radat[radat$source == "best_surv", 3])/nrow(radat[radat$source == "best_surv", 3]), colour = "red", alpha = 0.5)+
+  scale_x_continuous(breaks = c(seq(from = 1985, to = 2021, by = 4)))+
+  theme_bw()
+
+#saving the plot
+ggsave(file = "./output/OS_survival_CB_240516.png", width = 6, height = 3, units = "in")
+
+```
