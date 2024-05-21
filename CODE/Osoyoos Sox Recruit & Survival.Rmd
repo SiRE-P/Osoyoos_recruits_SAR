@@ -535,6 +535,25 @@ ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+
 
 ggsave("../figures/age_composition.png", width = 6.5, height = 4)
 
+age_data.df %>%
+  dplyr::select(-best_age_prop) %>% 
+  gather(key = type, value = prop, prop_Fryer:prop_SIRE) %>%
+  mutate(type = str_remove(type, "prop_")) %>% 
+  mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")) %>% 
+ggplot(aes(x = return_year, y = prop))+
+  geom_point(data = age_data.df %>% mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")), aes(y = best_age_prop), size = 2)+
+  geom_line(data = age_data.df %>% mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")), aes(y = best_age_prop))+
+  geom_point(pch = 16, size = 1.5, aes(color = type))+
+  facet_grid(ocean_age~.)+
+  scale_color_manual(values = c("red", "dodgerblue"), "source")+
+  scale_fill_manual(values = c("red", "dodgerblue"), "source")+
+  ylab("Ocean age proportion")+
+  xlab("Return year")+
+  scale_x_continuous(breaks = seq(1980, 2020, by = 5))+
+  scale_y_continuous(limits = c(0, 1))+
+  theme_bw()
+ggsave("../figures/SIRE_Fryer_age_comparison.png", height = 6, width = 8)
+
 ```
 
 ```{r juvenile abund}
