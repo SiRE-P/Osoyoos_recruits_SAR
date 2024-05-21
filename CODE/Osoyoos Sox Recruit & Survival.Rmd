@@ -17,7 +17,7 @@
 # update: 240416 - CB review of program; fix for apparent negative proportion N-O in 2011 affecting GAM model
 # update: 240426 - fixed bug in filter stmt in chunk {r oso vs ska} that allowed multiple 2011 records (ie filter stmt was disabled in 240416)
 # update: 240510 - prep program for csv inputs only (for ultimate upload to GitHub
-# update: 240515 - 
+# update: 240515 - configure for GitHub repository
 # update: TO DO  - incorporate RY2022 and 2023 data to extend mar-surv time-series to SY2021
 #####
 
@@ -133,9 +133,9 @@ ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+
 # geom_jitter(height=1) +
   geom_label_repel(aes(label = ret_year), fill = "white", colour = "black", size = 3)+ #, nudge_y = 5, nudge_x = -80)+
   geom_text(x=0, y=35, label=stats_txt, hjust="inward", size=4) +
-  labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+
-  ylab("24 hr - 16 hr Count Difference (1000s)")+
-  xlab("16 hr Count (1000s)")+
+  labs(title="Bonneville Dam Sockeye Counts (1000s)", subtitle = "1995-2002, 2013-2022")+
+  ylab("24 hr - 16 hr Count Difference")+
+  xlab("16 hr Count")+
   theme_bw()+
 
 ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
@@ -143,9 +143,9 @@ ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
 # geom_smooth(method = "lm", se=TRUE, alpha = 0.5, color = "white", linewidth = 0.01)+              # alternative line option
   geom_point(colour="black", size=2.5)+
   geom_label_repel(aes(label = ret_year), fill = "white", color = "black", size = 3, nudge_y = 50, nudge_x = -80)+
-  labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+
-  ylab("24 hr Count (1000s)")+
-  xlab("16 hr Count (1000s)")+
+# labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+
+  ylab("24 hr Count")+
+  xlab("16 hr Count")+
   theme_bw()+
   
   plot_annotation(tag_levels = 'A')+                                            # put A and B on Figure
@@ -158,12 +158,12 @@ ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
 
 # ok_riv_deadpitch <- readxl::read_xlsx("./data/OSO_SOX_deadpitch_data_tidy 23.11.30.xlsx") %>%  # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
 #   janitor::clean_names()                                                                       # detection of thermal marks                                # comment out for GitHub
-# write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240516.csv")                        # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
-ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240516.csv")                        # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
+# write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240516.csv")                       # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
+ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240516.csv")                         # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
 
 #pen_channel_deadpitch <-read.csv("../data/skaha_deadpitch_tidy_240208.csv") %>%                # deadpitch for Pen channel fish with thermal mark data 
 pen_channel_deadpitch <- read.csv("../data/skaha_deadpitch_tidy_240227.csv") %>%                # deadpitch version with 26 obs in Section "Skaha Beach" chngd to Pen channel  
-  janitor::clean_names() %>%                                                                   #           (i.e., 26 SK records in 2016: 25N-O, 1H-O)
+  janitor::clean_names() %>%                                                                    #           (i.e., 26 SK records in 2016: 25N-O, 1H-O)
   filter(location == "penticton channel") %>%                                                
   mutate(location = "Penticton Channel")
 
