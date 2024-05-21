@@ -37,11 +37,6 @@ library(patchwork)
 last_year <- 2021     # current last year of returns data handled or available 
 ```
 
-###{r setwd}
-# setwd("C:/Users/thompsonpa/Downloads/R")                                                                             # <-- reset for user directory
-#setwd("C:/DFO-MPO/OneDrive/OneDrive - DFO-MPO/Sockeye Index Stocks/Okanagan/Osoyoos/SAR Analysis/PROGRAMS/R/DATA")     # <-- reset for user directory
-###
-
 ```{r functions}
 cv_gam_loo <- function(data, formula, seed = 123) {
   # Get the number of observations
