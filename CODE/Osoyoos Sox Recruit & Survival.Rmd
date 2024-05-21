@@ -500,19 +500,23 @@ oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000)
   theme_bw()
 # theme_classic()
 
-ggsave(file = "./output/OS_recruits_CB_240516.png", width = 6, height = 3, units = "in") # CB: this saves the plot
+ggsave(file = "../figures/OS_recruits_CB_240516.png", width = 6, height = 3, units = "in") # CB: this saves the plot
 
 
 #CB: creating a timeseries of return year and number of total okanagan and osoyoos & skaha sub-stock recruits, and writing this to a CSV file
 recruits <- oso_recruits.df %>% dplyr::select(return_year, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns)
-write.csv(recruits, "../output/OS_recruits_HS_240516.csv")
+write.csv(recruits, "../figures/OS_recruits_HS_240516.csv")
 
 ```  
 ```{r age composition}
 
-age_data <- read_xlsx("../DATA/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Data at Age")
+# age_data <- read_xlsx("../DATA/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Data at Age") %>% 
+#   dplyr::select(return_year = `Return Year`, prop_Fryer = `Age Comp (Fryer)`, prop_SIRE = `Age Comp (SIRE)`, Age, best_source = `Best Source`)
+# write.csv(age_data,file="../DATA/age_composition_data.csv")
 
-age_data.df <- age_data %>% dplyr::select(return_year = `Return Year`, prop_Fryer = `Age Comp (Fryer)`, prop_SIRE = `Age Comp (SIRE)`, Age, best_source = `Best Source`) %>% 
+age_data <- read.csv("../DATA/age_composition_data.csv")
+
+age_data.df <- age_data %>% 
   mutate(ocean_age = str_sub(Age, start = -1)) %>% 
   group_by(return_year, ocean_age, best_source) %>% 
   summarise(prop_Fryer = sum(prop_Fryer, na.rm = TRUE), prop_SIRE = sum(prop_SIRE, na.rm = TRUE)) %>% 
@@ -534,7 +538,7 @@ ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+
   ylab("Ocean age proportion")+
   xlab("Return year")
 
-ggsave("../output/age_composition.png", width = 6.5, height = 4)
+ggsave("../figures/age_composition.png", width = 6.5, height = 4)
 
 ```
 
@@ -588,6 +592,6 @@ ggplot(radat, aes(x = s_year, y = survival, colour = source))+
   theme_bw()
 
 #saving the plot
-ggsave(file = "./output/OS_survival_CB_240516.png", width = 6, height = 3, units = "in")
+ggsave(file = "../figures/OS_survival_CB_240516.png", width = 6, height = 3, units = "in")
 
 ```
