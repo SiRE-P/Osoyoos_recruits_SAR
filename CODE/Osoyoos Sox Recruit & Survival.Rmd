@@ -524,10 +524,12 @@ age_data.df %>%
   arrange(total)
 
 ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+
-  geom_point(data = age_data.df %>% ungroup() %>% dplyr::select(return_year, best_source) %>% unique(), aes(x = return_year, y = -0.01, color = best_source), size = 3, pch = 15)+
-  geom_area(aes(fill = ocean_age))+
+  geom_point(data = age_data.df %>% ungroup() %>% dplyr::select(return_year, best_source) %>% unique(), aes(x = return_year, y = -0.02, color = best_source), size = 3, pch = 15)+
+  geom_col(aes(fill = ocean_age))+
   scale_fill_viridis_d("ocean age")+
   scale_color_manual(values = c("red", "dodgerblue", "black"), "source")+
+  guides(colour = guide_legend(order = 2), 
+          fill = guide_legend(order = 1))+
   coord_cartesian(expand = FALSE)+
   ylab("Ocean age proportion")+
   xlab("Return year")
