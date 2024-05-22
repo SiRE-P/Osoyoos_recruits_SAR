@@ -34,6 +34,12 @@ library(scales)
 library(ggpubr)       # for adding text boxes with regression coefficients to plots
 library(patchwork)
 
+if (!require(SiREfunctions)) {
+  install.packages("remotes")
+  remotes::install_github("SiRE-P/SiREfunctions")
+}
+library(SiREfunctions)
+
 last_year <- 2021     # current last year of returns data handled or available 
 ```
 
@@ -131,7 +137,7 @@ ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+
   labs(title="Bonneville Dam Sockeye Counts (1000s)", subtitle = "1995-2002, 2013-2022")+
   ylab("24 hr - 16 hr Count Difference")+
   xlab("16 hr Count")+
-  theme_bw()+
+  theme_pt()+
 
 ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
   geom_line(data = bonn_pred_seq, color = "red", linewidth = 1.0)+                                  # PT's predictive regression line
@@ -141,8 +147,8 @@ ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
 # labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+
   ylab("24 hr Count")+
   xlab("16 hr Count")+
-  theme_bw()+
-  
+  theme_pt()+
+
   plot_annotation(tag_levels = 'A')+                                            # put A and B on Figure
   plot_layout(nrow = 2)                                                         # stack figures
 
@@ -225,7 +231,8 @@ ggplot(deadpitch, aes(x = year, y = p_nat))+
                               p_nat = predict(pnat_low_m, data.frame(year = 2007:last_year, osoyoos_stocked = FALSE), type = "response")))+
   geom_line(data = data.frame(section = "Middle Ok River", year = 2009:last_year, 
                               p_nat = predict(pnat_mid_m, data.frame(year = 2009:last_year, osoyoos_stocked = FALSE), type = "response")))+
-  facet_wrap(~section)
+  facet_wrap(~section)+
+  theme_pt()
 
 #add in imputed values
 prop_natural <- bind_rows(deadpitch %>% mutate(type = "sampled"), 
@@ -239,7 +246,8 @@ ggplot(prop_natural, aes(x = year, y = p_nat))+
   geom_point(aes(color = type))+
   geom_line()+
   facet_wrap(~section)+
-  scale_x_continuous(breaks = c(seq(from = 2000, to = 2022, by = 2)))
+  scale_x_continuous(breaks = c(seq(from = 2000, to = 2022, by = 2)))+
+  theme_pt()
 
 #prop_natural_oso <- prop_natural %>%                                           #get just prop natural osoyoos
 #  filter(section == "Lower Ok River")
@@ -400,14 +408,16 @@ spawning_totals %>%
 # geom_line()+
   #geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
   geom_point(size=2)+
-  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2)))
+  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2)))+
+  theme_pt()
 
 spawning_totals %>%                                                                      # plot proportion OSO N-O
   ggplot(aes(x = year, y = prop_ska_origin_nat, color = prop_natural_origin_type))+
 # geom_line()+
   #geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
   geom_point(size=2)+
-  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2)))
+  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2)))+
+  theme_pt()
 
 write.csv(spawning_totals, "../output/Spawning_Totals_HS_240516.csv")
 
@@ -473,7 +483,8 @@ oso_recruits.df %>%                                                             
   ylab(label = "Sockeye (thousands)")+
   xlab(label = "Return Year") +
 # title(main="Sockeye Abundance (x1000) by Return Year",xlab=NULL, ylab=NULL)+
-  facet_wrap(~population, ncol=1)
+  facet_wrap(~population, ncol=1)+
+  theme_pt()
 
 write.csv(oso_recruits.df, file = "../output/recruits_deterministic_240516.csv")                       # output recruitment data
 
@@ -492,8 +503,7 @@ oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000)
                      minor_breaks = c(50, 150, 250, 350))+
   scale_x_continuous(breaks = c(seq(from = 1976, to = last_year, by = 4)))+
   labs(title="Osoyoos Sockeye Recruits", subtitle = "by Return Year", x="", y = "Sockeye Recruit Abundance (1000s)")+
-  theme_bw()
-# theme_classic()
+  theme_pt()
 
 ggsave(file = "../figures/OS_recruits_CB_240516.png", width = 6, height = 3, units = "in") # CB: this saves the plot
 
@@ -531,7 +541,8 @@ ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+
           fill = guide_legend(order = 1))+
   coord_cartesian(expand = FALSE)+
   ylab("Ocean age proportion")+
-  xlab("Return year")
+  xlab("Return year")+
+  theme_pt()
 
 ggsave("../figures/age_composition.png", width = 6.5, height = 4)
 
@@ -551,7 +562,7 @@ ggplot(aes(x = return_year, y = prop))+
   xlab("Return year")+
   scale_x_continuous(breaks = seq(1980, 2020, by = 5))+
   scale_y_continuous(limits = c(0, 1))+
-  theme_bw()
+  theme_pt()
 ggsave("../figures/SIRE_Fryer_age_comparison.png", height = 6, width = 8)
 
 ```
@@ -603,7 +614,7 @@ ggplot(radat, aes(x = s_year, y = survival, colour = source))+
   labs(x = "Smolt year", y = "Survival (proportion)")+
   geom_hline(yintercept = sum(radat[radat$source == "best_surv", 3])/nrow(radat[radat$source == "best_surv", 3]), colour = "red", alpha = 0.5)+
   scale_x_continuous(breaks = c(seq(from = 1985, to = 2021, by = 4)))+
-  theme_bw()
+  theme_pt()
 
 #saving the plot
 ggsave(file = "../figures/OS_survival_CB_240516.png", width = 6, height = 3, units = "in")
