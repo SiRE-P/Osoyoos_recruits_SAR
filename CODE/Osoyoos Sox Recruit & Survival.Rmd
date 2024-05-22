@@ -99,15 +99,6 @@ returns_select <- read.csv("../DATA/returns_select_SIS240212_xlsx_240516.csv")  
 ```{r bonn 16 to 24 hr count adjustment}  
 # estimate 16 to 24 hr count relationship at Bonneville dam, utilizing all years of available data as input to a single model
 
-# linear_eqn_f <- function(x,y) {                # stolen function to be called from ggplot to add linear reg stats to plots...
-#   m <- lm(y ~ x)                               # but it's not working... 
-#   as.character(as.expression(substitute(
-#   italic(y) == a + b %.% italic(x) * "," ~~ italic(r)^2 ~ "=" ~ r2,
-#     list(a = format(coef(m)[1], digits = 4),
-#          b = format(coef(m)[2], digits = 4),
-#          r2 = format(summary(m)$r.squared, digits = 3))
-#   )))}
-
 bonn_16_v_24 <- read.csv("../data/Bonneville_16_v_24.csv")              # input data for years with 24 and 16 hour sockeye counts at Bonneville Dam
 bonn_16_v_24 <- bonn_16_v_24 %>%                                       # BON has two fish ladders: Bradford (OR) and Washington (WA)
   mutate(tot_16 = ifelse(!is.na(tot_16), tot_16, bradford_16hr + washington_16hr),
@@ -355,26 +346,6 @@ spawning_totals_no2011 <- spawning_table %>%                                    
   mutate(prop_oso_origin_nat = oso_nat_origin/(oso_total + ska_total)) %>%
   mutate(prop_ska_origin_nat = ska_nat_origin/(oso_total + ska_total))
 
-### HS: not sure if this helps or is necessary. so commenting out CB's fixes for a "negative number" [240426]
-### CB: giving 2011 a value > 0 so GAM with the binomial distribution being used to impute 2011 can have an input value that isn't negative
-### spawning_totals[spawning_totals$year %in% c(2011), 9]  <- c(rep(0, 1))                     # set ska_nat_origin = 0 (instead of -1,478 which was due to stray rate) [HS 240416]
-### spawning_totals[spawning_totals$year %in% c(2011), 13] <- c(rep(0.0000000001, 1))          # set prop_ska_origin_nat = 0 or so [CB 240416]
-
-### HS: these plots are captured in last step in this chunk, so commented out here [240426]
-# spawning_totals %>% 
-#   ggplot(aes(x = year, y = prop_ska_origin_nat))+
-#   geom_point()+
-#   geom_line()+
-#   geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
-#   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))
-# 
-# spawning_totals %>% 
-#   ggplot(aes(x = year, y = prop_oso_origin_nat))+
-#   geom_point()+
-#   geom_line()+
-#   geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
-#   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))
-
 #fit gam to impute missing 2011 data
 #perform cross validation to determine appropriate df on year spline
 #filtering out early years where the proportion is 1
@@ -506,7 +477,6 @@ oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000)
   theme_pt()
 
 ggsave(file = "../figures/OS_recruits_CB_240516.png", width = 6, height = 3, units = "in") # CB: this saves the plot
-
 
 #CB: creating a timeseries of return year and number of total okanagan and osoyoos & skaha sub-stock recruits, and writing this to a CSV file
 recruits <- oso_recruits.df %>% dplyr::select(return_year, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns)
