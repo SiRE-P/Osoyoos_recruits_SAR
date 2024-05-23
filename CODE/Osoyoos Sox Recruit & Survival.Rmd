@@ -124,7 +124,7 @@ ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+
   geom_point(colour="black", size=2.5)+
 # geom_jitter(height=1) +
   geom_label_repel(aes(label = ret_year), fill = "white", colour = "black", size = 3)+ #, nudge_y = 5, nudge_x = -80)+
-  geom_text(x=0, y=35, label=stats_txt, hjust="inward", size=4) +
+  geom_text(x=0, y=36, label=stats_txt, hjust="inward", size=4) +
   labs(title="Bonneville Dam Sockeye Counts (1000s)", subtitle = "1995-2002, 2013-2022")+
   ylab("24 hr - 16 hr Count Difference")+
   xlab("16 hr Count")+
@@ -225,24 +225,33 @@ ggplot(deadpitch, aes(x = year, y = p_nat))+
   geom_line(data = data.frame(section = "Middle Ok River", year = 2009:last_year, 
                               p_nat = predict(pnat_mid_m, data.frame(year = 2009:last_year, osoyoos_stocked = FALSE), type = "response")))+
   facet_wrap(~section)+
-  theme_pt()
+  scale_x_continuous(breaks = c(seq(from = 2000, to = 2022, by = 4)))+
+  theme_pt(major_grid=TRUE)
 
 #add in imputed values
-prop_natural <- bind_rows(deadpitch %>% mutate(type = "sampled"), 
-                data.frame(year = 2019, section = "Lower Ok River", type = "imputed", 
+prop_natural <- bind_rows(deadpitch %>% mutate(type = "Sampled"), 
+                data.frame(year = 2019, section = "Lower Ok River", type = "Imputed", 
                            p_nat = predict(pnat_low_m, data.frame(year = 2019, osoyoos_stocked = FALSE), type = "response")),
-                data.frame(year = c(2016, 2019), section = "Middle Ok River", type = "imputed", 
+                data.frame(year = c(2016, 2019), section = "Middle Ok River", type = "Imputed", 
                            p_nat = predict(pnat_mid_m, data.frame(year = c(2016, 2019), osoyoos_stocked = FALSE), type = "response"))) %>% 
                 arrange(section, year)
 
 ggplot(prop_natural, aes(x = year, y = p_nat))+
-  geom_point(aes(color = type))+
   geom_line()+
+  geom_point(aes(color = type))+
   facet_wrap(~section)+
-  scale_x_continuous(breaks = c(seq(from = 2000, to = 2022, by = 2)))+
-  theme_pt()
+  scale_x_continuous(breaks = c(seq(from = 2000, to = 2024, by = 2)))+
+  ylab("Proportion Natural Origin")+
+  xlab(NULL)+
+  labs(type="Sample Type")+                                                     # label for legend? ### doesn't work
+  theme_pt(major_grid=TRUE)+
+  theme(legend.position = "bottom", legend.title = element_text(size=9),
+        legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
 
-#prop_natural_oso <- prop_natural %>%                                           #get just prop natural osoyoos
+filename <- paste("../figures/Prop_Nat_Origin_", timestamp, ".png", sep = "")   # filename for figure output 
+ggsave(file = filename, width = 6, height = 6, units = "in")                    # saves the plot to filename
+
+#prop_natural_oso <- prop_natural %>%                                           # get just prop natural osoyoos
 #  filter(section == "Lower Ok River")
 ```  
 
