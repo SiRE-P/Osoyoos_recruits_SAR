@@ -35,6 +35,7 @@ library(ggpubr)       # for adding text boxes with regression coefficients to pl
 library(patchwork)
 
 if (!require(SiREfunctions)) {
+  install.packages("devtools")
   install.packages("remotes")
   remotes::install_github("SiRE-P/SiREfunctions")
 }
@@ -110,7 +111,7 @@ bonn_16_v_24 <- bonn_16_v_24 %>%                                       # BON has
 bonn_model <- glm.nb((diff) ~ log(tot_16), data = bonn_16_v_24, link = "log") # predictive model: diff as func of log(16-hr counts); link=log applies only to response var
 
 corrbonn <- corrr::correlate(log(bonn_16_v_24$tot_16), y = log(bonn_16_v_24$diff))    # r = 0.98 
-stats_txt = "ln(Y) = -4.89 + 1.15 * ln(X); r = 0.98; deviance = 18.2"                 # stats to annotate regression plot   
+stats_txt = "ln(Y) = -4.89 + 1.15 * ln(X); r2 = 0.96; dev = 18.2"                     # stats to annotate regression plot   
 
 tot16_seq <- data.frame(tot_16 = seq(min(bonn_16_v_24$tot_16), max(bonn_16_v_24$tot_16), length= 100))   # makes a sequence to predict over so we can get the line in the plot
 
@@ -128,7 +129,7 @@ ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+
   labs(title="Bonneville Dam Sockeye Counts (1000s)", subtitle = "1995-2002, 2013-2022")+
   ylab("24 hr - 16 hr Count Difference")+
   xlab("16 hr Count")+
-  theme_pt()+
+  theme_pt(major_grid=TRUE)+
 
 ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
   geom_line(data = bonn_pred_seq, color = "red", linewidth = 1.0)+                                  # PT's predictive regression line
@@ -138,11 +139,12 @@ ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
 # labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+
   ylab("24 hr Count")+
   xlab("16 hr Count")+
-  theme_pt()+
+  theme_pt(major_grid=TRUE)+
 
   plot_annotation(tag_levels = 'A')+                                            # put A and B on Figure
   plot_layout(nrow = 2)                                                         # stack figures
 
+ggsave(file = "../figures/Bon_Dam_Counts_240523.png", width = 6, height = 6, units = "in") # saves the plot
 ```  
 
 ```{r proportion hatch and natch}  
@@ -530,7 +532,7 @@ ggplot(aes(x = return_year, y = prop))+
   scale_fill_manual(values = c("red", "dodgerblue"), "source")+
   ylab("Ocean age proportion")+
   xlab("Return year")+
-  scale_x_continuous(breaks = seq(1980, 2020, by = 5))+
+  scale_x_continuous(breaks = seq(1980, 2025, by = 5))+
   scale_y_continuous(limits = c(0, 1))+
   theme_pt()
 ggsave("../figures/SIRE_Fryer_age_comparison.png", height = 6, width = 8)
