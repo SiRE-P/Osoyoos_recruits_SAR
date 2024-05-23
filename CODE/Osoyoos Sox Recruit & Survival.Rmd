@@ -1,5 +1,4 @@
 ```{r setup, include=FALSE}
-
 #####
 # title:  "Osoyoos Sockeye Recruitment Estimation"
 # author: "Colin Bailey, Patrick Thompson, Howard Stiff"
@@ -20,6 +19,8 @@
 # update: 240515 - configure for GitHub repository
 # update: TO DO  - incorporate RY2022 and 2023 data to extend mar-surv time-series to SY2021
 #####
+
+timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -77,7 +78,6 @@ cv_gam_loo <- function(data, formula, seed = 123) {
   # Return the average errors
   return(mean_mse)
 }
-
 ```
 
 ```{r import returns}
@@ -85,16 +85,15 @@ cv_gam_loo <- function(data, formula, seed = 123) {
 #         NOTE : if relevant changes are ever made to SIS worksheet, then uncomment out xlsx import statements and write statement & rerun chunk & program
 #                OR: alternatively, leave all statements uncommented (for data changes in SIS) until final execution and then comment out for upload to GitHub
 
-#returns_data<- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Sockeye Returns Data") %>%   # assign to latest SIS workbook - now obsolete
+#returns_data<- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Sockeye Returns Data") %>%     # assign to latest SIS workbook - now obsolete
 # returns_data <- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.05.13.xlsx", sheet = "Sockeye Returns Data") %>%   # latest SIS workbook - update to Total Harvest (all fisheries) below BON
 # janitor::clean_names()                                                                                                 # (which is 24.05.13.xlsx as of 240515)
 # returns_select <- returns_data %>%                                                                                     # input BON dam counts, Snake abund., d/s harvest & stock composition %
 # filter(!is.na(return_year), return_year <= last_year) %>%
 # dplyr::select(return_year, tot_bonn_16hr = total_sox_bonn_16_hour, total_sockeye_snake, ok_stock_comp_percent_best, total_comm_harvest_below_bonn)
-# write.csv(returns_select,"../data/returns_select_SIS240212_xlsx_240516.csv")                                          # if SIS xlsx data imported, re-write to CSV
+# write.csv(returns_select,"../data/returns_select_SIS240212_xlsx_240516.csv")                                           # if SIS xlsx data imported, re-write to CSV
 
-returns_select <- read.csv("../DATA/returns_select_SIS240212_xlsx_240516.csv")                                        # replaces import data from SIS workbook [240510]
-
+returns_select <- read.csv("../DATA/returns_select_SIS240212_xlsx_240516.csv")                                           # replaces import data from SIS workbook [240510]
 ```
 
 ```{r bonn 16 to 24 hr count adjustment}  
@@ -144,7 +143,8 @@ ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
   plot_annotation(tag_levels = 'A')+                                            # put A and B on Figure
   plot_layout(nrow = 2)                                                         # stack figures
 
-ggsave(file = "../figures/Bon_Dam_Counts_240523.png", width = 6, height = 6, units = "in") # saves the plot
+filename <- paste("../figures/Bon_Dam_Counts_", timestamp, ".png", sep = "")    # figure output filename
+ggsave(file = filename, width = 6, height = 6, units = "in")                    # saves the plot
 ```  
 
 ```{r proportion hatch and natch}  
