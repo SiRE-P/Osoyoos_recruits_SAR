@@ -129,13 +129,14 @@ ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+
   ylab("24 hr - 16 hr Count Difference")+
   xlab("16 hr Count")+
   theme_pt(major_grid=TRUE)+
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))+             # theme_pt centers main title but not subtitle
 
 ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
   geom_line(data = bonn_pred_seq, color = "red", linewidth = 1.0)+                                  # PT's predictive regression line
 # geom_smooth(method = "lm", se=TRUE, alpha = 0.5, color = "white", linewidth = 0.01)+              # alternative line option
   geom_point(colour="black", size=2.5)+
   geom_label_repel(aes(label = ret_year), fill = "white", color = "black", size = 3, nudge_y = 50, nudge_x = -80)+
-# labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+
+# labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+                   
   ylab("24 hr Count")+
   xlab("16 hr Count")+
   theme_pt(major_grid=TRUE)+
