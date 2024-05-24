@@ -241,7 +241,8 @@ ggplot(prop_natural, aes(x = year, y = p_nat))+
   geom_point(aes(color = type))+
   facet_wrap(~section)+
   scale_x_continuous(breaks = c(seq(from = 2000, to = 2024, by = 2)))+
-  ylab("Proportion Natural Origin")+
+  labs(title="Proportion Natural Origin")+
+  ylab("Proportion")+
   xlab(NULL)+
   labs(type="Sample Type")+                                                     # label for legend? ### doesn't work
   theme_pt(major_grid=TRUE)+
