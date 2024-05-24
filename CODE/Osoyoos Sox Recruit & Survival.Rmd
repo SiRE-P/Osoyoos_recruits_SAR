@@ -150,10 +150,13 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 ```{r proportion hatch and natch}  
 # estimates of hatchery numbers      ### NOTE: initial ok_riv_deadpitch import from XLSX should be commented out for final GitHub version. ###
 
-# ok_riv_deadpitch <- readxl::read_xlsx("./data/OSO_SOX_deadpitch_data_tidy 23.11.30.xlsx") %>%  # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
-#   janitor::clean_names()                                                                       # detection of thermal marks                                # comment out for GitHub
+# ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 23.11.30.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
+  ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 24.05.24.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
+    janitor::clean_names()                                                                       # detection of thermal marks                                # comment out for GitHub
 # write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240516.csv")                       # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
-ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240516.csv")                         # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
+  write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                       # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
+#ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240516.csv")                         # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
+ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240524.csv")                         # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
 
 #pen_channel_deadpitch <-read.csv("../data/skaha_deadpitch_tidy_240208.csv") %>%                # deadpitch for Pen channel fish with thermal mark data 
 pen_channel_deadpitch <- read.csv("../data/skaha_deadpitch_tidy_240227.csv") %>%                # deadpitch version with 26 obs in Section "Skaha Beach" chngd to Pen channel  
