@@ -151,20 +151,18 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 # estimates of hatchery numbers      ### NOTE: initial ok_riv_deadpitch import from XLSX should be commented out for final GitHub version. ###
 
 # ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 23.11.30.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
-  ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 24.05.24.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
-    janitor::clean_names()                                                                       # detection of thermal marks                                # comment out for GitHub
-# write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240516.csv")                       # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
-  write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                       # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
-#ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240516.csv")                         # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
+# ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 24.05.24.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
+#     janitor::clean_names()                                                                     # detection of thermal marks                                # comment out for GitHub
+# write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                       # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
 ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240524.csv")                         # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
 
-#pen_channel_deadpitch <-read.csv("../data/skaha_deadpitch_tidy_240208.csv") %>%                # deadpitch for Pen channel fish with thermal mark data 
-pen_channel_deadpitch <- read.csv("../data/skaha_deadpitch_tidy_240227.csv") %>%                # deadpitch version with 26 obs in Section "Skaha Beach" chngd to Pen channel  
-  janitor::clean_names() %>%                                                                    #           (i.e., 26 SK records in 2016: 25N-O, 1H-O)
+#pen_channel_deadpitch <-read.csv("../data/skaha_deadpitch_tidy_240208.csv") %>%                 # deadpitch for Pen channel fish with thermal mark data 
+pen_channel_deadpitch <- read.csv("../data/skaha_deadpitch_tidy_240227.csv") %>%                 # deadpitch version with 26 obs in Section "Skaha Beach" chngd to Pen channel  
+  janitor::clean_names() %>%                                                                     #           (i.e., 26 SK records in 2016: 25N-O, 1H-O)
   filter(location == "penticton channel") %>%                                                
   mutate(location = "Penticton Channel")
 
-shingle_deadpitch <- read.csv("../data/shingle_deadpitch.csv") %>%                              # deadpitch for Shingle Ck fish with thermal marks 
+shingle_deadpitch <- read.csv("../data/shingle_deadpitch.csv") %>%                               # deadpitch for Shingle Ck fish with thermal marks 
   janitor::clean_names()
 
 deadpitch_low_mid <- ok_riv_deadpitch %>%                           # process lower and middle Ok River data...
@@ -263,9 +261,9 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 # osoyoos vs. skaha data     ### NOTE: initial AUC_data_Import import from XLSX should be commented out for final GitHub version. ###
 
 # AUC_data_Import <- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                               # comment out for GitHub
-#   janitor::clean_names()                                                                                                                                      # comment out for GitHub  
-# write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240516.csv")                        # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
-AUC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_240516.csv")                        # replaces AUC data from SIS xlsx workbook                       # keep for GitHub [240510]
+#   janitor::clean_names()   # comment out for GitHub  
+# write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240516.csv")        # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
+AUC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_240516.csv")          # replaces AUC data from SIS xlsx workbook                       # keep for GitHub [240510]
 
 AUC_data <- AUC_data_Import %>% 
   dplyr::select(rearing_lake, spawning_location, year, spawning_nerkids, percent_35cm_fl) %>% 
@@ -334,7 +332,7 @@ spawning_table <- spawning_location %>%                                         
   summarise(total_sockeye = sum(total_sockeye), natural_sockeye = sum(natural_sockeye))    # aggregate by rearing lake
   
 stray_correct <- function(obs_focal, obs_other, stray_focal, stray_other){
-  ((stray_other - 1) * obs_focal + stray_other * obs_other)/(stray_focal + stray_other - 1)}
+  ((stray_other - 1) * obs_focal + stray_other * obs_other)/(stray_focal + stray_other - 1)}  ### move this function to top of code???
 
 spawning_totals_no2011 <- spawning_table %>%                                               # tabulate spawning ground data (total sox, prop. natural, strays, etc) by year
   dplyr::select(-natural_sockeye) %>% 
@@ -405,8 +403,8 @@ spawning_totals %>%                                                             
   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2)))+
   theme_pt()
 
-write.csv(spawning_totals, "../output/Spawning_Totals_HS_240516.csv")
-
+filename <- paste("../output/Spawning_Totals_", timestamp, ".csv", sep = "")    # filename for recruitment output 
+write.csv(spawning_totals, filename)                                            # saves the data to filename
 ```  
 
 ```{r oso recruitment}  
@@ -472,32 +470,35 @@ oso_recruits.df %>%                                                             
   facet_wrap(~population, ncol=1)+
   theme_pt()
 
-write.csv(oso_recruits.df, file = "../output/recruits_deterministic_240516.csv")                       # output recruitment data
+filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")   # filename for recruitment output 
+write.csv(oso_recruits.df, filename)                                                    # saves the data to filename
 
-#CB: mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns
+# mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns  
 pre_fwmt  <- mean(oso_recruits.df[oso_recruits.df$return_year %in% c(1977:2007),]$oso_origin_nat_returns)/1000
-post_fwmt <- mean(oso_recruits.df[oso_recruits.df$return_year %in% c(2008:last_year),]$oso_origin_nat_returns)/1000
+post_fwmt <- mean(oso_recruits.df[oso_recruits.df$return_year %in% c(2008:last_year),]$oso_origin_nat_returns)/1000 ### compute geometric mean ###
 
-#CB: plotting recruits through time
+# plot recruits through time
 oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000))+
   geom_line(linewidth = 0.5)+
   geom_point(size = 2)+
   geom_segment(aes(x = 1977,   xend = 2007.5, y = pre_fwmt,  yend = pre_fwmt),  colour = "red",       linewidth = 1.0, linetype = 3)+ # CB: this is for the option of adding the pre- and current freshwater management tools era to compare mean recruits between the two time periods
   geom_segment(aes(x = 2007.5, xend = 2021,   y = post_fwmt, yend = post_fwmt), colour = "darkgreen", linewidth = 1.0, linetype = 3)+
   geom_hline(yintercept = mean(oso_recruits.df$oso_origin_nat_returns)/1000,    colour = "blue",      linewidth = 1.0, linetype = 2)+
-  scale_y_continuous(breaks = c(0, 100, 200, 300, 400),
+  scale_y_continuous(breaks       = c( 0, 100, 200, 300, 400),
                      minor_breaks = c(50, 150, 250, 350))+
   scale_x_continuous(breaks = c(seq(from = 1976, to = last_year, by = 4)))+
   labs(title="Osoyoos Sockeye Recruits", subtitle = "by Return Year", x="", y = "Sockeye Recruit Abundance (1000s)")+
   theme_pt()
 
-ggsave(file = "../figures/OS_recruits_CB_240516.png", width = 6, height = 3, units = "in") # CB: this saves the plot
+filename <- paste("../figures/OSO_Recruits_", timestamp, ".png", sep = "")      # filename for figure output 
+ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
 
-#CB: creating a timeseries of return year and number of total okanagan and osoyoos & skaha sub-stock recruits, and writing this to a CSV file
+# create timeseries of return year and number of total okanagan, osoyoos & skaha sub-stock recruits, and write to a CSV file
 recruits <- oso_recruits.df %>% dplyr::select(return_year, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns)
-write.csv(recruits, "../figures/OS_recruits_HS_240516.csv")
-
+filename <- paste("../output/OSO_Recruits_", timestamp, ".csv", sep = "")       # filename for recruitment output 
+write.csv(recruits, filename)                                                   # saves the data to filename
 ```  
+
 ```{r age composition}
 
 # age_data <- read_xlsx("../DATA/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Data at Age") %>% 
@@ -517,7 +518,7 @@ age_data.df %>%
   summarise(total = sum(prop_SIRE)) %>% 
   arrange(total)
 
-ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+
+ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   #stacked 100% bar plot of annual age composition    
   geom_point(data = age_data.df %>% ungroup() %>% dplyr::select(return_year, best_source) %>% unique(), aes(x = return_year, y = -0.02, color = best_source), size = 3, pch = 15)+
   geom_col(aes(fill = ocean_age))+
   scale_fill_viridis_d("ocean age")+
@@ -529,9 +530,10 @@ ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+
   xlab("Return year")+
   theme_pt()
 
-ggsave("../figures/age_composition.png", width = 6.5, height = 4)
+filename <- paste("../figures/Age_Composition_", timestamp, ".png", sep = "")   # filename for figure output 
+ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
 
-age_data.df %>%
+age_data.df %>%                                                                 # compare SiRE/ONA vs CRITFC/Fryer annual age comp% by ocean age
   dplyr::select(-best_age_prop) %>% 
   gather(key = type, value = prop, prop_Fryer:prop_SIRE) %>%
   mutate(type = str_remove(type, "prop_")) %>% 
@@ -548,7 +550,9 @@ ggplot(aes(x = return_year, y = prop))+
   scale_x_continuous(breaks = seq(1980, 2025, by = 5))+
   scale_y_continuous(limits = c(0, 1))+
   theme_pt()
-ggsave("../figures/SIRE_Fryer_age_comparison.png", height = 6, width = 8)
+
+filename <- paste("../figures/Compare_SiRE_Fryer_Age_Comp_", timestamp, ".png", sep = "")   # filename for figure output 
+ggsave(file = filename, width = 6, height = 6, units = "in")                                # saves the plot to filename
 
 ```
 
@@ -602,6 +606,7 @@ ggplot(radat, aes(x = s_year, y = survival, colour = source))+
   theme_pt()
 
 #saving the plot
-ggsave(file = "../figures/OS_survival_CB_240516.png", width = 6, height = 3, units = "in")
+filename <- paste("../figures/OSO_SAR_Survival_", timestamp, ".png", sep = "")   # filename for figure output 
+ggsave(file = filename, width = 6, height = 4, units = "in")                     # saves the plot to filename
 
 ```
