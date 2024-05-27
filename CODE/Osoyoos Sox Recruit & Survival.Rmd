@@ -17,6 +17,7 @@
 # update: 240426 - fixed bug in filter stmt in chunk {r oso vs ska} that allowed multiple 2011 records (ie filter stmt was disabled in 240416)
 # update: 240510 - prep program for csv inputs only (for ultimate upload to GitHub
 # update: 240515 - configure for GitHub repository
+# update: 240524 + see GitHub
 # update: TO DO  - incorporate RY2022 and 2023 data to extend mar-surv time-series to SY2021
 #####
 
@@ -446,7 +447,7 @@ oso_recruits.df <- oso_recruits %>%
   mutate(oso_origin_nat_returns = round(okanagan * prop_oso_origin_nat,0)) %>%                                 # OSO N-O abundance
   mutate(ska_origin_nat_returns = round(okanagan * prop_ska_origin_nat,0)) %>%                                 # SKA N-O abundance
   mutate(hatchery_returns = round(okanagan - oso_origin_nat_returns - ska_origin_nat_returns,0)) %>%           # SKA H-O abundance
-  mutate(ska_total_returns = ifelse(return_year == 2013, ska_origin_nat_returns + 0.5 * hatchery_returns,      # SKA total = H-O + N-O (presuming 50% of H-O returns --> SKA in RY2013 (since half or BY2009 releases were in SKA and half in OSO lake...
+  mutate(ska_total_returns = ifelse(return_year == 2013, ska_origin_nat_returns + 0.5 * hatchery_returns,      # SKA total = H-O + N-O (presuming 50% of H-O returns in RY2013 --> SKA (since half or BY2009 releases were in SKA and half in OSO lake...
                                     ifelse(return_year %in% c(2015, 2016, 2017),ska_origin_nat_returns,        #                        whereas in RY2015 & 2016, all H-O returns were of OSO origin, so add nont to Skaha...
                                            ska_origin_nat_returns + hatchery_returns))) %>%                    #                        otherwise, for all other years, set SKA Total Recruits = SKA N-O + H-O 
   mutate(prop_oso_strays = round(prop_oso_strays,3)) %>%
