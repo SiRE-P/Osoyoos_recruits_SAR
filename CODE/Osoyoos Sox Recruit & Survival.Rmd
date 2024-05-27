@@ -402,7 +402,11 @@ spawning_totals %>%                                                             
   #geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
   geom_point(size=2)+
   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2)))+
-  theme_pt()
+  theme_pt()+
+  theme_pt(major_grid=TRUE)+
+  theme(legend.position = "bottom", legend.title = element_text(size=9),
+        legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
+
 
 filename <- paste("../output/Spawning_Totals_", timestamp, ".csv", sep = "")    # filename for recruitment output 
 write.csv(spawning_totals, filename)                                            # saves the data to filename
@@ -438,11 +442,15 @@ oso_recruits <- returns_select %>%
 oso_recruits.df <- oso_recruits %>% 
   mutate(columbia = round(bonn_dam_est - total_sockeye_snake + total_comm_harvest_below_bonn,0)) %>%           # total SK to mouth of Columbia
   mutate(okanagan = round(columbia * ok_stock_comp_percent_best,0)) %>%                                        # Ok-bound SK at mouth of Columbia
+  mutate(wenatchee = round(columbia - okanagan)) %>%                                                           # Wen-bound SK at mouth of Columbia
   mutate(oso_origin_nat_returns = round(okanagan * prop_oso_origin_nat,0)) %>%                                 # OSO N-O abundance
   mutate(ska_origin_nat_returns = round(okanagan * prop_ska_origin_nat,0)) %>%                                 # SKA N-O abundance
   mutate(hatchery_returns = round(okanagan - oso_origin_nat_returns - ska_origin_nat_returns,0)) %>%           # SKA H-O abundance
+  mutate(ska_total_returns = ifelse(return_year == 2013, ska_origin_nat_returns + 0.5 * hatchery_returns,      # SKA total = H-O + N-O (presuming 50% of H-O returns --> SKA in RY2013 (since half or BY2009 releases were in SKA and half in OSO lake...
+                                    ifelse(return_year %in% c(2015, 2016, 2017),ska_origin_nat_returns,        #                        whereas in RY2015 & 2016, all H-O returns were of OSO origin, so add nont to Skaha...
+                                           ska_origin_nat_returns + hatchery_returns))) %>%                    #                        otherwise, for all other years, set SKA Total Recruits = SKA N-O + H-O 
   mutate(prop_oso_strays = round(prop_oso_strays,3)) %>%
-  mutate(prop_ska_strays = round(prop_ska_strays,3)) %>%                                                       # round off column data... 
+  mutate(prop_ska_strays = round(prop_ska_strays,3)) %>%                                                       # these next statements refer to spawning ground totals... 
   mutate(oso_total = round(oso_total,0)) %>%
   mutate(ska_total = round(ska_total,0)) %>%
   mutate(oso_nat = round(oso_nat,0)) %>%
@@ -465,11 +473,13 @@ oso_recruits.df %>%                                                             
   scale_x_continuous(breaks = c(seq(from = 1985, to = 2025, by = 5)))+
 # scale_y_continuous(labels = scales::label_comma(trim = TRUE))+
   scale_y_continuous(labels = label_number(suffix = "", scale = 1e-3))+
-  ylab(label = "Sockeye (thousands)")+
-  xlab(label = "Return Year") +
+# ylab(label = "Sockeye (thousands)")+
+# xlab(label = "Return Year") +
 # title(main="Sockeye Abundance (x1000) by Return Year",xlab=NULL, ylab=NULL)+
+  labs(title="Osoyoos Sockeye Recruits", subtitle = "by Return Year", x="", y = "Sockeye Recruit Abundance (1000s)")+
   facet_wrap(~population, ncol=1)+
-  theme_pt()
+  theme_pt(major_grid=TRUE)+
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
 filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")   # filename for recruitment output 
 write.csv(oso_recruits.df, filename)                                                    # saves the data to filename
@@ -489,13 +499,17 @@ oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000)
                      minor_breaks = c(50, 150, 250, 350))+
   scale_x_continuous(breaks = c(seq(from = 1976, to = last_year, by = 4)))+
   labs(title="Osoyoos Sockeye Recruits", subtitle = "by Return Year", x="", y = "Sockeye Recruit Abundance (1000s)")+
-  theme_pt()
+  theme_pt(major_grid=TRUE)+
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+  
 
 filename <- paste("../figures/OSO_Recruits_", timestamp, ".png", sep = "")      # filename for figure output 
 ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
 
 # create timeseries of return year and number of total okanagan, osoyoos & skaha sub-stock recruits, and write to a CSV file
-recruits <- oso_recruits.df %>% dplyr::select(return_year, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns)
+recruits <- oso_recruits.df %>% 
+  dplyr::select(return_year, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns, ska_total_returns)
+
 filename <- paste("../output/OSO_Recruits_", timestamp, ".csv", sep = "")       # filename for recruitment output 
 write.csv(recruits, filename)                                                   # saves the data to filename
 ```  
