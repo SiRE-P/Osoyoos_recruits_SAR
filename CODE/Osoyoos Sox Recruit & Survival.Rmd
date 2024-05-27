@@ -43,7 +43,7 @@ if (!require(SiREfunctions)) {
 }
 library(SiREfunctions)
 
-last_year <- 2021     # current last year of returns data handled or available 
+last_year <- 2023     # current last year of returns data handled or available 
 ```
 
 ```{r functions}
@@ -86,15 +86,15 @@ cv_gam_loo <- function(data, formula, seed = 123) {
 #         NOTE : if relevant changes are ever made to SIS worksheet, then uncomment out xlsx import statements and write statement & rerun chunk & program
 #                OR: alternatively, leave all statements uncommented (for data changes in SIS) until final execution and then comment out for upload to GitHub
 
-#returns_data<- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Sockeye Returns Data") %>%     # assign to latest SIS workbook - now obsolete
-# returns_data <- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.05.13.xlsx", sheet = "Sockeye Returns Data") %>%   # latest SIS workbook - update to Total Harvest (all fisheries) below BON
+#returns_data<- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Sockeye Returns Data") %>%    # assign to latest SIS workbook - now obsolete
+# returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.05.13.xlsx", sheet = "Sockeye Returns Data") %>%  # latest SIS workbook - update to Total Harvest (all fisheries) below BON
 # janitor::clean_names()                                                                                                 # (which is 24.05.13.xlsx as of 240515)
 # returns_select <- returns_data %>%                                                                                     # input BON dam counts, Snake abund., d/s harvest & stock composition %
 # filter(!is.na(return_year), return_year <= last_year) %>%
 # dplyr::select(return_year, tot_bonn_16hr = total_sox_bonn_16_hour, total_sockeye_snake, ok_stock_comp_percent_best, total_comm_harvest_below_bonn)
-# write.csv(returns_select,"../data/returns_select_SIS240212_xlsx_240516.csv")                                           # if SIS xlsx data imported, re-write to CSV
+# write.csv(returns_select,"../data/returns_select_SIS240212_xlsx_240526.csv")                                           # if SIS xlsx data imported, re-write to CSV
 
-returns_select <- read.csv("../DATA/returns_select_SIS240212_xlsx_240516.csv")                                           # replaces import data from SIS workbook [240510]
+returns_select <- read.csv("../DATA/returns_select_SIS240212_xlsx_240526.csv")                                           # replaces import data from SIS workbook [240510]
 ```
 
 ```{r bonn 16 to 24 hr count adjustment}  
@@ -438,12 +438,18 @@ oso_recruits <- returns_select %>%
   mutate(prop_oso_origin_nat  = ifelse(is.na(prop_oso_origin_nat ), 1, round(prop_oso_origin_nat,3))) %>% 
   mutate(prop_ska_origin_nat  = ifelse(is.na(prop_ska_origin_nat ), 0, round(prop_ska_origin_nat,3))) %>% 
   mutate(total_comm_harvest_below_bonn =                                                              # this var is actually ALL harvest below BON (REC, COMM, TREATY) - data update (Ryan Lothrop WDFW May 2024)
-         ifelse(is.na(total_comm_harvest_below_bonn), 0, total_comm_harvest_below_bonn))              # set missing harvest to 0
-                                                                                                      # revisit decision to set harvest=0 when NA  
+         ifelse(is.na(total_comm_harvest_below_bonn), 0, total_comm_harvest_below_bonn))              # set missing harvest to 0 # revisit decision to set harvest=0 when NA 
+oso_recruits$X <- NULL                                                                                # drop X (extra observation counter?)
+
+###
+oso_recruits$prop_oso_origin_nat[46] <- 0.719;  oso_recruits$prop_ska_origin_nat[46] <- 1 - oso_recruits$prop_oso_origin_nat[46] ### Hardwire Prop OSO for 2022 till raw input data are available
+oso_recruits$prop_oso_origin_nat[47] <- 0.542;  oso_recruits$prop_ska_origin_nat[47] <- 1 - oso_recruits$prop_oso_origin_nat[47] ### Hardwire Prop OSO for 2023 till raw input data are available
+###
+
 oso_recruits.df <- oso_recruits %>% 
   mutate(columbia = round(bonn_dam_est - total_sockeye_snake + total_comm_harvest_below_bonn,0)) %>%           # total SK to mouth of Columbia
-  mutate(okanagan = round(columbia * ok_stock_comp_percent_best,0)) %>%                                        # Ok-bound SK at mouth of Columbia
-  mutate(wenatchee = round(columbia - okanagan)) %>%                                                           # Wen-bound SK at mouth of Columbia
+  mutate(wenatchee = round(columbia * (1 - ok_stock_comp_percent_best),0)) %>%                                 # Wen-bound SK at mouth of Columbia
+  mutate(okanagan = round(columbia * ok_stock_comp_percent_best,0)) %>%                                        # Oka-bound SK at mouth of Columbia
   mutate(oso_origin_nat_returns = round(okanagan * prop_oso_origin_nat,0)) %>%                                 # OSO N-O abundance
   mutate(ska_origin_nat_returns = round(okanagan * prop_ska_origin_nat,0)) %>%                                 # SKA N-O abundance
   mutate(hatchery_returns = round(okanagan - oso_origin_nat_returns - ska_origin_nat_returns,0)) %>%           # SKA H-O abundance
@@ -462,16 +468,19 @@ oso_recruits.df <- oso_recruits %>%
   mutate(ska_total = round(ska_total,0)) %>%
   mutate(oso_strays = round(oso_strays,0)) %>%
   mutate(ska_strays = round(ska_strays,0)) 
-  
+
+filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")   # filename for recruitment output 
+write.csv(oso_recruits.df, filename)                                                    # saves the data to filename
+
 oso_recruits.df %>%                                                                                   # facet plots
-  filter(return_year > 1984) %>% 
+# filter(return_year > 1984) %>% 
   dplyr::select(return_year, columbia, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns) %>% 
 # dplyr::select(return_year, columbia, okanagan, osoyoos_origin_returns, osoyoos_origin_returns_no_strays, 
 #               osoyoos_natural_origin_no_strays, skaha_origin_returns) %>% 
   gather(key = population, value = sockeye, -return_year) %>% 
   ggplot(aes(x = return_year, y = sockeye))+
   geom_line()+
-  scale_x_continuous(breaks = c(seq(from = 1985, to = 2025, by = 5)))+
+  scale_x_continuous(breaks = c(seq(from = 1975, to = 2025, by = 5)))+
 # scale_y_continuous(labels = scales::label_comma(trim = TRUE))+
   scale_y_continuous(labels = label_number(suffix = "", scale = 1e-3))+
 # ylab(label = "Sockeye (thousands)")+
@@ -481,9 +490,6 @@ oso_recruits.df %>%                                                             
   facet_wrap(~population, ncol=1)+
   theme_pt(major_grid=TRUE)+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
-
-filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")   # filename for recruitment output 
-write.csv(oso_recruits.df, filename)                                                    # saves the data to filename
 
 # mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns  
 pre_fwmt  <- mean(oso_recruits.df[oso_recruits.df$return_year %in% c(1977:2007),]$oso_origin_nat_returns)/1000
