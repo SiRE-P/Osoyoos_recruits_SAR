@@ -87,7 +87,7 @@ cv_gam_loo <- function(data, formula, seed = 123) {
 #                OR: alternatively, leave all statements uncommented (for data changes in SIS) until final execution and then comment out for upload to GitHub
 
 #returns_data<- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Sockeye Returns Data") %>%    # assign to latest SIS workbook - now obsolete
-# returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.05.13.xlsx", sheet = "Sockeye Returns Data") %>%  # latest SIS workbook - update to Total Harvest (all fisheries) below BON
+# returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Sockeye Returns Data") %>%  # latest SIS workbook - update to Total Harvest (all fisheries) below BON
 # janitor::clean_names()                                                                                                 # (which is 24.05.13.xlsx as of 240515)
 # returns_select <- returns_data %>%                                                                                     # input BON dam counts, Snake abund., d/s harvest & stock composition %
 # filter(!is.na(return_year), return_year <= last_year) %>%
@@ -523,10 +523,10 @@ write.csv(recruits, filename)                                                   
 
 ```{r age composition}
 
-age_data <- read_xlsx("../DATA/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Data at Age") %>%
-  dplyr::select(return_year = `Return Year`, prop_Fryer = `Age Comp (Fryer)`, 
-                prop_SIRE = `Age Comp (SIRE)`, Age, best_source = `Best Source`, Comments)
-write.csv(age_data,file="../DATA/age_composition_data.csv")
+# age_data <- read_xlsx("../DATA/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Data at Age") %>%
+#   dplyr::select(return_year = `Return Year`, prop_Fryer = `Age Comp (Fryer)`, 
+#                 prop_SIRE = `Age Comp (SIRE)`, Age, best_source = `Best Source`, Comments)
+# write.csv(age_data,file="../DATA/age_composition_data.csv")
 
 age_data <- read.csv("../DATA/age_composition_data.csv")
 

@@ -107,10 +107,10 @@ age_comp_ONA_long <- age_composition_ONA_wide %>%                               
 ##          by removing likely contributions of larger WEN SK... to be confirmed.
 ## ------------------------------------------------------------------------------
 
-age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.05.27.xlsx",
-          sheet = "CRITFC Age Comp", na="")                                     # read CRITFC age comp from workbook in OneDrive      ### fix folder spec
-filename <- paste(work, "\\DATA\\age_comp_critfc_240527.csv", sep = "")         # CSV filename for CRITFC age composition proportions ### fix folder spec
-write.csv(age_comp_critfc, filename)                                            # saves the data to filename
+# age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.05.27.xlsx",
+#           sheet = "CRITFC Age Comp", na="")                                     # read CRITFC age comp from workbook in OneDrive      ### fix folder spec
+  filename <- paste(work, "\\DATA\\age_comp_critfc_240527.csv", sep = "")         # CSV filename for CRITFC age composition proportions ### fix folder spec
+# write.csv(age_comp_critfc, filename)                                            # saves the data to filename
 
 age_comp_critfc <- read.csv2(filename, sep=",")                                 # input saved CRITFC annual age composition  
 age_comp_critfc_wide <- age_comp_critfc %>%    
