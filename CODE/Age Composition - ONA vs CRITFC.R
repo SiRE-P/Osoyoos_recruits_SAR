@@ -11,6 +11,11 @@
 ## Issues:  see statements where triple hash marks (###) exist.
 ## ---------------------------------------------------------------------------------------------------------------------------
 
+work <- "C:\\Users\\StiffH\\Documents\\Rcode\\Osoyoos_recruits_SAR"             # working directory
+
+filename <- paste(work, "\\DATA\\ok_riv_deadpitch_xlsx_240524.csv", sep = "")
+ok_riv_deadpitch <- read.csv2(filename, sep=",") 
+
 age_sample_lower <- ok_riv_deadpitch %>%                            # get lower Ok River Sockeye biosample data (SiRE/ONA) for age composition estimate...
   filter(fish == "sockeye") %>%        
   filter(section != "Skaha") %>%                                    # remove mid-OkRiver (Skaha) samples
@@ -101,8 +106,6 @@ age_comp_ONA_long <- age_composition_ONA_wide %>%                               
 ##          Bonneville Dam that have been tweaked by JF to represent Oka-bound SK
 ##          by removing likely contributions of larger WEN SK... to be confirmed.
 ## ------------------------------------------------------------------------------
-
-work <- "C:\\Users\\StiffH\\Documents\\Rcode\\Osoyoos_recruits_SAR"             # working directory
 
 age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.05.27.xlsx",
           sheet = "CRITFC Age Comp", na="")                                     # read CRITFC age comp from workbook in OneDrive      ### fix folder spec
@@ -443,55 +446,53 @@ ocean_age_1_plotdata <- ocean_age_1 %>%                                         
   pivot_longer(cols = ends_with("_age_comp"),                                   # arranging the data to long format for plotting
                               names_to = "Source",
                               values_to = "Ocean_Age_1") %>%
-  dplyr::filter(return_year > 1997) 
+  dplyr::filter(return_year >= 1990) 
 
 ocean_age_2_plotdata <- ocean_age_2 %>%                                         # focus on ocean age 2 (42s and 53s)
   dplyr::select(-diff_OA_comp) %>%
   pivot_longer(cols = ends_with("_age_comp"),                                   #arranging the data to long format for plotting
                names_to = "Source",
                values_to = "Ocean_Age_2") %>%
-  dplyr::filter(return_year > 1997) 
+  dplyr::filter(return_year >= 1990) 
 
 ocean_age_3_plotdata <- ocean_age_3 %>%                                         # focus on ocean age 3 (52s and 63s
   dplyr::select(-diff_OA_comp) %>%
   pivot_longer(cols = ends_with("_age_comp"),                                   #arranging the data to long format for plotting
                names_to = "Source",
                values_to = "Ocean_Age_3") %>%
-  dplyr::filter(return_year > 1997) 
+  dplyr::filter(return_year >= 1990) 
 
 ggplot(ocean_age_1_plotdata, aes(x = factor(return_year), y = Ocean_Age_1, fill = Source)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar(stat = "identity", position = "dodge", width = 0.80) +
   xlab(NULL) +
   ylab(NULL) +
   ggtitle("Compare Proportions at Age 1") +
   scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+
-  scale_x_discrete(breaks = c(seq(from = 1998, to = 2024, by = 2)))+            # omit 1980-1999 as CRITFC = ONA
-  scale_fill_discrete(name = "Variables", labels = c("CRITFC", "ONA")) +
+  scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
+  scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
   theme_pt(major_grid = TRUE)+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5)) +            # theme_pt centers main title but not subtitle
 
 ggplot(ocean_age_2_plotdata, aes(x = factor(return_year), y = Ocean_Age_2, fill = Source)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar(stat = "identity", position = "dodge", width = 0.80) +
   xlab(NULL) +
   ylab(NULL) +
   ggtitle("Compare Proportions at Age 2") +
   scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+ 
-  scale_x_discrete(breaks = c(seq(from = 1998, to = 2024, by = 2)))+            # omit 1980-1999 as CRITFC = ONA
-  scale_fill_discrete(name = "Variables", labels = c("CRITFC", "ONA")) +
+  scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
+  scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
   theme_pt(major_grid = TRUE)+
-  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))+
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.75))+
 
 ggplot(ocean_age_3_plotdata, aes(x = factor(return_year), y = Ocean_Age_3, fill = Source)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar(stat = "identity", position = "dodge", width = 0.80) +
   xlab(NULL) +
   ylab(NULL) +
   ggtitle("Compare Proportions at Age 3") +
   scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+
-  scale_x_discrete(breaks = c(seq(from = 1998, to = 2024, by = 2)))+            # omit 1980-1999 as CRITFC = ONA
-  scale_fill_discrete(name = "Variables", labels = c("CRITFC", "ONA")) +
+  scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
+  scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
   theme_pt(major_grid = TRUE)+
-# ggplot2::theme(panel.grid.major.x = element_line(colour = "grey90")) +          # Major grid lines
-# ggplot2::theme(panel.grid.minor.x = element_line(colour = "grey80")) +          # Minor grid lines
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))+
   
   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
