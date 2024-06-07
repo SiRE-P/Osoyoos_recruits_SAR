@@ -466,7 +466,7 @@ ggplot(ocean_age_1_plotdata, aes(x = factor(return_year), y = Ocean_Age_1, fill 
   geom_bar(stat = "identity", position = "dodge", width = 0.80) +
   xlab(NULL) +
   ylab(NULL) +
-  ggtitle("Compare Proportions at Age 1") +
+  ggtitle("Compare Proportions at Ocean Age 1") +
   scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+
   scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
   scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
@@ -477,7 +477,7 @@ ggplot(ocean_age_2_plotdata, aes(x = factor(return_year), y = Ocean_Age_2, fill 
   geom_bar(stat = "identity", position = "dodge", width = 0.80) +
   xlab(NULL) +
   ylab(NULL) +
-  ggtitle("Compare Proportions at Age 2") +
+  ggtitle("Compare Proportions at Ocean Age 2") +
   scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+ 
   scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
   scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
@@ -488,7 +488,7 @@ ggplot(ocean_age_3_plotdata, aes(x = factor(return_year), y = Ocean_Age_3, fill 
   geom_bar(stat = "identity", position = "dodge", width = 0.80) +
   xlab(NULL) +
   ylab(NULL) +
-  ggtitle("Compare Proportions at Age 3") +
+  ggtitle("Compare Proportions at Ocean Age 3") +
   scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+
   scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
   scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
