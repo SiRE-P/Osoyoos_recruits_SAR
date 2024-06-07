@@ -1,4 +1,4 @@
-# Scripts to 
+### Scripts to 
 1. estimate total annual Osoyoos recruits and combine with age composition to estimate smolt-to-adult survival (Osoyoos Sox Recruit & Survival.Rmd)
 2. compare and contrast ocean age composition proportions depending on whether CRITFC (mainstem) or ONA (spawning grounds) ageing employed (Age Composition - ONA vs CRITFC.R)
 
