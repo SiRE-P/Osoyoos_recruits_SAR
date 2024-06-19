@@ -89,7 +89,8 @@ age_composition_setup <- age_composition %>%
 
 age_composition_ONA_wide <- age_composition_setup %>% 
   mutate(across(everything(), ~ . / total, .names = "prop_{.col}")) %>%         # Calculate the annual proportions for each age column
-  mutate(source = "ONA")
+  mutate(source = ifelse(return_year >= 2006, 
+                         "ONA Deadpitch", "ONA UNK (Broodstock?)"))
 
 age_comp_ONA_long <- age_composition_ONA_wide %>%                               # Pivot to list age composition by return year and age class
   pivot_longer(cols = c("prop_age_1.1", "prop_age_1.2", "prop_age_1.3",         ### caution: explicit selection of age classes may leave rare age classes 
@@ -107,9 +108,9 @@ age_comp_ONA_long <- age_composition_ONA_wide %>%                               
 ##          by removing likely contributions of larger WEN SK... to be confirmed.
 ## ------------------------------------------------------------------------------
 
-# age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.05.27.xlsx",
+# age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.06.13.xlsx",
 #           sheet = "CRITFC Age Comp", na="")                                     # read CRITFC age comp from workbook in OneDrive      ### fix folder spec
-  filename <- paste(work, "\\DATA\\age_comp_critfc_240527.csv", sep = "")         # CSV filename for CRITFC age composition proportions ### fix folder spec
+  filename <- paste(work, "\\DATA\\age_comp_critfc_240613.csv", sep = "")         # CSV filename for CRITFC age composition proportions ### fix folder spec
 # write.csv(age_comp_critfc, filename)                                            # saves the data to filename
 
 age_comp_critfc <- read.csv2(filename, sep=",")                                 # input saved CRITFC annual age composition  
@@ -408,7 +409,8 @@ setup_CRITFC_OA_comp <- ocean_age_comp_CRITFC %>% ungroup() %>%
 
 compare_OA_comp <-
   merge(setup_ONA_OA_comp, setup_CRITFC_OA_comp) %>%
-  mutate(diff_OA_comp = abs(ONA_age_comp - CRITFC_age_comp))
+  mutate(diff_OA_comp = abs(ONA_age_comp - CRITFC_age_comp)) %>%
+  dplyr::filter(return_year >= 1990) 
 
 ocean_age_1 <- compare_OA_comp %>%
   filter(ocean_age == 1)
@@ -422,21 +424,30 @@ ggplot(ocean_age_1, aes(x = return_year, y = diff_OA_comp)) +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 1 Composition") + 
+# scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 1)+
+# scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2))) +           # omit 1980-1999 as only CRITFC or M-Yr ONA
 
 ggplot(ocean_age_2, aes(x = return_year, y = diff_OA_comp)) +
   geom_bar(stat = "identity") +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 2 Composition") + 
+# scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 1)+
+# scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
   
 ggplot(ocean_age_3, aes(x = return_year, y = diff_OA_comp)) +
   geom_bar(stat = "identity") +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 3 Composition") +   
+# scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 1)+ 
+# scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
   
   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
   plot_layout(nrow = 3)                                                         # stack figures
+
+filename <- paste(work, "\\FIGURES\\Age_Comp_CompareDiff_", timestamp, ".png", sep = "") # figure output filename
+ggsave(file = filename, width = 6, height = 8, units = "in")                    # saves the plot
 
 #---- 
 # Side-by-side bar chart comparison of CRITFC vs ONA proportions by ocean age classes 1 and 2
