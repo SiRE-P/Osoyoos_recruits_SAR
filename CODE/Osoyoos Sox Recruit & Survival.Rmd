@@ -596,27 +596,37 @@ j_dat <- read.csv("../data/juv_dat_xlsx_240516.csv")    # replaces import data f
 
 ```{r marine survival}
 
-#calculating marine survival by age composition source 
+# calculating marine survival by age composition source 
+# NOTE that oso_sox mouth here is the number of osoyoos recruits, not the total number of sockeye of all stocks below Bonneville
+
 #radat <- left_join(recruit %>% dplyr::select(ret_year, oso_sox_mouth = recruit_os), a_dat, by = "ret_year") %>% #joining the recruitment dataframe with the age composition data frame ***NOTE that oso_sox mouth here is the number of osoyoos recruits, not the total number of sockeye of all stocks below Bonneville
-radat  <- left_join(oso_recruits.df %>% dplyr::select(return_year, oso_sox_mouth = oso_origin_nat_returns), a_dat, by = "return_year") %>% #joining the recruitment dataframe with the age composition data frame ***NOTE that oso_sox mouth here is the number of osoyoos recruits, not the total number of sockeye of all stocks below Bonneville
-  mutate(sox_age_fry  = oso_sox_mouth * ac_fryr, #calculating the number of recruits according to each age composition source
-         sox_age_sire = oso_sox_mouth * ac_sire,
-         sox_age_best = oso_sox_mouth * ac_best) %>% 
-  group_by(s_year) %>% summarize(oso_sox_fry = sum(sox_age_fry), #summing the recruits by smolt year
-                                 oso_sox_sire = sum(sox_age_sire),
-                                 oso_sox_best = sum(sox_age_best)) %>% 
+radat  <- left_join(oso_recruits.df %>% 
+                    filter(return_year >= 1980) %>%
+                    dplyr::select(return_year, oso_sox_mouth = oso_origin_nat_returns), 
+                    age_data, by = "return_year") %>%            #joining the recruitment dataframe with the age composition data frame 
+  mutate(ocean_age       = as.numeric(str_sub(Age, start = -1)),
+         s_year          = return_year - ocean_age,
+         sox_age_critfc  = oso_sox_mouth * prop_Fryer,           #calculating the number of recruits according to each age composition source
+         sox_age_sire    = oso_sox_mouth * prop_SIRE,
+         sox_age_best    = oso_sox_mouth * ifelse(best_source == "CRITFC", prop_Fryer, prop_SIRE))     
+  radat[is.na(radat)] <- 0 
+
+radat2 <- radat %>%
+  group_by(s_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),          #summing the recruits by smolt year
+                                 oso_sox_sire   = sum(sox_age_sire),
+                                 oso_sox_best   = sum(sox_age_best)) %>% 
   left_join(., j_dat, by = "s_year") %>% #joining the juvenile dataframe
   filter(s_year > 1997) %>% #removing all years prior to 1998
-  mutate(fry_surv = oso_sox_fry / no_smolt, #calculating marine survival
-         sire_surv = oso_sox_sire / no_smolt,
-         best_surv = oso_sox_best / no_smolt) %>%
-  dplyr::select(s_year, fry_surv, sire_surv, best_surv) %>% #streamlining the dataset to the relevant columns
-  pivot_longer(cols = ends_with("_surv"), #arranging the data to long format for plotting
+  mutate(critfc_surv = oso_sox_critfc / no_smolt, #calculating marine survival
+         sire_surv   = oso_sox_sire   / no_smolt,
+         best_surv   = oso_sox_best   / no_smolt) %>%
+  dplyr::select(s_year, critfc_surv, sire_surv, best_surv) %>%                  #streamlining the dataset to the relevant columns
+  pivot_longer(cols = ends_with("_surv"),                                       #arranging the data to long format for plotting
                names_to = "source",
                values_to = "survival")
 
 #plotting marine survival
-ggplot(radat, aes(x = s_year, y = survival, colour = source))+
+ggplot(radat2, aes(x = s_year, y = survival, colour = source))+
   geom_point(aes(size = source, alpha = source))+
   geom_line(aes(linewidth = source, alpha = source))+
   scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
