@@ -35,11 +35,11 @@ age_composition_natural <- age_sample_lower %>%                     # get age co
   filter(thermal_mark %in% c(NA, "Natural")) %>%                    # removing all rows where thermal mark is Unknown or Hatchery (2007-2021)
   pivot_wider(names_from=age, names_prefix="age_", values_from=n)   # tabulate by year and age group
 
-missing_ages_2006 <- data.frame(year = 2006, age_1.1=1,             ### use summary at age data from ONA (thanks Sam P 240527) for missing age comp in 2006
+missing_ages_2006 <- data.frame(year = 2006, age_1.1=1,             ### use summary # at age data from ONA (thanks Sam P 240527) for missing age comp in 2006
                                 age_1.2=371, age_1.3=46, age_2.2=2, ### will need to incorporate 2006 raw data into source data later...
                                 thermal_mark="Natural") 
-missing_ages_2022 <- data.frame(year = 2022, age_1.1=178,           ### use summary % at age data from ONA (from AO 240322) for missing age comp in 2022
-                                age_1.2=765, age_1.3=57,            ### will need to incorporate 2022 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
+missing_ages_2022 <- data.frame(year = 2022, age_1.1=19,            ### use summary % at age data from ONA (from AO 240322) for missing age comp in 2022
+                                age_1.2=861, age_1.3=120,           ### will need to incorporate 2022 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
                                 thermal_mark="Natural")            
 missing_ages_2023 <- data.frame(year = 2023, age_1.1=89,            ### use summary % at age data from ONA (from AO 240322) for missing age comp in 2023
                                 age_1.2=812, age_1.3=96, age_2.2=3, ### will need to incorporate 2023 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
@@ -82,8 +82,8 @@ age_composition$thermal_mark <- NULL                                # drop therm
 age_composition[is.na(age_composition)] <- 0                        # set NAs to 0 in pivot table
 age_composition_setup <- age_composition %>% 
   rename(return_year = year) %>%
-  dplyr::select(return_year, age_1.1, age_1.2, age_1.3, 
-                age_1.4, age_2.1, age_2.2) %>%                      ### careful: this COLUMN SORT drops age_2.3 or older if these ages ever exist
+  dplyr::select(return_year, age_1.1, age_1.2, age_1.3, age_1.4,  
+                age_2.1, age_2.2) %>%                               ### careful: this COLUMN SORT drops age_2.3 or older if these ages ever exist
   rowwise() %>% 
   mutate(total = sum(c_across(everything())))                       # Calculate the sum of N for each row
 
@@ -100,6 +100,7 @@ age_comp_ONA_long <- age_composition_ONA_wide %>%                               
   dplyr::select(-source, -total, -prop_total, -age_1.1, -age_1.2, -age_1.3,     # Drop sample size columns 
                 -age_1.4, -age_2.1, -age_2.2)
 
+
 ## ------------------------------------------------------------------------------
 ## Purpose: Get age composition of Okanagan-bound SK from CRITFC data (Jeff Fryer)
 ## Notes:   Years 2006-present come from PIT-tag data confirmed Okanagan-bound SK
@@ -109,14 +110,15 @@ age_comp_ONA_long <- age_composition_ONA_wide %>%                               
 ## ------------------------------------------------------------------------------
 
 # age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.06.13.xlsx",
-#           sheet = "CRITFC Age Comp", na="")                                     # read CRITFC age comp from workbook in OneDrive      ### fix folder spec
-  filename <- paste(work, "\\DATA\\age_comp_critfc_240613.csv", sep = "")         # CSV filename for CRITFC age composition proportions ### fix folder spec
-# write.csv(age_comp_critfc, filename)                                            # saves the data to filename
+# age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.06.19.xlsx",
+#           sheet = "CRITFC Age Comp", na="")                                   # read CRITFC age comp from workbook in OneDrive      ### fix folder spec
+filename <- paste(work, "\\DATA\\age_comp_critfc_240619.csv", sep = "")         # CSV filename for CRITFC age composition proportions ### fix folder spec
+# write.csv(age_comp_critfc, filename)                                          # saves the data to filename
 
 age_comp_critfc <- read.csv2(filename, sep=",")                                 # input saved CRITFC annual age composition  
 age_comp_critfc_wide <- age_comp_critfc %>%    
   rename(return_year = Year) %>%
-  dplyr::select(-Other,-TOTAL,-Confirmed,-Source,-Notes,-X,-Sample_Size) %>%    # remove meta-data columns
+  dplyr::select(-Other,-Confirmed,-Source,-Notes,-X,-Sample_Size) %>%    # remove meta-data columns
   mutate(source = "CRITFC")                                                     # add source data tag
 
 age_comp_CRITFC_long <- age_comp_critfc_wide %>%                                # pivot to list proportions by return year and age class
@@ -126,7 +128,7 @@ age_comp_CRITFC_long <- age_comp_critfc_wide %>%                                
                         "prop_age_4.1"), 
                names_to = "age_class", values_to = "CRITFC_prop_at_age") %>%
   mutate(CRITFC_method = Age_Method) %>%
-  dplyr::select(-source, -Age_Method)
+  dplyr::select(-source, -Age_Method, -TOTAL)
  
 ## -----------------------------------------------------------------------------
 
@@ -211,7 +213,7 @@ age_comp_source_all <- merge(age_comp_ONA_CRITFC,
   
 #------
 # 
-# This section defines three age composition (proportions) time-series based on three different combinations of the source data to review the differences.
+# This section defines three age composition time-series (proportions) based on three different combinations of the source data to review the differences.
 # The source data are annual age compositions from either SiRE/ONA sampling on the Okanagan River spawning grounds (based on raw data in ok_riv_deadpitch), 
 # or CRITFC sampling at mainstem dams (BON and/or WELLS), for which age proportions were provided by Jeff Fryer (CRITFC; see OKA Returns at Age from JF 24.05.27.xlsx) 
 # and largely confirmed against annual CRITFC reports.
