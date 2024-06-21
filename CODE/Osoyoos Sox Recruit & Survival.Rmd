@@ -520,95 +520,199 @@ recruits <- oso_recruits.df %>%
 filename <- paste("../output/OSO_Recruits_", timestamp, ".csv", sep = "")       # filename for recruitment output 
 write.csv(recruits, filename)                                                   # saves the data to filename
 ```  
-
-```{r age composition}
-
-# age_data <- read_xlsx("../DATA/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Data at Age") %>%
-#   dplyr::select(return_year = `Return Year`, prop_Fryer = `Age Comp (Fryer)`, 
-#                 prop_SIRE = `Age Comp (SIRE)`, Age, best_source = `Best Source`, Comments)
-# write.csv(age_data,file="../DATA/age_composition_data.csv")
-
-age_data <- read.csv("../DATA/age_composition_data.csv")
-
-age_data.df <- age_data %>% 
-  mutate(ocean_age = str_sub(Age, start = -1)) %>% 
-  group_by(return_year, ocean_age, best_source) %>% 
-  summarise(prop_Fryer = sum(prop_Fryer, na.rm = TRUE), prop_SIRE = sum(prop_SIRE, na.rm = TRUE)) %>% 
-  mutate(best_age_prop = ifelse(best_source == "CRITFC", prop_Fryer, prop_SIRE))
-
-age_data.df %>% 
-  group_by(return_year) %>% 
-  summarise(total = sum(prop_SIRE)) %>% 
-  arrange(total)
-
-ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   #stacked 100% bar plot of annual age composition    
-  geom_point(data = age_data.df %>% ungroup() %>% dplyr::select(return_year, best_source) %>% unique(), aes(x = return_year, y = -0.02, color = best_source), size = 3, pch = 15)+
-  geom_col(aes(fill = ocean_age))+
-  scale_fill_viridis_d("ocean age")+
-  scale_color_manual(values = c("red", "dodgerblue", "black"), "source")+
-  guides(colour = guide_legend(order = 2), 
-          fill = guide_legend(order = 1))+
-  coord_cartesian(expand = FALSE)+
-  ylab("Ocean age proportion")+
-  xlab("Return year")+
-  theme_pt()
-
-filename <- paste("../figures/Age_Composition_", timestamp, ".png", sep = "")   # filename for figure output 
-ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
-
-age_data.df %>%                                                                 # compare SiRE/ONA vs CRITFC/Fryer annual age comp% by ocean age
-  dplyr::select(-best_age_prop) %>% 
-  gather(key = type, value = prop, prop_Fryer:prop_SIRE) %>%
-  mutate(type = str_remove(type, "prop_")) %>% 
-  mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")) %>% 
-ggplot(aes(x = return_year, y = prop))+
-  geom_point(data = age_data.df %>% mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")), aes(y = best_age_prop), size = 2)+
-  geom_line(data = age_data.df %>% mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")), aes(y = best_age_prop))+
-  geom_point(pch = 16, size = 1.5, aes(color = type))+
-  facet_grid(ocean_age~.)+
-  scale_color_manual(values = c("red", "dodgerblue"), "source")+
-  scale_fill_manual(values = c("red", "dodgerblue"), "source")+
-  ylab("Ocean age proportion")+
-  xlab("Return year")+
-  scale_x_continuous(breaks = seq(1980, 2025, by = 5))+
-  scale_y_continuous(limits = c(0, 1))+
-  theme_pt()
-
-filename <- paste("../figures/Compare_SiRE_Fryer_Age_Comp_", timestamp, ".png", sep = "")   # filename for figure output 
-ggsave(file = filename, width = 6, height = 6, units = "in")                                # saves the plot to filename
-
-```
-
 ```{r juvenile abund}
 #uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.01.12.xlsx", sheet = "Juvenile Data") #presmolt (was 23.09.26.xlsx)
 #uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
-# juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.05.13.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
+juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Juvenile Data") #presmolt (was 24.05.13.xlsx) [hs: 240426]
 # #Pre-smolt abundance
-# j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>% #grabbing the appropriate columns from the excel file
-#   dplyr::select(s_year = `Smolt Migration Year`, no_smolt = `...6`) %>% 
-#   mutate_at("no_smolt", as.numeric) %>% #selecting columns and converting no_smolt to numeric
-#   filter(s_year >=1998, s_year <= last_year)                                                    
-# # write.csv(j_dat,  "../data/juv_dat_xlsx_240516.csv")    # if juv data imported, re-write to CSV  # comment out for GitHub
+j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>% #grabbing the appropriate columns from the excel file
+  dplyr::select(s_year = `Smolt Migration Year`, no_smolt = `...6`) %>%
+  mutate_at("no_smolt", as.numeric) %>% #selecting columns and converting no_smolt to numeric
+  filter(s_year >=1998, s_year <= last_year)
+write.csv(j_dat,  "../data/juv_dat_xlsx_240517.csv")    # if juv data imported, re-write to CSV  # comment out for GitHub
 
-j_dat <- read.csv("../data/juv_dat_xlsx_240516.csv")    # replaces import data from SIS-OSO xlsx workbook # keep for GitHub [240510]
+j_dat <- read.csv("../data/juv_dat_xlsx_240517.csv")    # replaces import data from SIS-OSO xlsx workbook # keep for GitHub [240510]
 
 ```
+
+```{r age composition}
+# Section on age_data from SIS...xlsx workbook not used anymore...           ###
+# age_data <- read_xlsx("../DATA/SIS - Data - OSOYOOS - 24.05.17.xlsx",           # Import age comp data for CRITFC and SIRE
+#                       sheet = "Data at Age") %>%                                # sources along with "past" "Best Source" annual assignments
+#   dplyr::select(return_year = `Return Year`, prop_Fryer = `Age Comp (Fryer)`,
+#                 prop_SIRE = `Age Comp (SIRE)`, Age, best_source = `Best Source`,
+#                 Comments)
+# write.csv(age_data,file="../DATA/age_composition_data.csv")                     # write to csv
+# 
+# age_data <- read.csv("../DATA/age_composition_data.csv")  %>%                   # read csv & build on previous "best source" assignments to construct new source option...    
+#   mutate(best_source_old = best_source) %>%                                     # first, copy prev "best source" to best_source_old variable to preserve old assignments
+#   mutate(best_source_new = ifelse(return_year %in% c(1985,1987:2001,2004:2022), # next, create best_source_new assignment variable by setting all years specified here to CRITFC...
+#                                   "CRITFC", best_source_old)) %>%
+#   mutate(best_source_new = ifelse(return_year %in% c(2002:2003, 2007, 2023),    # ...and all years specified here to SIRE... 
+#                                   "SIRE", best_source_new))
+
+age_proportions_ONA_CRITFC <- age_comp_ONA_CRITFC %>%                        ### see "Age Composition - ONA vs CRITFC.R for source of age_comp_ONA_long ###
+    dplyr::select(return_year, age_class,
+                  ONA_prop_at_age, ONA_method, 
+                  CRITFC_prop_at_age, CRITFC_method) %>%
+    mutate(Age = as.numeric(substr(age_class, 10, 13))) %>%
+    mutate(best_source_old = ifelse(return_year %in% c(1985,1987:2000,2002:2005,
+                                                       2013, 2015),               # next, create best_source_new assignment variable by setting all years specified here to CRITFC...
+                                   "CRITFC", "UNKNOWN")) %>%
+    mutate(best_source_old = ifelse(return_year %in% c(2001,2006:2012,            # ...and all years specified here to ONA, 
+                                                       2014,2016:2023),           #  
+                                   "ONA", best_source_old)) %>%
+    mutate(best_source_old = ifelse(return_year %in% c(1980:1984,1986),           # ... multi-year averages (1980-1984, 1986)
+                                   "Average", best_source_old)) %>%
+    mutate(best_source_new = ifelse(return_year %in% c(1985,1987:2001,2004:2022), # next, create best_source_new assignment variable by setting all years specified here to CRITFC...
+                                   "CRITFC", "UNKNOWN")) %>%
+    mutate(best_source_new = ifelse(return_year %in% c(2002:2003, 2007, 2023),    # ...and all years specified here to ONA...  
+                                   "ONA", best_source_new)) %>%
+    mutate(best_source_new = ifelse(return_year %in% c(1980:1984,1986),           # ... multi-year averages (1980-1984, 1986)
+                                   "Average", best_source_new)) %>%
+    mutate(CRITFC_prop_at_age = as.numeric(CRITFC_prop_at_age))
+                
+age_data_old <- age_proportions_ONA_CRITFC %>%
+  mutate(best_source     = best_source_old)                                     ### select OLD annual assignments to use in analysis below, OR...
+
+age_data_new <- age_proportions_ONA_CRITFC %>%
+  mutate(best_source     = best_source_new)                                     ### select NEW annual assignments to use in analysis below
+
+#--- OLD age comp assignments... 
+
+age_data.df <- age_data_old %>% 
+  mutate(ocean_age = str_sub(Age, start = -1)) %>% 
+  group_by(return_year, ocean_age, best_source) %>% 
+  summarise(CRITFC_prop_at_age = sum(CRITFC_prop_at_age, na.rm = TRUE), 
+            ONA_prop_at_age = sum(ONA_prop_at_age, na.rm = TRUE)) %>% 
+  mutate(best_age_prop = ifelse(best_source == "CRITFC", CRITFC_prop_at_age, ONA_prop_at_age))
+
+age_prop_chk <- age_data.df %>%                                                 # shows if any annual total age proportions don't add up to 1.0
+  group_by(return_year) %>%                                                     # sorted by total_best proportion
+  summarise(total_best = sum(best_age_prop), 
+            total_ONA  = sum(ONA_prop_at_age), 
+            total_CRITFC  = sum(CRITFC_prop_at_age)) %>% 
+  arrange(total_best)
+
+# Following plots check the age composition visually.  First one shows selected proportions by ocean age with annual assignment source
+ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   #stacked 100% bar plot of annual age composition
+  geom_point(data = age_data.df %>% ungroup() %>% 
+             dplyr::select(return_year, best_source) %>% unique(), 
+             aes(x = return_year, y = -0.02, color = best_source), 
+             size = 3, pch = 15)+
+  geom_col(aes(fill = ocean_age))+
+  scale_fill_viridis_d("Ocean Age")+
+  scale_color_manual(values = c("black", "red", "dodgerblue", "green"), "Source")+
+  guides(colour = guide_legend(order = 2),
+          fill = guide_legend(order = 1))+
+  coord_cartesian(expand = FALSE)+
+  labs(title = "Ocean Age Composition (OLD)", subtitle = "By Return Year")+
+  ylab("Proportion at Age")+
+  xlab("")+
+  theme_pt(major_grid=TRUE)+
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+
+filename <- paste("../figures/Age_Composition_(OLD)_", timestamp, ".png", sep = "")   # filename for figure output
+ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
+# 
+# age_data.df %>%                                                                 # compare SiRE/ONA vs CRITFC/Fryer annual age comp% by ocean age
+#   dplyr::select(-best_age_prop) %>% 
+#   gather(key = type, value = prop, prop_Fryer:prop_SIRE) %>%
+#   mutate(type = str_remove(type, "prop_")) %>% 
+#   mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")) %>% 
+# ggplot(aes(x = return_year, y = prop))+
+#   geom_point(data = age_data.df %>% mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")), aes(y = best_age_prop), size = 2)+
+#   geom_line(data = age_data.df %>%  mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")), aes(y = best_age_prop))+
+#   geom_point(pch = 16, size = 1.5, aes(color = type))+
+#   facet_grid(ocean_age~.)+
+#   scale_color_manual(values = c("red", "dodgerblue"), "source")+
+#   scale_fill_manual( values = c("red", "dodgerblue"), "source")+
+#   ylab("Ocean age proportion")+
+#   xlab("Return year")+
+#   scale_x_continuous(breaks = seq(1980, last_year, by = 4))+
+#   scale_y_continuous(limits = c(0, 1))+
+  # theme_pt(major_grid=TRUE)+
+  # ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+# 
+# filename <- paste("../figures/Compare_SiRE_Fryer_Age_Comp_", timestamp, ".png", sep = "")   # filename for figure output 
+# ggsave(file = filename, width = 6, height = 6, units = "in")                                # saves the plot to filename
+
+#--- NEW age comp assignments... 
+
+age_data.df <- age_data_new %>% 
+  mutate(ocean_age = str_sub(Age, start = -1)) %>% 
+  group_by(return_year, ocean_age, best_source) %>% 
+  summarise(CRITFC_prop_at_age = sum(CRITFC_prop_at_age, na.rm = TRUE), 
+            ONA_prop_at_age = sum(ONA_prop_at_age, na.rm = TRUE)) %>% 
+  mutate(best_age_prop = ifelse(best_source == "CRITFC", CRITFC_prop_at_age, ONA_prop_at_age))
+
+age_prop_chk <- age_data.df %>%                                                 # shows if any annual total age proportions don't add up to 1.0
+  group_by(return_year) %>%                                                     # sorted by total_best proportion
+  summarise(total_best = sum(best_age_prop), 
+            total_ONA  = sum(ONA_prop_at_age), 
+            total_CRITFC  = sum(CRITFC_prop_at_age)) %>% 
+  arrange(total_best)
+
+# Following plots check the age composition visually.  First one shows selected proportions by ocean age with annual assignment source
+ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   #stacked 100% bar plot of annual age composition
+  geom_point(data = age_data.df %>% ungroup() %>% 
+               dplyr::select(return_year, best_source) %>% 
+               unique(), aes(x = return_year, y = -0.02, 
+                             color = best_source), size = 3, pch = 15)+
+  geom_col(aes(fill = ocean_age))+
+  scale_fill_viridis_d("Ocean Age")+
+  scale_color_manual(values = c("black", "red", "dodgerblue", "green"), "Source")+
+  guides(colour = guide_legend(order = 2),
+          fill = guide_legend(order = 1))+
+  coord_cartesian(expand = FALSE)+
+  labs(title = "Ocean Age Composition (NEW)", subtitle = "By Return Year")+
+  ylab("Proportion at Age")+
+  xlab("")+
+  theme_pt(major_grid=TRUE)+
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+
+filename <- paste("../figures/Age_Composition_(NEW)_", timestamp, ".png", sep = "")   # filename for figure output
+ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
+# 
+# age_data.df %>%                                                                 # compare SiRE/ONA vs CRITFC/Fryer annual age comp% by ocean age
+#   dplyr::select(-best_age_prop) %>% 
+#   gather(key = type, value = prop, prop_Fryer:prop_SIRE) %>%
+#   mutate(type = str_remove(type, "prop_")) %>% 
+#   mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")) %>% 
+# ggplot(aes(x = return_year, y = prop))+
+#   geom_point(data = age_data.df %>% mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")), aes(y = best_age_prop), size = 2)+
+#   geom_line(data = age_data.df %>%  mutate(ocean_age = paste("Ocean age ", ocean_age, sep = "")), aes(y = best_age_prop))+
+#   geom_point(pch = 16, size = 1.5, aes(color = type))+
+#   facet_grid(ocean_age~.)+
+#   scale_color_manual(values = c("red", "dodgerblue"), "source")+
+#   scale_fill_manual( values = c("red", "dodgerblue"), "source")+
+#   ylab("Ocean age proportion")+
+#   xlab("Return year")+
+#   scale_x_continuous(breaks = seq(1980, last_year, by = 4))+
+#   scale_y_continuous(limits = c(0, 1))+
+#   theme_pt()
+# 
+# filename <- paste("../figures/Compare_SiRE_Fryer_Age_Comp_", timestamp, ".png", sep = "")   # filename for figure output 
+# ggsave(file = filename, width = 6, height = 6, units = "in")                                # saves the plot to filename
+
+```
+
+
 
 ```{r marine survival}
 
 # calculating marine survival by age composition source 
 # NOTE that oso_sox mouth here is the number of osoyoos recruits, not the total number of sockeye of all stocks below Bonneville
 
-#radat <- left_join(recruit %>% dplyr::select(ret_year, oso_sox_mouth = recruit_os), a_dat, by = "ret_year") %>% #joining the recruitment dataframe with the age composition data frame ***NOTE that oso_sox mouth here is the number of osoyoos recruits, not the total number of sockeye of all stocks below Bonneville
 radat  <- left_join(oso_recruits.df %>% 
                     filter(return_year >= 1980) %>%
                     dplyr::select(return_year, oso_sox_mouth = oso_origin_nat_returns), 
-                    age_data, by = "return_year") %>%            #joining the recruitment dataframe with the age composition data frame 
+                    age_data_new, by = "return_year") %>%        # joining the recruitment dataframe with the NEW age composition data frame 
   mutate(ocean_age       = as.numeric(str_sub(Age, start = -1)),
          s_year          = return_year - ocean_age,
-         sox_age_critfc  = oso_sox_mouth * prop_Fryer,           #calculating the number of recruits according to each age composition source
-         sox_age_sire    = oso_sox_mouth * prop_SIRE,
-         sox_age_best    = oso_sox_mouth * ifelse(best_source == "CRITFC", prop_Fryer, prop_SIRE))     
+         sox_age_critfc  = oso_sox_mouth * CRITFC_prop_at_age,           # calculating the number of recruits according to each age composition source
+         sox_age_sire    = oso_sox_mouth * ONA_prop_at_age,
+         sox_age_best    = oso_sox_mouth * ifelse(best_source == "CRITFC", CRITFC_prop_at_age, ONA_prop_at_age))     
   radat[is.na(radat)] <- 0 
 
 radat2 <- radat %>%
@@ -616,7 +720,7 @@ radat2 <- radat %>%
                                  oso_sox_sire   = sum(sox_age_sire),
                                  oso_sox_best   = sum(sox_age_best)) %>% 
   left_join(., j_dat, by = "s_year") %>% #joining the juvenile dataframe
-  filter(s_year > 1997) %>% #removing all years prior to 1998
+  filter(s_year > 1997) %>%                                                     #no juvenile abund data prior to 1998
   mutate(critfc_surv = oso_sox_critfc / no_smolt, #calculating marine survival
          sire_surv   = oso_sox_sire   / no_smolt,
          best_surv   = oso_sox_best   / no_smolt) %>%
@@ -629,17 +733,19 @@ radat2 <- radat %>%
 ggplot(radat2, aes(x = s_year, y = survival, colour = source))+
   geom_point(aes(size = source, alpha = source))+
   geom_line(aes(linewidth = source, alpha = source))+
-  scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
-  scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
-  scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
-  scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "Fryer", "SIRE"))+
-  labs(x = "Smolt year", y = "Survival (proportion)")+
-  geom_hline(yintercept = sum(radat[radat$source == "best_surv", 3])/nrow(radat[radat$source == "best_surv", 3]), colour = "red", alpha = 0.5)+
-  scale_x_continuous(breaks = c(seq(from = 1985, to = 2021, by = 4)))+
-  theme_pt()
+  scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
+  scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
+  scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
+  scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
+  geom_hline(yintercept = sum(radat2[radat2$source == "best_surv", 3])/nrow(radat2[radat2$source == "best_surv", 3]), colour = "red", alpha = 0.5)+
+  scale_x_continuous(breaks = c(seq(from = 1998, to = last_year, by = 4)))+
+  labs(title="Osoyoos Sockeye SAR (NEW)", subtitle = "by Smolt Year", 
+       x="", y = "Annual Survival (proportion)")+
+  theme_pt(major_grid=TRUE)+
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
 #saving the plot
-filename <- paste("../figures/OSO_SAR_Survival_", timestamp, ".png", sep = "")   # filename for figure output 
+filename <- paste("../figures/OSO_SAR_Survival_(NEW)_", timestamp, ".png", sep = "")   # filename for figure output 
 ggsave(file = filename, width = 6, height = 4, units = "in")                     # saves the plot to filename
 
 ```
