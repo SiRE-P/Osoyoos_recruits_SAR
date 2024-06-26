@@ -717,17 +717,21 @@ radat  <- left_join(oso_recruits.df %>%
          sox_age_best    = oso_sox_mouth * ifelse(best_source == "CRITFC", CRITFC_prop_at_age, ONA_prop_at_age))     
   radat[is.na(radat)] <- 0 
 
+check_radat_old <- radat %>% filter(smolt_year == 1999) %>%
+  dplyr::select(smolt_year, return_year, best_source, oso_sox_mouth, sox_age_critfc, sox_age_sire, sox_age_best)
+
 radat2 <- radat %>%
-  group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      #summing the recruits by smolt year
+  filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
+  group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
                                      oso_sox_sire   = sum(sox_age_sire),
                                      oso_sox_best   = sum(sox_age_best)) %>% 
-  left_join(., j_dat, by = "smolt_year") %>%                                    #joining the juvenile dataframe
-  filter(smolt_year > 1997) %>%                                                 #no juvenile abund data prior to 1998
-  mutate(critfc_surv = oso_sox_critfc / no_smolt,                               #calculating marine survival
+  left_join(., j_dat, by = "smolt_year") %>%                                    # joining the juvenile dataframe
+  filter(smolt_year > 1997) %>%                                                 # no juvenile abund data prior to 1998
+  mutate(critfc_surv = oso_sox_critfc / no_smolt,                               # calculating marine survival
          sire_surv   = oso_sox_sire   / no_smolt,
          best_surv   = oso_sox_best   / no_smolt) %>%
-  dplyr::select(smolt_year, critfc_surv, sire_surv, best_surv) %>%              #streamlining the dataset to the relevant columns
-  pivot_longer(cols = ends_with("_surv"),                                       #arranging the data to long format for plotting
+  dplyr::select(smolt_year, critfc_surv, sire_surv, best_surv) %>%              # streamlining the dataset to the relevant columns
+  pivot_longer(cols = ends_with("_surv"),                                       # arranging the data to long format for plotting
                names_to = "source",
                values_to = "survival")
 
@@ -750,7 +754,7 @@ ggplot(radat2, aes(x = smolt_year, y = survival, colour = source))+
 filename <- paste("../figures/OSO_SAR_Survival_(OLD)_", timestamp, ".png", sep = "")   # filename for figure output 
 ggsave(file = filename, width = 6, height = 4, units = "in")                     # saves the plot to filename
 
-### NEW age comp ###
+### NEW age comp ###############################################################
 
 oso_age_at_return <- left_join(oso_recruits.df %>% 
                      filter(return_year >= 1980) %>%
@@ -771,29 +775,37 @@ oso_marine_survival <- oso_age_at_return %>%
                                      oso_sox_sire   = sum(sox_age_sire),
                                      oso_sox_best   = sum(sox_age_best)) %>% 
   left_join(., j_dat, by = "smolt_year") %>%                                    # joining the juvenile dataframe
-  filter(smolt_year >= 1985) %>%                                                # no juvenile abund data prior to 1998
-  mutate(critfc_surv  = oso_sox_critfc / no_smolt,                               # calculating marine survival
+  filter(smolt_year >= 1998) %>%  filter(smolt_year <= last_year - 2) %>%       # no juvenile abund data prior to 1998 and incomplete returns at age in most recent years
+  mutate(critfc_surv  = oso_sox_critfc / no_smolt,                              # calculating marine survival
          sire_surv    = oso_sox_sire   / no_smolt,
          best_surv    = oso_sox_best   / no_smolt,
          oso_sox_survival = best_surv, oso_juv_presmolt = no_smolt) %>%
-  dplyr::select(smolt_year, critfc_surv, sire_surv, best_surv,                  # streamlining the dataset to the relevant columns
+  dplyr::select(smolt_year, critfc_surv, sire_surv, best_surv,     # streamlining the dataset to the relevant columns
                 oso_sox_critfc, oso_sox_sire, oso_sox_best, oso_juv_presmolt,
                 critfc_surv, sire_surv, best_surv, oso_sox_survival)  
 
-oso_marine_survival_long <- oso_marine_survival %>%                 
+filename <- paste("../output/OSO_Marine_Survival_", timestamp, ".csv", sep = "")# filename for survival time-series output 
+write.csv(oso_marine_survival,filename)
+
+oso_marine_survival_long <- oso_marine_survival %>%     
+  group_by(smolt_year) %>%
   pivot_longer(cols = ends_with("_surv"),                                       # arranging the data to long format for plotting
                names_to = "source",
-               values_to = "survival")
+               values_to = "survival") %>%
+  arrange(source, smolt_year)
 
 #plotting marine survival
-ggplot(radat2, aes(x = s_year, y = survival, colour = source))+
+ggplot(oso_marine_survival_long, aes(x = smolt_year, y = survival, colour = source))+
   geom_point(aes(size = source, alpha = source))+
   geom_line(aes(linewidth = source, alpha = source))+
   scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
   scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
   scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
   scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
-  geom_hline(yintercept = sum(radat2[radat2$source == "best_surv", 3])/nrow(radat2[radat2$source == "best_surv", 3]), colour = "red", alpha = 0.5)+
+  geom_hline(yintercept = 
+             sum(oso_marine_survival_long[oso_marine_survival_long$source == "best_surv", 3]) /
+             nrow(oso_marine_survival_long[oso_marine_survival_long$source == "best_surv", 3]), 
+             colour = "red", alpha = 0.5)+
   scale_x_continuous(breaks = c(seq(from = 1998, to = last_year, by = 4)))+
   labs(title="Osoyoos Sockeye SAR (NEW)", subtitle = "by Smolt Year", 
        x="", y = "Annual Survival (proportion)")+
