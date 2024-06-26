@@ -2,7 +2,7 @@
 #####
 # title:  "Osoyoos Sockeye Recruitment Estimation"
 # author: "Colin Bailey, Patrick Thompson, Howard Stiff"
-# date:   '2024-03-12'
+# date:   '2024-06-24'
 # output: html_document
 # update: 240124 - revisions to CB's program, replacing 16-to-24-hr BON dam count models with single predictive model
 # update: 240124 - included GAM model for imputation of missing 2011 spawn grd sub-stock ratios
@@ -18,7 +18,7 @@
 # update: 240510 - prep program for csv inputs only (for ultimate upload to GitHub
 # update: 240515 - configure for GitHub repository
 # update: 240524 + see GitHub
-# update: TO DO  - incorporate RY2022 and 2023 data to extend mar-surv time-series to SY2021
+# update: TO DO  - incorporate RY2022 and 2023 data to extend mar-surv time-series to SY2021 - DONE
 #####
 
 timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
@@ -35,6 +35,7 @@ library(splines)
 library(scales)
 library(ggpubr)       # for adding text boxes with regression coefficients to plots
 library(patchwork)
+library(psych)
 
 if (!require(SiREfunctions)) {
   install.packages("devtools")
@@ -86,15 +87,17 @@ cv_gam_loo <- function(data, formula, seed = 123) {
 #         NOTE : if relevant changes are ever made to SIS worksheet, then uncomment out xlsx import statements and write statement & rerun chunk & program
 #                OR: alternatively, leave all statements uncommented (for data changes in SIS) until final execution and then comment out for upload to GitHub
 
-#returns_data<- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Sockeye Returns Data") %>%    # assign to latest SIS workbook - now obsolete
+# returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Sockeye Returns Data") %>%  # assign to latest SIS workbook - now obsolete
 # returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Sockeye Returns Data") %>%  # latest SIS workbook - update to Total Harvest (all fisheries) below BON
-# janitor::clean_names()                                                                                                 # (which is 24.05.13.xlsx as of 240515)
-# returns_select <- returns_data %>%                                                                                     # input BON dam counts, Snake abund., d/s harvest & stock composition %
-# filter(!is.na(return_year), return_year <= last_year) %>%
-# dplyr::select(return_year, tot_bonn_16hr = total_sox_bonn_16_hour, total_sockeye_snake, ok_stock_comp_percent_best, total_comm_harvest_below_bonn)
-# write.csv(returns_select,"../data/returns_select_SIS240212_xlsx_240526.csv")                                           # if SIS xlsx data imported, re-write to CSV
+  returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "Sockeye Returns Data") %>%  # latest SIS workbook - update to Total Harvest (all fisheries) below BON
+  janitor::clean_names()                                                                                                 # 
 
-returns_select <- read.csv("../DATA/returns_select_SIS240212_xlsx_240526.csv")                                           # replaces import data from SIS workbook [240510]
+returns_select <- returns_data %>%                                                                                       # input BON dam counts, Snake abund., d/s harvest & stock composition %
+filter(!is.na(return_year), return_year <= last_year) %>%
+dplyr::select(return_year, tot_bonn_16hr = total_sox_bonn_16_hour, total_sockeye_snake, ok_stock_comp_percent_best, total_comm_harvest_below_bonn)
+write.csv(returns_select,"../data/returns_select_SIS_xlsx_240624.csv")                                                   # Was 240526; if SIS xlsx data imported, re-write to CSV
+
+returns_select <- read.csv("../DATA/returns_select_SIS_xlsx_240624.csv")                                                 # replaces import data from SIS workbook [240510]
 ```
 
 ```{r bonn 16 to 24 hr count adjustment}  
@@ -153,9 +156,9 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 # estimates of hatchery numbers      ### NOTE: initial ok_riv_deadpitch import from XLSX should be commented out for final GitHub version. ###
 
 # ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 23.11.30.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
-# ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 24.05.24.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
-#     janitor::clean_names()                                                                     # detection of thermal marks                                # comment out for GitHub
-# write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                       # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
+ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 24.05.24.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
+  janitor::clean_names()                                                                       # detection of thermal marks (was 24.05.24)                # comment out for GitHub
+write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                         # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
 ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240524.csv")                         # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
 
 #pen_channel_deadpitch <-read.csv("../data/skaha_deadpitch_tidy_240208.csv") %>%                 # deadpitch for Pen channel fish with thermal mark data 
@@ -262,10 +265,11 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 ```{r oso vs ska}  
 # osoyoos vs. skaha data     ### NOTE: initial AUC_data_Import import from XLSX should be commented out for final GitHub version. ###
 
-# AUC_data_Import <- readxl::read_xlsx("./data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                               # comment out for GitHub
-#   janitor::clean_names()   # comment out for GitHub  
-# write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240516.csv")        # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
-AUC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_240516.csv")          # replaces AUC data from SIS xlsx workbook                       # keep for GitHub [240510]
+#UC_data_Import <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "OK AUC and Deadpitch Results") %>% 
+AUC_data_Import <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                           
+  janitor::clean_names()   # comment out for GitHub
+write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240624.csv")        # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
+AUC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_240624.csv")          # replaces AUC data from SIS xlsx workbook (was 240516)          # keep for GitHub [240510]
 
 AUC_data <- AUC_data_Import %>% 
   dplyr::select(rearing_lake, spawning_location, year, spawning_nerkids, percent_35cm_fl) %>% 
@@ -367,18 +371,15 @@ spawning_totals_no2011 <- spawning_table %>%                                    
 cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 3))
 cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 4))
 cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 5))
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 6))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 6)) #6 df gives lowest mean square error
 cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006), formula = prop_oso_origin_nat ~ bs(year, 7))
-#6 df gives lowest mean square error
 
 #filtering out early years where the proportion is 0
 cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 3))
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 4))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 4)) #4 df gives lowest mean square error
 cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 5))
 cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 6))
 cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011), formula = prop_ska_origin_nat ~ bs(year, 7))
-#4 df gives lowest mean square error
-
 
 prop_oso_natural_m <- gam(prop_oso_origin_nat ~ bs(year, 6), data = spawning_totals_no2011 %>% filter(year > 2006), family = binomial(link = "logit"))  # OSO imputation model
 prop_ska_natural_m <- gam(prop_ska_origin_nat ~ bs(year, 4), data = spawning_totals_no2011 %>% filter(year > 2010), family = binomial(link = "logit"))  # SKA imputation model
@@ -407,7 +408,6 @@ spawning_totals %>%                                                             
   theme_pt(major_grid=TRUE)+
   theme(legend.position = "bottom", legend.title = element_text(size=9),
         legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
-
 
 filename <- paste("../output/Spawning_Totals_", timestamp, ".csv", sep = "")    # filename for recruitment output 
 write.csv(spawning_totals, filename)                                            # saves the data to filename
@@ -491,20 +491,22 @@ oso_recruits.df %>%                                                             
   theme_pt(major_grid=TRUE)+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
-# mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns  
-pre_fwmt  <- mean(oso_recruits.df[oso_recruits.df$return_year %in% c(1977:2007),]$oso_origin_nat_returns)/1000
-post_fwmt <- mean(oso_recruits.df[oso_recruits.df$return_year %in% c(2008:last_year),]$oso_origin_nat_returns)/1000 ### compute geometric mean ###
+# geometric mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns  
+pre_fwmt  <- median(oso_recruits.df[oso_recruits.df$return_year %in% c(1977:2007),]$oso_origin_nat_returns)/1000
+post_fwmt <- median(oso_recruits.df[oso_recruits.df$return_year %in% c(2008:last_year),]$oso_origin_nat_returns)/1000 
+pre_fwmt  <- geometric.mean(oso_recruits.df[oso_recruits.df$return_year %in% c(1977:2007),]$oso_origin_nat_returns)/1000
+post_fwmt <- geometric.mean(oso_recruits.df[oso_recruits.df$return_year %in% c(2008:last_year),]$oso_origin_nat_returns)/1000 ### compute geometric mean ###
 
 # plot recruits through time
 oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000))+
   geom_line(linewidth = 0.5)+
   geom_point(size = 2)+
-  geom_segment(aes(x = 1977,   xend = 2007.5, y = pre_fwmt,  yend = pre_fwmt),  colour = "red",       linewidth = 1.0, linetype = 3)+ # CB: this is for the option of adding the pre- and current freshwater management tools era to compare mean recruits between the two time periods
-  geom_segment(aes(x = 2007.5, xend = 2021,   y = post_fwmt, yend = post_fwmt), colour = "darkgreen", linewidth = 1.0, linetype = 3)+
-  geom_hline(yintercept = mean(oso_recruits.df$oso_origin_nat_returns)/1000,    colour = "blue",      linewidth = 1.0, linetype = 2)+
+  geom_segment(aes(x = 1977,   xend = 2007.5, y = pre_fwmt,  yend = pre_fwmt),  colour = "red",       linewidth = 1.5, linetype = 3)+ # CB: this is for the option of adding the pre- and current freshwater management tools era 
+  geom_segment(aes(x = 2007.5, xend = 2023,   y = post_fwmt, yend = post_fwmt), colour = "darkgreen", linewidth = 1.5, linetype = 3)+ #     to compare median recruits between the two time periods
+  geom_hline(yintercept = geometric.mean(oso_recruits.df$oso_origin_nat_returns)/1000,colour= "blue", linewidth = 1.0, linetype = 2)+
   scale_y_continuous(breaks       = c( 0, 100, 200, 300, 400),
                      minor_breaks = c(50, 150, 250, 350))+
-  scale_x_continuous(breaks = c(seq(from = 1976, to = last_year, by = 4)))+
+  scale_x_continuous(breaks = c(seq(from = 1976, to = last_year+1, by = 4)))+
   labs(title="Osoyoos Sockeye Recruits", subtitle = "by Return Year", x="", y = "Sockeye Recruit Abundance (1000s)")+
   theme_pt(major_grid=TRUE)+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
@@ -523,15 +525,16 @@ write.csv(recruits, filename)                                                   
 ```{r juvenile abund}
 #uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.01.12.xlsx", sheet = "Juvenile Data") #presmolt (was 23.09.26.xlsx)
 #uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
-juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Juvenile Data") #presmolt (was 24.05.13.xlsx) [hs: 240426]
+#uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Juvenile Data") #presmolt (was 24.05.13.xlsx) [hs: 240517]
+juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "Juvenile Data") #presmolt (was 24.05.17.xlsx) [hs: 240624]
 # #Pre-smolt abundance
 j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>% #grabbing the appropriate columns from the excel file
   dplyr::select(smolt_year = `Smolt Migration Year`, no_smolt = `...6`) %>%
   mutate_at("no_smolt", as.numeric) %>% #selecting columns and converting no_smolt to numeric
   filter(smolt_year >=1998, smolt_year <= last_year)
-write.csv(j_dat,  "../data/juv_dat_xlsx_240517.csv")    # if juv data imported, re-write to CSV  # comment out for GitHub
+write.csv(j_dat,  "../data/juv_dat_xlsx_240624.csv")    # if juv data imported, re-write to CSV  # comment out for GitHub
 
-j_dat <- read.csv("../data/juv_dat_xlsx_240517.csv")    # replaces import data from SIS-OSO xlsx workbook # keep for GitHub [240510]
+j_dat <- read.csv("../data/juv_dat_xlsx_240624.csv")    # replaces import data from SIS-OSO xlsx workbook # keep for GitHub [240510]
 
 ```
 
@@ -787,25 +790,55 @@ oso_marine_survival <- oso_age_at_return %>%
 filename <- paste("../output/OSO_Marine_Survival_", timestamp, ".csv", sep = "")# filename for survival time-series output 
 write.csv(oso_marine_survival,filename)
 
-oso_marine_survival_long <- oso_marine_survival %>%     
-  group_by(smolt_year) %>%
+# oso_marine_survival_long <- oso_marine_survival %>%     
+#   group_by(smolt_year) %>%
+#   pivot_longer(cols = ends_with("_surv"),                                       # arranging the data to long format for plotting
+#                names_to = "source",
+#                values_to = "survival") %>%
+#   arrange(source, smolt_year)
+# 
+# #plotting marine survival
+# ggplot(oso_marine_survival_long, aes(x = smolt_year, y = survival, colour = source))+
+#   geom_point(aes(size = source, alpha = source))+
+#   geom_line(aes(linewidth = source, alpha = source))+
+#   scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
+#   scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
+#   scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
+#   scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
+#   geom_hline(yintercept = 
+#              sum(oso_marine_survival_long[oso_marine_survival_long$source == "best_surv", 3]) /
+#              nrow(oso_marine_survival_long[oso_marine_survival_long$source == "best_surv", 3]), 
+#              colour = "red", alpha = 0.5)+
+#   scale_x_continuous(breaks = c(seq(from = 1998, to = last_year, by = 4)))+
+#   labs(title="Osoyoos Sockeye SAR (NEW)", subtitle = "by Smolt Year", 
+#        x="", y = "Annual Survival (proportion)")+
+#   theme_pt(major_grid=TRUE)+
+#   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+
+radat2_new <- oso_age_at_return %>%
+  filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
+  group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
+                                     oso_sox_sire   = sum(sox_age_sire),
+                                     oso_sox_best   = sum(sox_age_best)) %>% 
+  left_join(., j_dat, by = "smolt_year") %>%                                    # joining the juvenile dataframe
+  filter(smolt_year > 1997) %>%                                                 # no juvenile abund data prior to 1998
+  mutate(critfc_surv = oso_sox_critfc / no_smolt,                               # calculating marine survival
+         sire_surv   = oso_sox_sire   / no_smolt,
+         best_surv   = oso_sox_best   / no_smolt) %>%
+  dplyr::select(smolt_year, critfc_surv, sire_surv, best_surv) %>%              # streamlining the dataset to the relevant columns
   pivot_longer(cols = ends_with("_surv"),                                       # arranging the data to long format for plotting
                names_to = "source",
-               values_to = "survival") %>%
-  arrange(source, smolt_year)
+               values_to = "survival")
 
 #plotting marine survival
-ggplot(oso_marine_survival_long, aes(x = smolt_year, y = survival, colour = source))+
+ggplot(radat2_new, aes(x = smolt_year, y = survival, colour = source))+
   geom_point(aes(size = source, alpha = source))+
   geom_line(aes(linewidth = source, alpha = source))+
   scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
   scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
   scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
   scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
-  geom_hline(yintercept = 
-             sum(oso_marine_survival_long[oso_marine_survival_long$source == "best_surv", 3]) /
-             nrow(oso_marine_survival_long[oso_marine_survival_long$source == "best_surv", 3]), 
-             colour = "red", alpha = 0.5)+
+  geom_hline(yintercept = sum(radat2_new[radat2_new$source == "best_surv", 3])/nrow(radat2_new[radat2_new$source == "best_surv", 3]), colour = "red", alpha = 0.5)+
   scale_x_continuous(breaks = c(seq(from = 1998, to = last_year, by = 4)))+
   labs(title="Osoyoos Sockeye SAR (NEW)", subtitle = "by Smolt Year", 
        x="", y = "Annual Survival (proportion)")+
