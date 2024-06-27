@@ -1,12 +1,19 @@
 ## --------------------------------------------------------------------------
-## FILENAME.R
+## Program: Download Sockeye Dam Counts from CBR-DATA.R
 ##
-## Title:   
-## Purpose: 
+## Title:   Download Sockeye Dam Counts from CBR-DART.R (mispelled in filename!)
+## Purpose: Obtain raw total annual dam counts from online web portal
 ## Author:  H Stiff
-## Date:    20.
-## Notes:   
-##          
+## Date:    24.06.27
+## Notes:   Data retrieval queries obtained from: https://www.cbr.washington.edu/dart/query/adult_annual_sum  
+##          Some dam/year combinations are based on 16-hr counts; these are adjusted up to full 24-hr day counts either
+##          via binomial log-link regression analysis (Bonneville) in another program, 
+##          or application of a simple multi-year mean multiplier based on years where both 16- and 24-hr counts are available.
+##          --> Wells pre-1998: Estimated from 16-hr counts (pre-1998) + average annual difference 13.2% between 16- and 24-hour counts (1998-2022; Tom Kahler pers. comm.), i.e. 16-hr count x 1.132 [hs 2022-10-17] 
+##          --> Rocky Reach pre-1994: Using 16-to-24-hr adj factor (1.12) up to 1993 based on multi-year avg 2004-2011 at RRH (from CW WDFW)
+##          --> Rock Island is effectively 24-hr day counts, as is Tumwater
+##          --> Not sure about John Day, McNary, Priest Rapids
+##          --> Bonneville is adjusted in Osoyoos Sox Recruit & Survival.Rmd {r oso recruitment} based on model from {r bonn 16 to 24 hr count adjustment}
 ## --------------------------------------------------------------------------
 
 # install.packages("rvest")
@@ -22,7 +29,7 @@ Bonn_data <- Bonn_data[[1]]
 Bonn_Sockeye <- Bonn_data %>%
   filter(Year != "Year") %>%
   mutate(Return_Year = as.numeric(Year), Bonn_Sockeye = as.numeric(Sockeye)) %>%
-  dplyr::select(Project, Return_Year, Bonn_Sockeye) 
+  dplyr::select(Project, Return_Year, Bonn_Sockeye)                             # NOTE: All years based on 16-hr daily counts only
   
 #-------------------------------------------------------------------------------
 # John Day Dam Counts
@@ -34,7 +41,7 @@ JDay_data <- JDay_data[[1]]
 JDay_Sockeye <- JDay_data %>%
   filter(Year != "Year") %>%
   mutate(Return_Year = as.numeric(Year), JDay_Sockeye = as.numeric(Sockeye)) %>%
-  dplyr::select(Project, Return_Year, JDay_Sockeye)
+  dplyr::select(Project, Return_Year, JDay_Sockeye)                             # NOTE: UNKNOWN whether JDay based on 16-hr daily counts only
 
 #-------------------------------------------------------------------------------
 # McNary Dam Counts
@@ -46,7 +53,7 @@ MCN_data <- MCN_data[[1]]
 MCN_Sockeye <- MCN_data %>%
   filter(Year != "Year") %>%
   mutate(Return_Year = as.numeric(Year), MCN_Sockeye = as.numeric(Sockeye)) %>%
-  dplyr::select(Project, Return_Year, MCN_Sockeye)
+  dplyr::select(Project, Return_Year, MCN_Sockeye)                              # NOTE: UNKNOWN whether McNary based on 16-hr daily counts only 
 
 #-------------------------------------------------------------------------------
 # Priest Rapids Dam Counts
@@ -57,8 +64,9 @@ PRD_data <- PRD_data[[1]]
 
 PRD_Sockeye <- PRD_data %>%
   filter(Year != "Year") %>%
-  mutate(Return_Year = as.numeric(Year), PRD_Sockeye = as.numeric(Sockeye)) %>%
-  dplyr::select(Project, Return_Year, PRD_Sockeye)
+  mutate(Return_Year = as.numeric(Year), PRD_Sockeye = as.numeric(Sockeye)) %>% # NOTE: UNKNOWN whether PRD based on 16-hr daily counts only
+  dplyr::select(Project, Return_Year, PRD_Sockeye) %>%
+  mutate(PRD_Sockeye = ifelse(PRD_Sockeye < 5, NA, PRD_Sockeye))                # Bad data (1 fish!) in 2023 ? 
 
 #-------------------------------------------------------------------------------
 # Rock Island Dam Counts
@@ -67,8 +75,8 @@ RockI_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_an
 RockI_data <- RockI_html %>% html_table(fill = TRUE)
 RockI_data <- RockI_data[[1]] 
 
-RockI_Sockeye <- RockI_data %>%
-  filter(Year != "Year") %>%
+RockI_Sockeye <- RockI_data %>%                                                 # Based on actual 24-hour counts since 1993, and effective 24-hour counts pre-1993
+  filter(Year != "Year") %>%                                                    # (since, pre-1993, 16 hours were observed and then gates closed for 8 hours, but no fish could pass till re-opened for next 16-hr count).  Source: Catherine Willard (WDFW), Oct 2022 
   mutate(Return_Year = as.numeric(Year), RockI_Sockeye = as.numeric(Sockeye)) %>%
   dplyr::select(Project, Return_Year, RockI_Sockeye) 
 
@@ -79,7 +87,7 @@ RRH_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annu
 RRH_data <- RRH_html %>% html_table(fill = TRUE)
 RRH_data <- RRH_data[[1]] 
 
-RRH_Sockeye <- RRH_data %>%
+RRH_Sockeye <- RRH_data %>%                                                     # NOTE: 16-hr counts (pre-1994), 24-hr counts since 1994. USE multi-year mean multiplier of 1.12 to expand 16- to 24-hr counts (C. Willard, Chelan PUD)
   filter(Year != "Year") %>%
   mutate(Return_Year = as.numeric(Year), RRH_Sockeye = as.numeric(Sockeye)) %>%
   dplyr::select(Project, Return_Year, RRH_Sockeye) 
@@ -91,7 +99,7 @@ Tum_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annu
 Tum_data <- Tum_html %>% html_table(fill = TRUE)
 Tum_data <- Tum_data[[1]] 
 
-Tum_Sockeye <- Tum_data %>%
+Tum_Sockeye <- Tum_data %>%                                                     # NOTE: Annual totals all based on 24-hr counts
   filter(Year != "Year") %>%
   mutate(Return_Year = as.numeric(Year), Tum_Sockeye = as.numeric(Sockeye)) %>%
   dplyr::select(Project, Return_Year, Tum_Sockeye) 
@@ -103,21 +111,27 @@ Wells_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_an
 Wells_data <- Wells_html %>% html_table(fill = TRUE)
 Wells_data <- Wells_data[[1]] 
 
-Wells_Sockeye <- Wells_data %>%
+Wells_Sockeye <- Wells_data %>%                                                 # NOTE: 16-hr counts (pre-1998), 24-hr counts since 1998. USE multi-year mean multiplier of 1.13 to expand 16- to 24-hr counts (T. Kahler, DC PUD) 
   filter(Year != "Year") %>%
   mutate(Return_Year = as.numeric(Year), Wells_Sockeye = as.numeric(Sockeye)) %>%
   dplyr::select(Project, Return_Year, Wells_Sockeye) 
 
 #-------------------------------------------------------------------------------
 
-Columbia_Sockeye_Dam_Counts_by_Year <- Bonn_Sockeye %>%
+Columbia_Sockeye_Dam_Counts_by_Year_Raw <- Bonn_Sockeye %>%
   full_join(JDay_Sockeye, by = "Return_Year") %>%
   full_join(MCN_Sockeye, by = "Return_Year") %>%
   full_join(PRD_Sockeye, by = "Return_Year") %>%
   full_join(RockI_Sockeye, by = "Return_Year") %>%
+  full_join(Tum_Sockeye, by = "Return_Year") %>%
   full_join(RRH_Sockeye, by = "Return_Year") %>%
   full_join(Wells_Sockeye, by = "Return_Year") %>%
   dplyr::select(-starts_with("Project"))
 
-        
+Columbia_Sockeye_Dam_Counts_1977_2023_Raw <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>%
+  filter(Return_Year >= 1977 & Return_Year != year(today()))
 
+
+        
+#mutate(Wells_Sockeye = ifelse(Return_Year < 1998, round(Wells_Sockeye * 1.132, 0), Wells_Sockeye)) %>% # Estimated from 16-hr counts (pre-1998) + average annual difference 13.2% between 16- and 24-hour counts (1998-2022; Tom Kahler pers. comm.), i.e. 16-hr count x 1.132 [hs 2022-10-17]
+  
