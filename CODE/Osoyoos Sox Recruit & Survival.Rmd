@@ -89,12 +89,38 @@ cv_gam_loo <- function(data, formula, seed = 123) {
 
 # returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Sockeye Returns Data") %>%  # assign to latest SIS workbook - now obsolete
 # returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Sockeye Returns Data") %>%  # latest SIS workbook - update to Total Harvest (all fisheries) below BON
-  returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "Sockeye Returns Data") %>%  # latest SIS workbook - update to Total Harvest (all fisheries) below BON
-  janitor::clean_names()                                                                                                 # 
 
-returns_select <- returns_data %>%                                                                                       # input BON dam counts, Snake abund., d/s harvest & stock composition %
+returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "Sockeye Returns Data") %>%  # latest SIS workbook - update to Total Harvest (all fisheries) below BON
+  janitor::clean_names()  %>%                                                                                                
+  filter(!is.na(return_year), return_year <= last_year) %>%
+  dplyr::select(return_year, tot_bonn_16hr = total_sox_bonn_16_hour, total_sockeye_snake, total_comm_harvest_below_bonn, 
+                total_sockeye_rock_i_24_hr, total_sockeye_rrh_24_hour, total_sockeye_tum_24_hour,
+                ok_stock_comp_percent_best, wen_stock_comp_percent_best)
+
+returns_data[is.na(returns_data)] <- 0 
+
+returns_stock_prop <- returns_data %>%                                                                                       # input BON dam counts, Snake abund., d/s harvest & stock composition %
 filter(!is.na(return_year), return_year <= last_year) %>%
-dplyr::select(return_year, tot_bonn_16hr = total_sox_bonn_16_hour, total_sockeye_snake, ok_stock_comp_percent_best, total_comm_harvest_below_bonn)
+  mutate(ok_stock_comp_percent_xlsx  = round(ok_stock_comp_percent_best, 2)) %>%
+  mutate(wen_stock_comp_percent_xlsx = round(wen_stock_comp_percent_best, 2)) %>%
+  mutate(total_sockeye_rrh_24_hour   = round(total_sockeye_rrh_24_hour, 0)) %>%
+  mutate(wen_stock_comp_percent_tum  = round(total_sockeye_tum_24_hour / total_sockeye_rock_i_24_hr, 2)) %>%
+  mutate(ok_stock_comp_percent_rock  = round(total_sockeye_rrh_24_hour / total_sockeye_rock_i_24_hr, 2)) %>%
+  mutate(wen_stock_comp_percent_best = pmax(1-ok_stock_comp_percent_rock, wen_stock_comp_percent_tum)) %>%
+  mutate(ok_stock_comp_percent_best  = pmin(ok_stock_comp_percent_rock, 1-wen_stock_comp_percent_best)) %>%
+  mutate(sum_stock_comp_percent_best = ok_stock_comp_percent_best + wen_stock_comp_percent_best) %>%
+  mutate(sum_stock_comp_percent_xlsx = ok_stock_comp_percent_xlsx + wen_stock_comp_percent_xlsx) %>%
+  dplyr::select(return_year, tot_bonn_16hr, total_sockeye_snake, total_comm_harvest_below_bonn, 
+                total_sockeye_rock_i_24_hr, total_sockeye_rrh_24_hour, total_sockeye_tum_24_hour,
+                wen_stock_comp_percent_xlsx, wen_stock_comp_percent_tum, wen_stock_comp_percent_best,  
+                ok_stock_comp_percent_xlsx,  ok_stock_comp_percent_rock, ok_stock_comp_percent_best,  
+                sum_stock_comp_percent_best, sum_stock_comp_percent_xlsx)
+                
+returns_select <- returns_stock_prop %>%
+    dplyr::select(return_year, tot_bonn_16hr, total_sockeye_snake, total_comm_harvest_below_bonn, 
+              total_sockeye_rock_i_24_hr, total_sockeye_rrh_24_hour, total_sockeye_tum_24_hour,
+              ok_stock_comp_percent_best, wen_stock_comp_percent_best, sum_stock_comp_percent_best)
+
 write.csv(returns_select,"../data/returns_select_SIS_xlsx_240624.csv")                                                   # Was 240526; if SIS xlsx data imported, re-write to CSV
 
 returns_select <- read.csv("../DATA/returns_select_SIS_xlsx_240624.csv")                                                 # replaces import data from SIS workbook [240510]
@@ -522,6 +548,7 @@ recruits <- oso_recruits.df %>%
 filename <- paste("../output/OSO_Recruits_", timestamp, ".csv", sep = "")       # filename for recruitment output 
 write.csv(recruits, filename)                                                   # saves the data to filename
 ```  
+
 ```{r juvenile abund}
 #uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.01.12.xlsx", sheet = "Juvenile Data") #presmolt (was 23.09.26.xlsx)
 #uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
