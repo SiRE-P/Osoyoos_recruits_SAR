@@ -94,7 +94,7 @@ returns_data <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx"
   janitor::clean_names()  %>%                                                                                                
   filter(!is.na(return_year), return_year <= last_year) %>%
   dplyr::select(return_year, tot_bonn_16hr = total_sox_bonn_16_hour, total_sockeye_snake, total_comm_harvest_below_bonn, 
-                total_sockeye_rock_i_24_hr, total_sockeye_rrh_24_hour, total_sockeye_tum_24_hour,
+                total_sockeye_rock_i_24_hr, total_sockeye_rrh_24_hour, total_sockeye_tum_24_hour, total_sockeye_wells_24_hour,
                 ok_stock_comp_percent_best, wen_stock_comp_percent_best)
 
 returns_data[is.na(returns_data)] <- 0 
@@ -467,6 +467,9 @@ oso_recruits <- returns_select %>%
          ifelse(is.na(total_comm_harvest_below_bonn), 0, total_comm_harvest_below_bonn))              # set missing harvest to 0 # revisit decision to set harvest=0 when NA 
 oso_recruits$X <- NULL                                                                                # drop X (extra observation counter?)
 
+# bonn_rocki_check <- oso_recruits %>%                                                                # check for years where RI24 > BON24
+#   dplyr::select(return_year, tot_bonn_16hr, bonn_dam_est, total_sockeye_rock_i_24_hr) %>%
+#   mutate(dam_diff <- bonn_dam_est - total_sockeye_rock_i_24_hr)                                     # minor diffs in 1995 & 1999
 ###
 oso_recruits$prop_oso_origin_nat[46] <- 0.719;  oso_recruits$prop_ska_origin_nat[46] <- 1 - oso_recruits$prop_oso_origin_nat[46] ### Hardwire Prop OSO for 2022 till raw input data are available
 oso_recruits$prop_oso_origin_nat[47] <- 0.542;  oso_recruits$prop_ska_origin_nat[47] <- 1 - oso_recruits$prop_oso_origin_nat[47] ### Hardwire Prop OSO for 2023 till raw input data are available
