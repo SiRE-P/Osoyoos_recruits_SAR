@@ -121,6 +121,7 @@ Wells_Sockeye <- Wells_data %>%                                                 
   dplyr::select(Project, Return_Year, Wells_Sockeye) 
 
 #-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 Columbia_Sockeye_Dam_Counts_by_Year_All <- Bonn_Sockeye %>%                     # collate all Sockeye dam count series by year
   full_join(JDay_Sockeye,  by = "Return_Year") %>%
@@ -135,16 +136,20 @@ Columbia_Sockeye_Dam_Counts_by_Year_All <- Bonn_Sockeye %>%                     
 Columbia_Sockeye_Dam_Counts_by_Year_Raw <- Columbia_Sockeye_Dam_Counts_by_Year_All %>%    # filter raw data !938-present to years common to 
   filter(Return_Year >= 1977 & Return_Year != year(today()))      ### Note: End Year!?    # mainstem dams (1977-present), dropping current incomplete year  
 
+#-------------------------------------------------------------------------------
+
 Columbia_Sockeye_Dam_Counts_24hr <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>%           # expand dam counts from 16-to-24 hr counts where applicable
   mutate(RRH_Sockeye_24hr   = ifelse(Return_Year < 1994,                                
                                      round(RRH_Sockeye   * 1.120, 0), RRH_Sockeye  )) %>% # Using 16-to-24-hr adj factor (1.12) up to 1993 based on multi-year avg 2004-2011 at RRH (from CW WDFW)
   mutate(Wells_Sockeye_24hr = ifelse(Return_Year < 1998, 
                                      round(Wells_Sockeye * 1.132, 0), Wells_Sockeye)) %>% # Estimated from 16-hr counts (pre-1998) + average annual difference 13.2% between 16- and 24-hour counts (1998-2022; Tom Kahler pers. comm.), i.e. 16-hr count x 1.132 [hs 2022-10-17]
-  mutate(Bonn_Sockeye_24hr  = round(Bonn_Sockeye * 1.040, 0)) %>%                      ### WAIT: OLD EXPANSION FACTOR. Incorporate PT's Bonn-16-to-24-hr adjustment here too????
+  mutate(Bonn_Sockeye_24hr  = round(Bonn_Sockeye * 1.040, 0)) %>%                      ### WAIT: NOTE OLD EXPANSION FACTOR. Incorporate PT's Bonn-16-to-24-hr adjustment here too????
   mutate(RockI_Sockeye_24hr = RockI_Sockeye) %>%                                          # RockI dam counts are already 24hr based
   mutate(Tum_Sockeye_24hr   = Tum_Sockeye) %>%                                            # Tumwater dam counts are already 24hr based
   dplyr::select(Return_Year, Bonn_Sockeye_24hr, RockI_Sockeye_24hr, RRH_Sockeye_24hr,     # Keep just the variables based on 24-hr counts.
                 Tum_Sockeye_24hr, Wells_Sockeye_24hr)
+
+#-------------------------------------------------------------------------------
 
 Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_24hr %>%                   # Compare u/s dam totals to d/s dam totals
   mutate(Well_gt_RRH_diff  = ifelse(Wells_Sockeye_24hr > RRH_Sockeye_24hr,                # and calculate dam count difference if u/s > d/s
@@ -160,6 +165,8 @@ Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_24hr %>%         
                              RockI_Sockeye_24hr, RRH_gt_RockI_diff, RockI_Sockeye_adj,
                              RRH_Sockeye_24hr, Well_gt_RRH_diff, RRH_Sockeye_adj, 
                              Wells_Sockeye_24hr, Tum_Sockeye_24hr)
+
+#-------------------------------------------------------------------------------
 
 Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%                        # Get best mid-Columbia stock composition proportions...
   mutate(Ok_Stock_Comp_1  = round(RRH_Sockeye_adj / RockI_Sockeye_adj,2)) %>%             # Ok-bound stock is typically calc'd from ratio of RRH:RockI dam counts.
