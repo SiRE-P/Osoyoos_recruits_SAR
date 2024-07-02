@@ -82,6 +82,42 @@ cv_gam_loo <- function(data, formula, seed = 123) {
 }
 ```
 
+```{r import harvest} 
+
+workbook <- "Columbia River sockeye harvest (Ryan Lothrop WDFW 240513).xlsx"    # raw USA harvest from WDFW and Okanagan (CAN) harvest by gear
+worksheet<- "SockeyeHarvestDataForR"                                            # raw data with easy column headings for R
+filename <- paste("../data/", workbook, sep = "")
+
+columbia_sockeye_harvest_data <- read_xlsx(filename, sheet=worksheet) %>%
+  janitor::clean_names() %>%  
+  filter(!is.na(year), year <= last_year) %>%
+  mutate(return_year = year) %>%
+  mutate(okanagan_returns = round(okanagan_returns, 0),                         # import summary catch data, %okanagan, and est'd harvest rate 
+         okanagan_harvest_rate = round(okanagan_harvest_rate, 3)) %>%           # but for this analysis, 
+  dplyr::select(return_year, total_harvest_below_bonn, total_usa_harvest,       # we are only interested in total sockeye harvest below Bonneville... 
+                proportion_okanagan, okanagan_sockeye_harvest_usa,               
+                okanagan_sockeye_harvest_can, okanagan_sockeye_harvest_total,
+                okanagan_returns, okanagan_harvest_rate)
+
+columbia_sockeye_harvest_below_Bonn <- columbia_sockeye_harvest_data %>%
+  dplyr::select(return_year, total_harvest_below_bonn, proportion_okanagan)     # we are only interested in total sockeye harvest below Bonneville.
+
+columbia_sockeye_harvest_below_Bonn[is.na(columbia_sockeye_harvest_below_Bonn)] <- 0 
+```
+
+```{r import snake sockeye}
+workbook <- "Snake River Sockeye from Joint Staff Report.xlsx"                  # estimated Snake River Sockeye component from WDFW/ODFW Joint Staff Report
+worksheet<- "Snake River Sockeye Estimates"                                     # Table 15
+filename <- paste("../data/", workbook, sep = "")
+
+snake_sockeye_estimates <- read_xlsx(filename, sheet=worksheet) %>%
+  janitor::clean_names() %>%  
+  filter(!is.na(year), year <= last_year) %>%
+  mutate(return_year = year) %>%
+  dplyr::select(return_year, total_snake_sockeye)
+
+```
+
 ```{r import returns}
 # RETURNS DATA : early code importing SIS XLSX worksheet "Sockeye Returns Data" replaced with read.csv of workbook's filtered columns [240510]
 #         NOTE : if relevant changes are ever made to SIS worksheet, then uncomment out xlsx import statements and write statement & rerun chunk & program
