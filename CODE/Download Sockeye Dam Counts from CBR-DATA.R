@@ -62,6 +62,18 @@ MCN_Sockeye <- MCN_data %>%
   dplyr::select(Project, Return_Year, MCN_Sockeye)                              # NOTE: UNKNOWN whether McNary based on 16-hr daily counts only 
 
 #-------------------------------------------------------------------------------
+# Ice Harbor Dam Counts for Snake River Sockeye ####
+
+ICE_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=IHR&startdate=1%2F1&enddate=12%2F31&run=")
+ICE_data <- ICE_html %>% html_table(fill = TRUE)
+ICE_data <- ICE_data[[1]] 
+
+ICE_Sockeye <- ICE_data %>%
+  filter(Year != "Year") %>%
+  mutate(Return_Year = as.numeric(Year), ICE_Sockeye = as.numeric(Sockeye)) %>%
+  dplyr::select(Project, Return_Year, ICE_Sockeye)                              # NOTE: UNKNOWN whether ICE HARBOR is based on 16-hr daily counts only; assume 24-hr 
+
+#-------------------------------------------------------------------------------
 # Priest Rapids Dam Counts  ####
 
 PRD_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=PRD&startdate=1%2F1&enddate=12%2F31&run=")
@@ -127,8 +139,9 @@ Wells_Sockeye <- Wells_data %>%                                                 
 
 Columbia_Sockeye_Dam_Counts_by_Year_All <- Bonn_Sockeye %>%                     # Collate all Sockeye dam count series by year  ####
   full_join(JDay_Sockeye,  by = "Return_Year") %>%
-  full_join(MCN_Sockeye,   by = "Return_Year") %>%
-  full_join(PRD_Sockeye,   by = "Return_Year") %>%
+  full_join(MCN_Sockeye,   by = "Return_Year") %>%  
+  full_join(ICE_Sockeye,   by = "Return_Year") %>%  
+  full_join(PRD_Sockeye,   by = "Return_Year") %>%  
   full_join(RockI_Sockeye, by = "Return_Year") %>%
   full_join(Tum_Sockeye,   by = "Return_Year") %>%
   full_join(RRH_Sockeye,   by = "Return_Year") %>%
