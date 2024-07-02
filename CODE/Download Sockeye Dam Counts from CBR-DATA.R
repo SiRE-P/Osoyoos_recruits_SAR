@@ -1,30 +1,32 @@
-## --------------------------------------------------------------------------
-## Program: Download Sockeye Dam Counts from CBR-DATA.R
-##
-## Title:   Download Sockeye Dam Counts from CBR-DART.R (mispelled in filename!)
-## Purpose: Obtain raw total annual dam counts at Columbia mainstem dams from online web portal and adjust for 16-24-hr expansions where 
-##          appropriate, as well as "negative mortality" issues at u/s dams vs d/s dams. Calculate annual mid-Columbia Sockeye stock composition
-##          for Wenatchee- and Okanagan-bound Sockeye stocks.
-## Author:  H Stiff 24.06.27
-## Notes:   Annual dam count data retrieval queries (one for each dam) were obtained from: https://www.cbr.washington.edu/dart/query/adult_annual_sum  
-##          Though this program retrieves annual totals data from all mainstem dams for all species, only some dams are needed for subsequent analyses, 
-##          and only Sockeye data are processed.
-##          Some dam/year combinations are based on 16-hr counts; these are adjusted up to full 24-hr day counts either
-##          via negative binomial regression analysis (Bonneville) in another program, OR AS IS DONE IN THIS PROGRAM SO FAR, 
-##          application of a simple multi-year mean multiplier based on years where both 16- and 24-hr counts are available.
-##          --> Wells pre-1998: Estimated from 16-hr counts (pre-1998) + average annual difference 13.2% between 16- and 24-hour counts (1998-2022; Tom Kahler pers. comm.), i.e. 16-hr count x 1.132 [hs 2022-10-17] 
-##          --> Rocky Reach pre-1994: Using 16-to-24-hr adj factor (1.12) up to 1993 based on multi-year avg 2004-2011 at RRH (from CW WDFW)
-##          --> Rock Island is effectively 24-hr day counts, as is Tumwater
-##          --> Not sure about John Day, McNary, Priest Rapids
-##          --> Bonneville is most accurately adjusted as in Osoyoos Sox Recruit & Survival.Rmd {r oso recruitment} based on model from {r bonn 16 to 24 hr count adjustment}
-##          *** BUT here the expansion factor is only approximated with an old 4% inflation factor till we decide how to incorporate the GAM in this program. ***
-## --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# Program: Download Sockeye Dam Counts from CBR-DATA.R ####
+#
+# Title:   Download Sockeye Dam Counts from CBR-DART.R (mispelled in filename!)
+# Purpose: Obtain raw total annual dam counts at Columbia mainstem dams from online web portal and adjust for 16-24-hr expansions where 
+#          appropriate, as well as "negative mortality" issues at u/s dams vs d/s dams. Calculate annual mid-Columbia Sockeye stock composition
+#          for Wenatchee- and Okanagan-bound Sockeye stocks.
+# Author:  H Stiff 24.06.27
+# Notes:   Annual dam count data retrieval queries (one for each dam) were obtained from: https://www.cbr.washington.edu/dart/query/adult_annual_sum  
+#          Though this program retrieves annual totals data from all mainstem dams for all species, only some dams are needed for subsequent analyses, 
+#          and only Sockeye data are processed.
+#          Some dam/year combinations are based on 16-hr counts; these are adjusted up to full 24-hr day counts either
+#          via negative binomial regression analysis (Bonneville) in another program, OR AS IS DONE IN THIS PROGRAM SO FAR, 
+#          application of a simple multi-year mean multiplier based on years where both 16- and 24-hr counts are available.
+#          --> Wells pre-1998: Estimated from 16-hr counts (pre-1998) + average annual difference 13.2% between 16- and 24-hour counts (1998-2022; Tom Kahler pers. comm.), i.e. 16-hr count x 1.132 [hs 2022-10-17] 
+#          --> Rocky Reach pre-1994: Using 16-to-24-hr adj factor (1.12) up to 1993 based on multi-year avg 2004-2011 at RRH (from CW WDFW)
+#          --> Rock Island is effectively 24-hr day counts, as is Tumwater
+#          --> Not sure about John Day, McNary, Priest Rapids
+#          --> Bonneville is most accurately adjusted as in Osoyoos Sox Recruit & Survival.Rmd {r oso recruitment} based on model from {r bonn 16 to 24 hr count adjustment}
+#          *** BUT here the expansion factor is only approximated with an old 4% inflation factor till we decide how to incorporate the GAM in this program. ***
+# --------------------------------------------------------------------------
 
 # install.packages("rvest")
 library(rvest)
+library(tidyverse)
+library(MASS)
 
 #-------------------------------------------------------------------------------
-# Bonneville Dam Counts
+# Bonneville Dam Counts ####
 
 Bonn_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=BON&startdate=1%2F1&enddate=12%2F31&run=")
 Bonn_data <- Bonn_html %>% html_table(fill = TRUE)
@@ -36,7 +38,7 @@ Bonn_Sockeye <- Bonn_data %>%
   dplyr::select(Project, Return_Year, Bonn_Sockeye)                             # NOTE: All years based on 16-hr daily counts only
   
 #-------------------------------------------------------------------------------
-# John Day Dam Counts
+# John Day Dam Counts  ####
 
 JDay_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=JDA&startdate=1%2F1&enddate=12%2F31&run=")
 JDay_data <- JDay_html %>% html_table(fill = TRUE)
@@ -48,7 +50,7 @@ JDay_Sockeye <- JDay_data %>%
   dplyr::select(Project, Return_Year, JDay_Sockeye)                             # NOTE: UNKNOWN whether JDay based on 16-hr daily counts only
 
 #-------------------------------------------------------------------------------
-# McNary Dam Counts
+# McNary Dam Counts  ####
 
 MCN_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=MCN&startdate=1%2F1&enddate=12%2F31&run=")
 MCN_data <- MCN_html %>% html_table(fill = TRUE)
@@ -60,7 +62,7 @@ MCN_Sockeye <- MCN_data %>%
   dplyr::select(Project, Return_Year, MCN_Sockeye)                              # NOTE: UNKNOWN whether McNary based on 16-hr daily counts only 
 
 #-------------------------------------------------------------------------------
-# Priest Rapids Dam Counts
+# Priest Rapids Dam Counts  ####
 
 PRD_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=PRD&startdate=1%2F1&enddate=12%2F31&run=")
 PRD_data <- PRD_html %>% html_table(fill = TRUE)
@@ -73,7 +75,7 @@ PRD_Sockeye <- PRD_data %>%
   mutate(PRD_Sockeye = ifelse(PRD_Sockeye < 5, NA, PRD_Sockeye))                # Bad data (1 fish!) in 2023 ? 
 
 #-------------------------------------------------------------------------------
-# Rock Island Dam Counts
+# Rock Island Dam Counts ####
 
 RockI_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=RIS&startdate=1%2F1&enddate=12%2F31&run=")
 RockI_data <- RockI_html %>% html_table(fill = TRUE)
@@ -85,7 +87,7 @@ RockI_Sockeye <- RockI_data %>%                                                 
   dplyr::select(Project, Return_Year, RockI_Sockeye) 
 
 #-------------------------------------------------------------------------------
-# Rocky Reach Dam Counts
+# Rocky Reach Dam Counts  ####
 
 RRH_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=RRH&startdate=1%2F1&enddate=12%2F31&run=")
 RRH_data <- RRH_html %>% html_table(fill = TRUE)
@@ -97,7 +99,7 @@ RRH_Sockeye <- RRH_data %>%                                                     
   dplyr::select(Project, Return_Year, RRH_Sockeye) 
 
 #-------------------------------------------------------------------------------
-# Tumwater (Wenatchee) Dam Counts                                               # NOTE: CBR-DATA for TUM differ in year-span and value from SIS workbook entries which were provided by C.Willard (Chelan PUD, TUM mgmt)
+# Tumwater (Wenatchee) Dam Counts  ####                                         # NOTE: CBR-DATA for TUM differ in year-span and value from SIS workbook entries which were provided by C.Willard (Chelan PUD, TUM mgmt)
 
 Tum_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=TUM&startdate=1%2F1&enddate=12%2F31&run=")
 Tum_data <- Tum_html %>% html_table(fill = TRUE)
@@ -109,7 +111,7 @@ Tum_Sockeye <- Tum_data %>%                                                     
   dplyr::select(Project, Return_Year, Tum_Sockeye) 
 
 #-------------------------------------------------------------------------------
-# Wells Dam Counts
+# Wells Dam Counts  ####
 
 Wells_html <- read_html("https://www.cbr.washington.edu/dart/cs/php/rpt/adult_annual.php?sc=1&outputFormat=html&proj=WEL&startdate=1%2F1&enddate=12%2F31&run=")
 Wells_data <- Wells_html %>% html_table(fill = TRUE)
@@ -123,7 +125,7 @@ Wells_Sockeye <- Wells_data %>%                                                 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 
-Columbia_Sockeye_Dam_Counts_by_Year_All <- Bonn_Sockeye %>%                     # collate all Sockeye dam count series by year
+Columbia_Sockeye_Dam_Counts_by_Year_All <- Bonn_Sockeye %>%                     # Collate all Sockeye dam count series by year  ####
   full_join(JDay_Sockeye,  by = "Return_Year") %>%
   full_join(MCN_Sockeye,   by = "Return_Year") %>%
   full_join(PRD_Sockeye,   by = "Return_Year") %>%
@@ -139,7 +141,7 @@ Columbia_Sockeye_Dam_Counts_by_Year_Raw <- Columbia_Sockeye_Dam_Counts_by_Year_A
 #-------------------------------------------------------------------------------
 # Bonn 16-to-24 hr Model ####
 
-bonn_16_v_24 <- read.csv("./data/Bonneville_16_v_24.csv")             # input data for years with 24 and 16 hour sockeye counts at Bonneville Dam
+bonn_16_v_24 <- read.csv("./data/Bonneville_16_v_24.csv")              # input data for years with 24 and 16 hour sockeye counts at Bonneville Dam
 bonn_16_v_24 <- bonn_16_v_24 %>%                                       # BON has two fish ladders: Bradford (OR) and Washington (WA)
   mutate(tot_16 = ifelse(!is.na(tot_16), tot_16, bradford_16hr + washington_16hr),
          tot_24 = ifelse(!is.na(tot_24), tot_24, bradford_24hr + washington_24hr)) %>% 
@@ -197,8 +199,8 @@ Columbia_Sockeye_Dam_Counts_24hr <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>% 
                                      round(RRH_Sockeye   * 1.120, 0), RRH_Sockeye  )) %>% # Using 16-to-24-hr adj factor (1.12) up to 1993 based on multi-year avg 2004-2011 at RRH (from CW WDFW)
   mutate(Wells_Sockeye_24hr = ifelse(Return_Year < 1998, 
                                      round(Wells_Sockeye * 1.132, 0), Wells_Sockeye)) %>% # Estimated from 16-hr counts (pre-1998) + average annual difference 13.2% between 16- and 24-hour counts (1998-2022; Tom Kahler pers. comm.), i.e. 16-hr count x 1.132 [hs 2022-10-17]
-  # mutate(Bonn_Sockeye_24hr  = round(Bonn_Sockeye * 1.040, 0)) %>%                      ### WAIT: NOTE OLD EXPANSION FACTOR. Incorporate PT's Bonn-16-to-24-hr adjustment here too????
-  mutate(Bonn_Sockeye_24hr  = Bonn_Sockeye + predict(bonn_model,                         # use known 24-hr counts instead of estimates where they exist (i.e., 1994-2000, 2002, 2013-2022)
+  # mutate(Bonn_Sockeye_24hr  = round(Bonn_Sockeye * 1.040, 0)) %>%                     ### WAIT: NOTE OLD EXPANSION FACTOR. Incorporate PT's Bonn-16-to-24-hr adjustment here too????
+  mutate(Bonn_Sockeye_24hr  = Bonn_Sockeye + predict(bonn_model,                          # use known 24-hr counts instead of estimates where they exist (i.e., 1994-2000, 2002, 2013-2022)
                                                      data.frame(tot_16 = Bonn_Sockeye), 
                                                      type = "response")) %>%                          
   mutate(RockI_Sockeye_24hr = RockI_Sockeye) %>%                                          # RockI dam counts are already 24hr based
@@ -208,7 +210,7 @@ Columbia_Sockeye_Dam_Counts_24hr <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>% 
 
 #-------------------------------------------------------------------------------
 
-Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_24hr %>%                   # Compare u/s dam totals to d/s dam totals
+Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_24hr %>%                   # Compare u/s dam totals to d/s dam totals ####
   mutate(Well_gt_RRH_diff  = ifelse(Wells_Sockeye_24hr > RRH_Sockeye_24hr,                # and calculate dam count difference if u/s > d/s
                                     Wells_Sockeye_24hr - RRH_Sockeye_24hr, NA)) %>%       # and flag the record by displaying the difference.
   mutate(RRH_Sockeye_adj   = pmax(Wells_Sockeye_24hr, RRH_Sockeye_24hr)) %>%              # Set d/s dam to max of the two dams.
@@ -228,7 +230,7 @@ Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_24hr %>%         
 
 #-------------------------------------------------------------------------------
 
-Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%                        # Get best mid-Columbia stock composition proportions...
+Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%                        # Get best mid-Columbia stock composition proportions ####
   mutate(Ok_Stock_Comp_1  = round(RRH_Sockeye_adj / RockI_Sockeye_adj,2)) %>%             # Ok-bound stock is typically calc'd from ratio of RRH:RockI dam counts.
   mutate(Wen_Stock_Comp_1 = round(1 - (RRH_Sockeye_adj / RockI_Sockeye_adj),2)) %>%       # Wen stock is usually calc'd by subtracting the Ok proportion from 1...
   mutate(Wen_Stock_Comp_2 = ifelse(is.na(Tum_Sockeye_24hr), 0,                            # but if counts at Tumwater are large enough to indicate a higher proportion
@@ -236,7 +238,7 @@ Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%              
   mutate(Wen_Stock_Comp_Best = pmax(Wen_Stock_Comp_1, Wen_Stock_Comp_2)) %>%              # so the best Wen stock comp is set to the max of the two estimates,
   mutate(Ok_Stock_Comp_Best = 1 - Wen_Stock_Comp_Best) %>%                                # and the best Ok stock comp is 100 - Best_Wen%.
   mutate(Stock_Comp_Total = Wen_Stock_Comp_Best + Ok_Stock_Comp_Best) %>%                 # This is all a bit arbitrary, as it is not clear without dam count error data,
-  dplyr::select(Return_Year, RockI_Sockeye_adj, RRH_Sockeye_adj, Tum_Sockeye_adj,        # fall-back (and over-shoot) estimates, and spatially-resolved harvest data, to
+  dplyr::select(Return_Year, RockI_Sockeye_adj, RRH_Sockeye_adj, Tum_Sockeye_adj,         # fall-back (and over-shoot) estimates, and spatially-resolved harvest data, to
                 Wen_Stock_Comp_1, Ok_Stock_Comp_1, Wen_Stock_Comp_2,                      # know which of the three dams is contributing what to the noise.
                 Wen_Stock_Comp_Best, Ok_Stock_Comp_Best, Stock_Comp_Total)                # Note also that the workbook contains somewhat different counts in the Tumwater column (starting in 
                                                                                           # 1989 not 1999) provided by C.Willard (Chelan PUD; Tum Dam mgmt), who apparently supplies the dam 
