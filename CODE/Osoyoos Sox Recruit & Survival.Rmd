@@ -29,8 +29,8 @@ library(tidyverse)
 library(readxl)
 library(stringi)
 library(ggrepel)
-library(mgcv)
 library(MASS)
+library(mgcv)
 library(splines)
 library(scales)
 library(ggpubr)       # for adding text boxes with regression coefficients to plots
@@ -129,7 +129,7 @@ returns_select <- read.csv("../DATA/returns_select_SIS_xlsx_240624.csv")        
 ```{r bonn 16 to 24 hr count adjustment}  
 # estimate 16 to 24 hr count relationship at Bonneville dam, utilizing all years of available data as input to a single model
 
-bonn_16_v_24 <- read.csv("../data/Bonneville_16_v_24.csv")              # input data for years with 24 and 16 hour sockeye counts at Bonneville Dam
+bonn_16_v_24 <- read.csv("../data/Bonneville_16_v_24.csv")             # input data for years with 24 and 16 hour sockeye counts at Bonneville Dam
 bonn_16_v_24 <- bonn_16_v_24 %>%                                       # BON has two fish ladders: Bradford (OR) and Washington (WA)
   mutate(tot_16 = ifelse(!is.na(tot_16), tot_16, bradford_16hr + washington_16hr),
          tot_24 = ifelse(!is.na(tot_24), tot_24, bradford_24hr + washington_24hr)) %>% 
@@ -142,7 +142,7 @@ bonn_model <- glm.nb((diff) ~ log(tot_16), data = bonn_16_v_24, link = "log") # 
 corrbonn <- corrr::correlate(log(bonn_16_v_24$tot_16), y = log(bonn_16_v_24$diff))    # r = 0.98 
 stats_txt = "ln(Y) = -4.89 + 1.15 * ln(X); r2 = 0.96; dev = 18.2"                     # stats to annotate regression plot   
 
-tot16_seq <- data.frame(tot_16 = seq(min(bonn_16_v_24$tot_16), max(bonn_16_v_24$tot_16), length= 100))   # makes a sequence to predict over so we can get the line in the plot
+tot16_seq <- data.frame(tot_16 = seq(min(bonn_16_v_24$tot_16), max(bonn_16_v_24$tot_16), length=100))    # makes a sequence to predict over so we can get the line in the plot
 
 bonn_pred_seq <- data.frame(tot_16 = tot16_seq, 
                       diff = predict(bonn_model, newdata = tot16_seq, type = "response"))                # type = "response" reverts to the scale of original data
