@@ -206,16 +206,22 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 
 # Mainstem Dam Counts 16-to-24 adjustments ####
 
-
+bon_16_to_24 <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>%
+  dplyr::select(ret_year = Return_Year, Bonn_Sockeye) %>%
+  full_join(bonn_16_v_24, by = "ret_year") %>%
+  mutate(Bonn_Sockeye_24hr_pred  = round(Bonn_Sockeye + predict(bonn_model,     # use bonn_model to estimate 24-hr counts from 16-hr counts          
+                                   data.frame(tot_16 = Bonn_Sockeye),
+                                   type = "response"),0)) %>% 
+  mutate(Bonn_Sockeye_24hr = ifelse(is.na(tot_24), Bonn_Sockeye_24hr_pred,      # use known 24-hr counts instead of estimates where they exist (i.e., 1994-2000, 2002, 2013-2022)
+                                    tot_24)) %>%
+  rename(Return_Year = ret_year)
+  
 Columbia_Sockeye_Dam_Counts_24hr <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>%           # expand dam counts from 16-to-24 hr counts where applicable
+  full_join(bon_16_to_24, by = "Return_Year") %>%                                         # Bon 24-hr counts drawn from bon_16_to_24 data step
   mutate(RRH_Sockeye_24hr   = ifelse(Return_Year < 1994,                                
                                      round(RRH_Sockeye   * 1.120, 0), RRH_Sockeye  )) %>% # Using 16-to-24-hr adj factor (1.12) up to 1993 based on multi-year avg 2004-2011 at RRH (from CW WDFW)
   mutate(Wells_Sockeye_24hr = ifelse(Return_Year < 1998, 
                                      round(Wells_Sockeye * 1.132, 0), Wells_Sockeye)) %>% # Estimated from 16-hr counts (pre-1998) + average annual difference 13.2% between 16- and 24-hour counts (1998-2022; Tom Kahler pers. comm.), i.e. 16-hr count x 1.132 [hs 2022-10-17]
-  # mutate(Bonn_Sockeye_24hr  = round(Bonn_Sockeye * 1.040, 0)) %>%                     ### WAIT: NOTE OLD EXPANSION FACTOR. Incorporate PT's Bonn-16-to-24-hr adjustment here too????
-  mutate(Bonn_Sockeye_24hr  = Bonn_Sockeye + predict(bonn_model,                          # use known 24-hr counts instead of estimates where they exist (i.e., 1994-2000, 2002, 2013-2022)
-                                                     data.frame(tot_16 = Bonn_Sockeye), 
-                                                     type = "response")) %>%                          
   mutate(RockI_Sockeye_24hr = RockI_Sockeye) %>%                                          # RockI dam counts are already 24hr based
   mutate(Tum_Sockeye_24hr   = Tum_Sockeye) %>%                                            # Tumwater dam counts are already 24hr based
   dplyr::select(Return_Year, Bonn_Sockeye_24hr, RockI_Sockeye_24hr, RRH_Sockeye_24hr,     # Keep just the variables based on 24-hr counts.
