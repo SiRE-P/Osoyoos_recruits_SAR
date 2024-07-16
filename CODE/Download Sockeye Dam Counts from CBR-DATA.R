@@ -24,6 +24,10 @@
 library(rvest)
 library(tidyverse)
 library(MASS)
+library(ggrepel)
+library(SiREfunctions)
+
+timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
 
 #-------------------------------------------------------------------------------
 # Bonneville Dam Counts ####
@@ -266,8 +270,6 @@ Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%              
                                                                                           # which means there will be some generally small diffs in stock comp from analyses based on workbook data.
 #-------------------------------------------------------------------------------
 
-library(tidyverse)
-
 Columbia_Sockeye_Dam_Counts_24hr_long <- Columbia_Sockeye_Dam_Counts_24hr %>% 
   pivot_longer(cols = c(Bonn_Sockeye_24hr, RockI_Sockeye_24hr, RRH_Sockeye_24hr, Wells_Sockeye_24hr), 
                names_to = "Mainstem_Dam", values_to = "Sockeye_Estimates") %>%
@@ -275,7 +277,7 @@ Columbia_Sockeye_Dam_Counts_24hr_long <- Columbia_Sockeye_Dam_Counts_24hr %>%
 
 ggplot(Columbia_Sockeye_Dam_Counts_24hr_long, 
        aes(x = Return_Year, y = Sockeye_Estimates / 1000, color = Mainstem_Dam)) +
-  labs(title = "Sockeye Estimates at Columbia Mainstem Dams (1000s)",
+  labs(title = "Sockeye 24-hr Counts at Columbia Mainstem Dams (1000s)",
        subtitle = "by Return Year", x = NULL, y = NULL) +
   geom_line() + 
   geom_point() +
@@ -292,7 +294,7 @@ Columbia_Sockeye_Dam_Counts_Adj_long <- Columbia_Sockeye_Dam_Counts_Adj %>%
 
 ggplot(Columbia_Sockeye_Dam_Counts_Adj_long, 
        aes(x = Return_Year, y = Sockeye_Estimates / 1000, color = Mainstem_Dam)) +
-  labs(title = "Sockeye Estimates at Columbia Mainstem Dams (1000s)",
+  labs(title = "Adjusted Sockeye Estimates at Columbia Mainstem Dams (1000s)",
        subtitle = "by Return Year", x = NULL, y = NULL) +
   geom_line() + 
   geom_point() +

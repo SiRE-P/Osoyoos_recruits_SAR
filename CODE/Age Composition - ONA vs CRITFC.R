@@ -13,6 +13,8 @@
 
 work <- "C:\\Users\\StiffH\\Documents\\Rcode\\Osoyoos_recruits_SAR"             # working directory
 
+timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
+
 filename <- paste(work, "\\DATA\\ok_riv_deadpitch_xlsx_240524.csv", sep = "")
 ok_riv_deadpitch <- read.csv2(filename, sep=",") 
 
@@ -394,7 +396,7 @@ past_plot + CRITFC_plot + ONA_plot +                                            
   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
   plot_layout(nrow = 3)                                                         # stack figures
 
-filename <- paste(work, "\\FIGURES\\Age_Comp_Compare_", timestamp, ".png", sep = "") # figure output filename
+filename <- paste(work, "\\FIGURES\\Age_Comp_Compare_100_", timestamp, ".png", sep = "") # figure output filename
 ggsave(file = filename, width = 6, height = 8, units = "in")                    # saves the plot
 
 #-----------------------  
@@ -426,7 +428,7 @@ ggplot(ocean_age_1, aes(x = return_year, y = diff_OA_comp)) +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 1 Composition") + 
-# scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 1)+
+  scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 0.4)+
 # scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2))) +           # omit 1980-1999 as only CRITFC or M-Yr ONA
 
 ggplot(ocean_age_2, aes(x = return_year, y = diff_OA_comp)) +
@@ -434,7 +436,7 @@ ggplot(ocean_age_2, aes(x = return_year, y = diff_OA_comp)) +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 2 Composition") + 
-# scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 1)+
+  scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 0.4)+
 # scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
   
 ggplot(ocean_age_3, aes(x = return_year, y = diff_OA_comp)) +
@@ -442,7 +444,7 @@ ggplot(ocean_age_3, aes(x = return_year, y = diff_OA_comp)) +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 3 Composition") +   
-# scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 1)+ 
+  scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 0.4)+
 # scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
   
   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
@@ -511,4 +513,6 @@ ggplot(ocean_age_3_plotdata, aes(x = factor(return_year), y = Ocean_Age_3, fill 
   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
   plot_layout(nrow = 3)                                                         # stack figures
 
+filename <- paste(work, "\\FIGURES\\Age_Comp_Compare_by_Age_", timestamp, ".png", sep = "") # figure output filename
+ggsave(file = filename, width = 6, height = 8, units = "in")                    # saves the plot
 
