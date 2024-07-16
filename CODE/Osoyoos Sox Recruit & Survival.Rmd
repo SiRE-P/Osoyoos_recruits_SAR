@@ -780,7 +780,7 @@ ggplot(radat2, aes(x = smolt_year, y = survival, colour = source))+
 filename <- paste("../figures/OSO_SAR_Survival_(OLD)_", timestamp, ".png", sep = "")   # filename for figure output 
 ggsave(file = filename, width = 6, height = 4, units = "in")                     # saves the plot to filename
 
-### NEW age comp ###############################################################
+### NEW age comp ############################################################### 
 
 oso_age_at_return <- left_join(oso_recruits.df %>% 
                      filter(return_year >= 1980) %>%
