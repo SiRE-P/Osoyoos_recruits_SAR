@@ -20,12 +20,20 @@
 #          *** BUT here the expansion factor is only approximated with an old 4% inflation factor till we decide how to incorporate the GAM in this program. ***
 # --------------------------------------------------------------------------
 
-# install.packages("rvest")
-library(rvest)
-library(tidyverse)
-library(MASS)
+library(ggplot2)
+library(ggpubr)       # for adding text boxes with regression coefficients to plots
 library(ggrepel)
+library(rvest)
+library(MASS)
+library(mgcv)
+library(patchwork)
+library(psych)
+library(readxl)
+library(scales)
 library(SiREfunctions)
+library(splines)
+library(stringi)
+library(tidyverse)
 
 timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
 
@@ -155,6 +163,10 @@ Columbia_Sockeye_Dam_Counts_by_Year_All <- Bonn_Sockeye %>%                     
 Columbia_Sockeye_Dam_Counts_by_Year_Raw <- Columbia_Sockeye_Dam_Counts_by_Year_All %>%    # filter raw data !938-present to years common to 
   filter(Return_Year >= 1977 & Return_Year != year(today()))      ### Note: End Year!?    # mainstem dams (1977-present), dropping current incomplete year  
 
+filename <- paste("./data/Columbia_Sockeye_Dam_Counts_by_Year_", timestamp, 
+                  ".csv", sep = "")                                             # filename for raw dam counts output 
+write.csv(Columbia_Sockeye_Dam_Counts_by_Year_All, filename)                    # saves ALL YEARS (1938-present) dam counts data to filename
+
 #-------------------------------------------------------------------------------
 # Bonn 16-to-24 hr Model ####
 
@@ -191,8 +203,8 @@ ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))+             # theme_pt centers main title but not subtitle
   
   ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
-  geom_line(data = bonn_pred_seq, color = "red", linewidth = 1.0)+                                  # PT's predictive regression line
-  # geom_smooth(method = "lm", se=TRUE, alpha = 0.5, color = "white", linewidth = 0.01)+              # alternative line option
+  geom_line(data = bonn_pred_seq, color = "red", linewidth = 1.0)+                        # PT's predictive regression line
+  # geom_smooth(method = "lm", se=TRUE, alpha = 0.5, color = "white", linewidth = 0.01)+  # alternative line option
   geom_point(colour="black", size=2.5)+
   geom_label_repel(aes(label = ret_year), fill = "white", color = "black", size = 3, nudge_y = 50, nudge_x = -80)+
   # labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+                   
@@ -203,7 +215,7 @@ ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+
   plot_annotation(tag_levels = 'A')+                                            # put A and B on Figure
   plot_layout(nrow = 2)                                                         # stack figures
 
-filename <- paste("../figures/Bon_Dam_Counts_", timestamp, ".png", sep = "")    # figure output filename
+filename <- paste("./figures/Bon_Dam_Counts_", timestamp, ".png", sep = "")     # figure output filename
 ggsave(file = filename, width = 6, height = 6, units = "in")                    # saves the plot
 
 #-------------------------------------------------------------------------------
@@ -251,6 +263,10 @@ Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_24hr %>%         
                              Wells_Sockeye_24hr, Wells_Sockeye_adj, 
                              Tum_Sockeye_24hr, Tum_Sockeye_adj) 
 
+filename <- paste("./data/Columbia_Sockeye_Dam_Counts_Adj_", timestamp, 
+                  ".csv", sep = "")                                                       # filename for relevant adjusted dam counts output 
+write.csv(Columbia_Sockeye_Dam_Counts_Adj, filename)                                      # saves the adj dam count data (1977-2023) to filename
+
 #-------------------------------------------------------------------------------
 
 Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%                        # Get best mid-Columbia stock composition proportions ####
@@ -271,7 +287,8 @@ Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%              
 #-------------------------------------------------------------------------------
 
 Columbia_Sockeye_Dam_Counts_24hr_long <- Columbia_Sockeye_Dam_Counts_24hr %>% 
-  pivot_longer(cols = c(Bonn_Sockeye_24hr, RockI_Sockeye_24hr, RRH_Sockeye_24hr, Wells_Sockeye_24hr), 
+  pivot_longer(cols = c(Bonn_Sockeye_24hr, RockI_Sockeye_24hr, RRH_Sockeye_24hr, 
+                        Wells_Sockeye_24hr), 
                names_to = "Mainstem_Dam", values_to = "Sockeye_Estimates") %>%
   dplyr::select(Return_Year, Mainstem_Dam, Sockeye_Estimates)
 
@@ -281,11 +298,10 @@ ggplot(Columbia_Sockeye_Dam_Counts_24hr_long,
        subtitle = "by Return Year", x = NULL, y = NULL) +
   geom_line() + 
   geom_point() +
-  scale_x_continuous(breaks = seq(min(Columbia_Sockeye_Dam_Counts_24hr_long$Return_Year), 
-                                  max(Columbia_Sockeye_Dam_Counts_24hr_long$Return_Year), by = 5)) +
+  scale_x_continuous(breaks = seq(trunc(min(Columbia_Sockeye_Dam_Counts_24hr_long$Return_Year)/10)*10, 
+                                  max(Columbia_Sockeye_Dam_Counts_24hr_long$Return_Year), by = 4)) +
   theme_minimal() +
   theme(legend.position = "bottom")
-
 
 Columbia_Sockeye_Dam_Counts_Adj_long <- Columbia_Sockeye_Dam_Counts_Adj %>% 
   pivot_longer(cols = c(Bonn_Sockeye_adj, RockI_Sockeye_adj, RRH_Sockeye_adj, Wells_Sockeye_adj), 
@@ -298,11 +314,14 @@ ggplot(Columbia_Sockeye_Dam_Counts_Adj_long,
        subtitle = "by Return Year", x = NULL, y = NULL) +
   geom_line() + 
   geom_point() +
-  scale_x_continuous(breaks = seq(min(Columbia_Sockeye_Dam_Counts_Adj_long$Return_Year), 
-                                  max(Columbia_Sockeye_Dam_Counts_Adj_long$Return_Year), by = 5)) +
+  scale_x_continuous(breaks = seq(trunc(min(Columbia_Sockeye_Dam_Counts_24hr_long$Return_Year)/10)*10, 
+                                  max(Columbia_Sockeye_Dam_Counts_Adj_long$Return_Year), by = 4)) +
   theme_minimal() +
   theme(legend.position = "bottom")
 
+filename <- paste("./figures/Columbia_Sockeye_Dam_Counts_Adj_", 
+                  timestamp, ".png", sep = "")                                  # figure output filename
+ggsave(file = filename, width = 8, height = 6, units = "in")                    # saves the plot
 
   
   
