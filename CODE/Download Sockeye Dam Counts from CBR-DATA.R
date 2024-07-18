@@ -281,9 +281,9 @@ Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%              
                 Wen_Stock_Comp_1, Ok_Stock_Comp_1, Wen_Stock_Comp_2,                      # know which of the three dams is contributing what to the noise.
                 Wen_Stock_Comp_Best, Ok_Stock_Comp_Best, Stock_Comp_Total)                # Note also that the workbook contains somewhat different counts in the Tumwater column (starting in 
                                                                                           # 1989 not 1999) provided by C.Willard (Chelan PUD; Tum Dam mgmt), who apparently supplies the dam 
-                                                                                          # count data to CBR-DART; but her data may include rec harvest or spawning ground AUC estimates to 
-                                                                                          # better approximate 'total Wen returns'. This prog uses published CBR-DART data for Tumwater only, 
-                                                                                          # which means there will be some generally small diffs in stock comp from analyses based on workbook data.
+filename <- paste("./data/Columbia_Sockeye_Stock_Comp_", timestamp,                       # count data to CBR-DART; but her data may include rec harvest or spawning ground AUC estimates to 
+                  ".csv", sep = "")                                                       # better approximate 'total Wen returns'. This prog uses published CBR-DART data for Tumwater only, 
+write.csv(Columbia_Sockeye_Stock_Comp, filename)                                          # which means there will be some generally small diffs in stock comp from analyses based on workbook data.
 #-------------------------------------------------------------------------------
 
 Columbia_Sockeye_Dam_Counts_24hr_long <- Columbia_Sockeye_Dam_Counts_24hr %>% 
