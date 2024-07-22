@@ -102,7 +102,6 @@ age_comp_ONA_long <- age_composition_ONA_wide %>%                               
   dplyr::select(-source, -total, -prop_total, -age_1.1, -age_1.2, -age_1.3,     # Drop sample size columns 
                 -age_1.4, -age_2.1, -age_2.2)
 
-
 ## ------------------------------------------------------------------------------
 ## Purpose: Get age composition of Okanagan-bound SK from CRITFC data (Jeff Fryer)
 ## Notes:   Years 2006-present come from PIT-tag data confirmed Okanagan-bound SK
@@ -145,6 +144,13 @@ age_comp_ONA_CRITFC <- merge(age_comp_CRITFC_long, age_comp_ONA_long,           
 ## That leaves 2001 as the only "ONA" 'best source' in recent years, which might as well be assigned to CRITFC since the two sources have nearly identical age comps for the major ages.
 ## However, it would be worth reviewing 2002-2003, which were years where CRITFC showed a potentially problematic number of older ages (3.x, 4.x), which JF has suggested may be misread scales.
 
+age_data <- read.csv("./DATA/age_composition_data.csv")  %>%                    # read csv & build on previous "best source" assignments to construct new source option...
+  mutate(best_source_old = best_source) %>%                                     # first, copy prev "best source" to best_source_old variable to preserve old assignments
+  mutate(best_source_new = ifelse(return_year %in% c(1985,1987:2001,2004:2022), # next, create best_source_new assignment variable by setting all years specified here to CRITFC...
+                                  "CRITFC", best_source_old)) %>%
+  mutate(best_source_new = ifelse(return_year %in% c(2002:2003, 2007, 2023),    # ...and all years specified here to SIRE...
+                                  "SIRE", best_source_new))
+
 best_age_comp_source_long <- age_data %>% dplyr::select(return_year,best_source)# Assemble annual 'best source' tag for age comp - based on past assumptions
 best_age_comp_source_past <- distinct(best_age_comp_source_long, return_year,
                                       .keep_all = TRUE)                         # Pull 'best source' from old age_data frame for now
@@ -153,7 +159,7 @@ best_age_comp_source_past$best_source <- gsub("SiRE", "ONA",
 best_age_comp_source_past <- best_age_comp_source_past %>%
   dplyr::select(return_year, best_source)
 
-  filename <- paste(work, "\\DATA\\best_age_comp_source_past_240527.csv",       ### fix folder spec...
+filename <- paste(work, "\\DATA\\best_age_comp_source_past_240527.csv",       ### fix folder spec...
                     sep = "")                                                   # CSV filename for CRITFC age composition proportions
 write.csv(best_age_comp_source_past, filename)                                  # saves the data to filename
 best_age_comp_source_past <- read.csv(filename)                                 # read CSV file; this stmt needs filename stmt above to be uncommented
@@ -322,7 +328,8 @@ check_CRITFC_OA <- ocean_age_comp_CRITFC %>%                                    
   check_CRITFC_OA$total_prop <- 
   rowSums(check_CRITFC_OA[, c(-1, -2, -3)], na.rm = TRUE)                       # sum ocean age proportions, should add to 1.0  
   
-CRITFC_plot <- ggplot(ocean_age_comp_CRITFC, aes(x = return_year, y = best_age_comp))+         # stacked 100% bar plot of annual age composition    
+CRITFC_plot <- ggplot(ocean_age_comp_CRITFC, 
+                      aes(x = return_year, y = best_age_comp))+                 # stacked 100% bar plot of annual age composition    
   geom_point(data = ocean_age_comp_CRITFC %>% ungroup() %>% 
                dplyr::select(return_year, best_source) %>% 
                unique(), aes(x = return_year, y = -0.02, color = best_source), 
@@ -414,7 +421,7 @@ setup_CRITFC_OA_comp <- ocean_age_comp_CRITFC %>% ungroup() %>%
 compare_OA_comp <-
   merge(setup_ONA_OA_comp, setup_CRITFC_OA_comp) %>%
   mutate(diff_OA_comp = abs(ONA_age_comp - CRITFC_age_comp)) %>%
-  dplyr::filter(return_year >= 1990) 
+  dplyr::filter(return_year >= 1990)                                            # no differences prior to 2000, actually
 
 ocean_age_1 <- compare_OA_comp %>%
   filter(ocean_age == 1)
@@ -487,7 +494,8 @@ ggplot(ocean_age_1_plotdata, aes(x = factor(return_year), y = Ocean_Age_1, fill 
   scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
   theme_pt(major_grid = TRUE)+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5)) +            # theme_pt centers main title but not subtitle
-
+  theme(legend.position="none") +
+  
 ggplot(ocean_age_2_plotdata, aes(x = factor(return_year), y = Ocean_Age_2, fill = Source)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.80) +
   xlab(NULL) +
@@ -498,6 +506,7 @@ ggplot(ocean_age_2_plotdata, aes(x = factor(return_year), y = Ocean_Age_2, fill 
   scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
   theme_pt(major_grid = TRUE)+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.75))+
+  theme(legend.position="none") +
 
 ggplot(ocean_age_3_plotdata, aes(x = factor(return_year), y = Ocean_Age_3, fill = Source)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.80) +
@@ -509,6 +518,7 @@ ggplot(ocean_age_3_plotdata, aes(x = factor(return_year), y = Ocean_Age_3, fill 
   scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
   theme_pt(major_grid = TRUE)+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))+
+  theme(legend.position="bottom")+
   
   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
   plot_layout(nrow = 3)                                                         # stack figures
