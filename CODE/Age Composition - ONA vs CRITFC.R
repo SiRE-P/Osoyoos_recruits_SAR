@@ -119,7 +119,7 @@ filename <- paste(work, "\\DATA\\age_comp_critfc_240619.csv", sep = "")         
 age_comp_critfc <- read.csv2(filename, sep=",")                                 # input saved CRITFC annual age composition  
 age_comp_critfc_wide <- age_comp_critfc %>%    
   rename(return_year = Year) %>%
-  dplyr::select(-Other,-Confirmed,-Source,-Notes,-X,-Sample_Size) %>%    # remove meta-data columns
+  dplyr::select(-Other,-Confirmed,-Source,-Notes,-X,-Sample_Size) %>%           # remove meta-data columns
   mutate(source = "CRITFC")                                                     # add source data tag
 
 age_comp_CRITFC_long <- age_comp_critfc_wide %>%                                # pivot to list proportions by return year and age class
@@ -136,6 +136,9 @@ age_comp_CRITFC_long <- age_comp_critfc_wide %>%                                
 age_comp_ONA_CRITFC <- merge(age_comp_CRITFC_long, age_comp_ONA_long,           # Merge (full join) CRITFC and ONA age composition data by year and age class
                        by = c("return_year", "age_class"), all = TRUE) %>%
   filter(age_class != "prop_age_1.4")                                           ### this filters out a record in 2007 where age 1.4 < 0.3%... 
+
+filename <- paste(work, "\\DATA\\age_comp_ona_critfc.csv", sep = "")            # CSV filename for ONA & CRITFC age composition proportions ### fix folder spec
+write.csv(age_comp_ONA_CRITFC, filename)                                        # saves the data to filename FOR USE IN OSOYOOS SOX RECRUITS & SURVIVAL.RMD
 
 ## -----------------------------------------------------------------------------
 ## NEXT section generates an annual list of 'best source' (ONA spawning grounds or CRITFC mainstem dam samples) for age composition for each year.
