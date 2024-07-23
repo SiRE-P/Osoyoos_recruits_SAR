@@ -245,23 +245,41 @@ Columbia_Sockeye_Dam_Counts_24hr <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>% 
 
 #-------------------------------------------------------------------------------
 
+# Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_24hr %>%                   # Compare u/s dam totals to d/s dam totals ####
+#   mutate(Well_gt_RRH_diff  = ifelse(Wells_Sockeye_24hr > RRH_Sockeye_24hr,                # and calculate dam count difference if u/s > d/s
+#                                     Wells_Sockeye_24hr - RRH_Sockeye_24hr, NA)) %>%       # and flag the record by displaying the difference.
+#   mutate(RRH_Sockeye_adj   = pmax(Wells_Sockeye_24hr, RRH_Sockeye_24hr)) %>%              # Set d/s dam to max of the two dams.
+#   mutate(RRH_gt_RockI_diff = ifelse(RRH_Sockeye_adj > RockI_Sockeye_24hr,                 # Compare u/s Rocky Reach (RRH) to d/s Rock Island
+#                                     RRH_Sockeye_adj - RockI_Sockeye_24hr, NA)) %>%        # and flag any records with the difference.
+#   mutate(RockI_Sockeye_adj = pmax(RockI_Sockeye_24hr, RRH_Sockeye_adj)) %>%               # Set d/s dam to max of the two dams.
+#   mutate(RockI_gt_Bonn_diff = ifelse(RockI_Sockeye_adj > Bonn_Sockeye_24hr,               # Compare u/s Rocky Reach (RRH) to d/s Rock Island
+#                                      RockI_Sockeye_adj - Bonn_Sockeye_24hr, NA)) %>%      # and flag any records with the difference.
+#   mutate(Bonn_Sockeye_adj = pmax(Bonn_Sockeye_24hr, RockI_Sockeye_adj)) %>%               # Set d/s dam to max of the two dams.
+#   mutate(Wells_Sockeye_adj = Wells_Sockeye_24hr) %>%                                      # No further adjustments for Wells.
+#   mutate(Tum_Sockeye_adj = Tum_Sockeye_24hr) %>%                                          # or Tumwater.
+#   dplyr::select(Return_Year, Bonn_Sockeye_24hr, RockI_gt_Bonn_diff, Bonn_Sockeye_adj,
+#                              RockI_Sockeye_24hr, RRH_gt_RockI_diff, RockI_Sockeye_adj,
+#                              RRH_Sockeye_24hr, Well_gt_RRH_diff, RRH_Sockeye_adj, 
+#                              Wells_Sockeye_24hr, Wells_Sockeye_adj, 
+#                              Tum_Sockeye_24hr, Tum_Sockeye_adj) 
+
 Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_24hr %>%                   # Compare u/s dam totals to d/s dam totals ####
-  mutate(Well_gt_RRH_diff  = ifelse(Wells_Sockeye_24hr > RRH_Sockeye_24hr,                # and calculate dam count difference if u/s > d/s
-                                    Wells_Sockeye_24hr - RRH_Sockeye_24hr, NA)) %>%       # and flag the record by displaying the difference.
-  mutate(RRH_Sockeye_adj   = pmax(Wells_Sockeye_24hr, RRH_Sockeye_24hr)) %>%              # Set d/s dam to max of the two dams.
-  mutate(RRH_gt_RockI_diff = ifelse(RRH_Sockeye_adj > RockI_Sockeye_24hr,                 # Compare u/s Rocky Reach (RRH) to d/s Rock Island
-                                    RRH_Sockeye_adj - RockI_Sockeye_24hr, NA)) %>%        # and flag any records with the difference.
-  mutate(RockI_Sockeye_adj = pmax(RockI_Sockeye_24hr, RRH_Sockeye_adj)) %>%               # Set d/s dam to max of the two dams.
-  mutate(RockI_gt_Bonn_diff = ifelse(RockI_Sockeye_adj > Bonn_Sockeye_24hr,               # Compare u/s Rocky Reach (RRH) to d/s Rock Island
-                                     RockI_Sockeye_adj - Bonn_Sockeye_24hr, NA)) %>%      # and flag any records with the difference.
-  mutate(Bonn_Sockeye_adj = pmax(Bonn_Sockeye_24hr, RockI_Sockeye_adj)) %>%               # Set d/s dam to max of the two dams.
-  mutate(Wells_Sockeye_adj = Wells_Sockeye_24hr) %>%                                      # No further adjustments for Wells.
-  mutate(Tum_Sockeye_adj = Tum_Sockeye_24hr) %>%                                          # or Tumwater.
-  dplyr::select(Return_Year, Bonn_Sockeye_24hr, RockI_gt_Bonn_diff, Bonn_Sockeye_adj,
-                             RockI_Sockeye_24hr, RRH_gt_RockI_diff, RockI_Sockeye_adj,
-                             RRH_Sockeye_24hr, Well_gt_RRH_diff, RRH_Sockeye_adj, 
-                             Wells_Sockeye_24hr, Wells_Sockeye_adj, 
-                             Tum_Sockeye_24hr, Tum_Sockeye_adj) 
+  mutate(RockI_gt_Bonn_diff = ifelse(RockI_Sockeye_24hr > Bonn_Sockeye_24hr,              # Compare u/s Rocky Reach (RRH) to d/s Bonneville
+                                     RockI_Sockeye_24hr - Bonn_Sockeye_24hr, NA)) %>%     # and flag any records with the difference.
+  mutate(RockI_Sockeye_adj  = pmin(Bonn_Sockeye_24hr, RockI_Sockeye_24hr)) %>%            # Set d/s dam to min of the two dams.
+  mutate(RRH_gt_RockI_diff  = ifelse(RRH_Sockeye_24hr > RockI_Sockeye_adj,                # Compare u/s Rocky Reach (RRH) to d/s Rock Island
+                                     RRH_Sockeye_24hr - RockI_Sockeye_adj, NA)) %>%       # and flag any records with the difference.
+  mutate(RRH_Sockeye_adj    = pmin(RockI_Sockeye_adj, RRH_Sockeye_24hr)) %>%              # Set d/s dam to max of the two dams.
+  mutate(Well_gt_RRH_diff   = ifelse(Wells_Sockeye_24hr > RRH_Sockeye_adj,                # and calculate dam count difference if u/s > d/s
+                                     Wells_Sockeye_24hr - RRH_Sockeye_adj, NA)) %>%       # and flag the record by displaying the difference.
+  mutate(Wells_Sockeye_adj  = pmin(Wells_Sockeye_24hr, RRH_Sockeye_adj)) %>%              # Set d/s dam to max of the two dams.
+  mutate(Bonn_Sockeye_adj   = Bonn_Sockeye_24hr) %>%                                      # No further adjustments for Bonn.
+  mutate(Tum_Sockeye_adj    = Tum_Sockeye_24hr) %>%                                       # or Tumwater.
+  dplyr::select(Return_Year,  Bonn_Sockeye_24hr, Bonn_Sockeye_adj, RockI_gt_Bonn_diff, 
+                              RockI_Sockeye_24hr, RockI_Sockeye_adj, RRH_gt_RockI_diff, 
+                              RRH_Sockeye_24hr, RRH_Sockeye_adj, Well_gt_RRH_diff, 
+                              Wells_Sockeye_24hr, Wells_Sockeye_adj, 
+                              Tum_Sockeye_24hr, Tum_Sockeye_adj) 
 
 filename <- paste("./data/Columbia_Sockeye_Dam_Counts_Adj_", timestamp, 
                   ".csv", sep = "")                                                       # filename for relevant adjusted dam counts output 
@@ -286,7 +304,7 @@ filename <- paste("./data/Columbia_Sockeye_Stock_Comp_", timestamp,             
 write.csv(Columbia_Sockeye_Stock_Comp, filename)                                          # which means there will be some generally small diffs in stock comp from analyses based on workbook data.
 #-------------------------------------------------------------------------------
 
-Columbia_Sockeye_Dam_Counts_24hr_long <- Columbia_Sockeye_Dam_Counts_24hr %>% 
+Columbia_Sockeye_Dam_Counts_24hr_long <- Columbia_Sockeye_Dam_Counts_24hr %>%             # convert datasets to long to enable ggplot outputs
   pivot_longer(cols = c(Bonn_Sockeye_24hr, RockI_Sockeye_24hr, RRH_Sockeye_24hr, 
                         Wells_Sockeye_24hr), 
                names_to = "Mainstem_Dam", values_to = "Sockeye_Estimates") %>%
