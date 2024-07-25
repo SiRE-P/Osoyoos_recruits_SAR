@@ -531,7 +531,7 @@ oso_recruits.df %>%                                                             
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
 filename <- paste("../figures/Okanagan_Recruits_", timestamp, ".png", sep = "") # filename for figure output 
-ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
+ggsave(file = filename, width = 6, height = 10, units = "in")                    # saves the plot to filename
 
 # filename <- paste("../output/_Recruits_", timestamp, ".csv", sep = "")       # filename for recruitment output 
 # write.csv(oka_recruits, filename)                                               # saves the data to filename
@@ -695,7 +695,8 @@ age_data.df <- age_data_new %>%
   group_by(return_year, ocean_age, best_source) %>% 
   summarise(CRITFC_prop_at_age = sum(CRITFC_prop_at_age, na.rm = TRUE), 
             ONA_prop_at_age = sum(ONA_prop_at_age, na.rm = TRUE)) %>% 
-  mutate(best_age_prop = ifelse(best_source == "CRITFC", CRITFC_prop_at_age, ONA_prop_at_age))
+  mutate(best_age_prop = ifelse(best_source == "CRITFC", CRITFC_prop_at_age, ONA_prop_at_age)) %>%
+  filter(return_year > 1984)
 
 age_prop_chk <- age_data.df %>%                                                 # shows if any annual total age proportions don't add up to 1.0
   group_by(return_year) %>%                                                     # sorted by total_best proportion
@@ -707,25 +708,30 @@ age_prop_chk <- age_data.df %>%                                                 
 # Following plots check the age composition visually.  First one shows selected proportions by ocean age with annual assignment source
 ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   #stacked 100% bar plot of annual age composition
   geom_point(data = age_data.df %>% ungroup() %>% 
+#              filter(return_year >= 1985) %>%
                dplyr::select(return_year, best_source) %>% 
                unique(), aes(x = return_year, y = -0.02, 
                              color = best_source), size = 3, pch = 15)+
   geom_col(aes(fill = ocean_age))+
-  scale_fill_viridis_d("Ocean Age")+
+  scale_fill_viridis_d("Ocean Age (Years)")+
   scale_color_manual(values = c("black", "red", "dodgerblue", "green"), "Source")+
   guides(colour = guide_legend(order = 2),
-          fill = guide_legend(order = 1))+
-  coord_cartesian(expand = FALSE)+
-  labs(title = "Ocean Age Composition (NEW)", subtitle = "By Return Year")+
+           fill = guide_legend(order = 1))+
+# coord_cartesian(expand = FALSE)+
+# coord_cartesian(xlim = c(1986, last_year)) +
+  scale_x_continuous(breaks = c(seq(from = 1984, to = last_year, by = 4))) +
+  labs(title = "Osoyoos Sockeye Ocean Age Composition", subtitle = "By Return Year")+
   ylab("Proportion at Age")+
   xlab("")+
-  theme_pt(major_grid=TRUE)+
+  theme_pt(major_grid=TRUE)+theme(legend.position="bottom") +
+  theme(legend.background = element_rect(fill = "white", color = "black"),
+        legend.text = element_text(size = 10)) +
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
 filename <- paste("../figures/Age_Composition_(NEW)_", timestamp, ".png", sep = "")   # filename for figure output
-ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
+ggsave(file = filename, width = 8, height = 6, units = "in")                    # saves the plot to filename
 # 
-# age_data.df %>%                                                                 # compare SiRE/ONA vs CRITFC/Fryer annual age comp% by ocean age
+# age_data.df %>%                                                               # compare SiRE/ONA vs CRITFC/Fryer annual age comp% by ocean age
 #   dplyr::select(-best_age_prop) %>% 
 #   gather(key = type, value = prop, prop_Fryer:prop_SIRE) %>%
 #   mutate(type = str_remove(type, "prop_")) %>% 
@@ -823,7 +829,7 @@ oso_age_at_return <- left_join(oso_recruits.df %>%
                 best_source, sox_age_best, sox_age_critfc, sox_age_sire)
   oso_age_at_return[is.na(oso_age_at_return)] <- 0 
 
-oso_marine_survival <- oso_age_at_return %>%
+oso_marine_survival <- oso_age_at_return %>%                                    # gathering marine survival terms together for report
   group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
                                      oso_sox_sire   = sum(sox_age_sire),
                                      oso_sox_best   = sum(sox_age_best)) %>% 
@@ -865,6 +871,21 @@ write.csv(oso_marine_survival,filename)
 #   theme_pt(major_grid=TRUE)+
 #   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
+mar_surv_table <- oso_age_at_return %>%
+  filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
+  group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
+                                     oso_sox_sire   = sum(sox_age_sire),
+                                     oso_sox_best   = sum(sox_age_best)) %>% 
+  left_join(., j_dat, by = "smolt_year") %>%                                    # joining the juvenile dataframe
+  filter(smolt_year > 1997) %>%                                                 # no juvenile abund data prior to 1998
+  mutate(survival_critfc = oso_sox_critfc / no_smolt,                               # calculating marine survival
+         survival_ona    = oso_sox_sire   / no_smolt,
+         survival_select = oso_sox_best   / no_smolt) %>%
+  dplyr::select(smolt_year, no_smolt, 
+                adults_critfc = oso_sox_critfc, adults_ona = oso_sox_sire, adults_select = oso_sox_best,
+                survival_critfc, survival_ona, survival_select)
+  
+  
 radat2_new <- oso_age_at_return %>%
   filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
   group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
