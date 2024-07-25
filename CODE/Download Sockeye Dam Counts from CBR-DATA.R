@@ -231,7 +231,11 @@ bon_16_to_24 <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>%
   mutate(Bonn_Sockeye_24hr = ifelse(is.na(tot_24), Bonn_Sockeye_24hr_pred,      # use known 24-hr counts instead of estimates where they exist (i.e., 1994-2000, 2002, 2013-2022)
                                     tot_24)) %>%
   rename(Return_Year = ret_year)
-  
+
+filename <- paste("./output/bon_16_to_24_", timestamp, 
+                  ".csv", sep = "")                                                       # filename for relevant adjusted dam counts output 
+write.csv(bon_16_to_24, filename)                                      # saves the adj dam count data (1977-2023) to filename
+
 Columbia_Sockeye_Dam_Counts_24hr <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>%           # expand dam counts from 16-to-24 hr counts where applicable
   full_join(bon_16_to_24, by = "Return_Year") %>%                                         # Bon 24-hr counts drawn from bon_16_to_24 data step
   mutate(RRH_Sockeye_24hr   = ifelse(Return_Year < 1994,                                
