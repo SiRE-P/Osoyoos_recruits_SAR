@@ -331,24 +331,34 @@ check_CRITFC_OA <- ocean_age_comp_CRITFC %>%                                    
   check_CRITFC_OA$total_prop <- 
   rowSums(check_CRITFC_OA[, c(-1, -2, -3)], na.rm = TRUE)                       # sum ocean age proportions, should add to 1.0  
   
-CRITFC_plot <- ggplot(ocean_age_comp_CRITFC, 
+CRITFC_ocean_age_filtered <- ocean_age_comp_CRITFC %>% 
+    filter(return_year >= 1985) %>%
+    filter(best_source == "CRITFC") %>%
+    filter(best_method != "MultiYearAvg") %>%
+    filter(is.na(best_method) == FALSE)
+  
+CRITFC_plot <- ggplot(CRITFC_ocean_age_filtered, 
                       aes(x = return_year, y = best_age_comp))+                 # stacked 100% bar plot of annual age composition    
-  geom_point(data = ocean_age_comp_CRITFC %>% ungroup() %>% 
-               dplyr::select(return_year, best_source) %>% 
-               unique(), aes(x = return_year, y = -0.02, color = best_source), 
-             size = 3, pch = 15)+
+  # geom_point(data = CRITFC_ocean_age_filtered %>% ungroup() %>% 
+  #              dplyr::select(return_year, best_source) %>% 
+  #              unique(), aes(x = return_year, y = -0.02, color = best_source), 
+  #            size = 3, pch = 15)+
   geom_col(aes(fill = ocean_age))+
   scale_fill_viridis_d("Ocean Age")+
-  scale_color_manual(values = c("red", "dodgerblue", "black"), "Source")+
+  scale_x_continuous(breaks = c(seq(from = 1985, to = last_year, by = 2))) +
+# scale_color_manual(values = c("red", "dodgerblue", "black"), "Source")+
   guides(colour = guide_legend(order = 2), 
          fill = guide_legend(order = 1))+
-  coord_cartesian(expand = FALSE)+
-  labs(title="Ocean Age Proportion", 
-       subtitle = "Source: Primarily CRITFC Age Comp (Fryer et al.)")+
+# coord_cartesian(expand = FALSE)+
+  coord_cartesian(xlim = c(1985, last_year)) +
+  labs(title="Ocean Age Proportions", 
+       subtitle = "Source: Columbia Mainstem Dam Samples (CRITFC [Fryer et al.])")+
   ylab(NULL)+
   xlab(NULL)+
   theme_pt()+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+
+# CRITFC_plot
   
 #-------
   
@@ -383,31 +393,40 @@ check_ONA_OA <- ocean_age_comp_ONA %>%                                          
   select_if(~sum(!is.na(.)) > 0)                                                # drop proportions columns in which all years are NA
   check_ONA_OA$total_prop <- 
   rowSums(check_ONA_OA[, c(-1, -2, -3)], na.rm = TRUE)                          # sum ocean age proportions, should add to 1.0  
-  
-ONA_plot <- ggplot(ocean_age_comp_ONA, aes(x = return_year, y = best_age_comp))+# stacked 100% bar plot of annual age composition    
-  geom_point(data = ocean_age_comp_ONA %>% ungroup() %>% 
-               dplyr::select(return_year, best_source) %>% 
-               unique(), aes(x = return_year, y = -0.02, color = best_source), 
-             size = 3, pch = 15)+
+
+ONA_ocean_age_filtered <- ocean_age_comp_ONA %>% 
+  filter(return_year >= 1985) %>%
+  filter(best_source == "ONA") %>%
+  filter(best_method != "MultiYearAvg") %>%
+  filter(is.na(best_method) == FALSE)
+
+ONA_plot <- ggplot(ONA_ocean_age_filtered, aes(x = return_year, y = best_age_comp))+# stacked 100% bar plot of annual age composition    
+  # geom_point(data = ONA_ocean_age_filtered %>% ungroup() %>% 
+  #              dplyr::select(return_year, best_source) %>% 
+  #              unique(), aes(x = return_year, y = -0.02, color = best_source), 
+  #            size = 3, pch = 15)+
   geom_col(aes(fill = ocean_age))+
   scale_fill_viridis_d("Ocean Age")+
-  scale_color_manual(values = c("red", "dodgerblue", "black"), "Source")+
+  # scale_color_manual(values = c("red", "dodgerblue", "black"), "Source")+
+  scale_x_continuous(breaks = c(seq(from = 1985, to = last_year, by = 2))) +
   guides(colour = guide_legend(order = 2), 
          fill = guide_legend(order = 1))+
-  coord_cartesian(expand = FALSE)+
-  labs(title="Ocean Age Proportion", 
-       subtitle = "Source: Primarily Spawning Grounds (ONA, Hyatt et al.)")+
+# coord_cartesian(expand = FALSE)+
+  coord_cartesian(xlim = c(1985, last_year)) +
+  labs(title="Ocean Age Proportions", 
+       subtitle = "Source: Spawning Grounds Deadpitch (ONA, SiRE [Hyatt et al.])")+
   ylab(NULL)+
   xlab(NULL)+
   theme_pt()+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
-past_plot + CRITFC_plot + ONA_plot +                                            # collate three age comp plots for comparison
-  plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
-  plot_layout(nrow = 3)                                                         # stack figures
+# past_plot + CRITFC_plot + ONA_plot +                                          # collate three age comp plots for comparison
+CRITFC_plot + ONA_plot +                                                        # collate CRITFC & ONA age comp plots for comparison
+  plot_annotation(tag_levels = 'A')+                                            # put A B on Figure
+  plot_layout(nrow = 2)                                                         # stack figures
 
 filename <- paste(work, "\\FIGURES\\Age_Comp_Compare_100_", timestamp, ".png", sep = "") # figure output filename
-ggsave(file = filename, width = 6, height = 8, units = "in")                    # saves the plot
+ggsave(file = filename, width = 8, height = 8, units = "in")                    # saves the plot
 
 #-----------------------  
 
@@ -439,15 +458,19 @@ ggplot(ocean_age_1, aes(x = return_year, y = diff_OA_comp)) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 1 Composition") + 
   scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 0.4)+
-# scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2))) +           # omit 1980-1999 as only CRITFC or M-Yr ONA
-
+  scale_x_continuous(breaks = c(seq(from = 1990, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
+  theme_pt(major_grid = TRUE)+
+  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) +                 # theme_pt centers main title but not subtitle
+  
 ggplot(ocean_age_2, aes(x = return_year, y = diff_OA_comp)) +
   geom_bar(stat = "identity") +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 2 Composition") + 
   scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 0.4)+
-# scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
+  scale_x_continuous(breaks = c(seq(from = 1990, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
+  theme_pt(major_grid = TRUE)+
+  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) +                 # theme_pt centers main title but not subtitle
   
 ggplot(ocean_age_3, aes(x = return_year, y = diff_OA_comp)) +
   geom_bar(stat = "identity") +
@@ -455,77 +478,81 @@ ggplot(ocean_age_3, aes(x = return_year, y = diff_OA_comp)) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 3 Composition") +   
   scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 0.4)+
-# scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
-  
+  scale_x_continuous(breaks = c(seq(from = 1990, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
+  theme_pt(major_grid = TRUE)+
+  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) +                 # theme_pt centers main title but not subtitle
+
   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
   plot_layout(nrow = 3)                                                         # stack figures
 
-filename <- paste(work, "\\FIGURES\\Age_Comp_CompareDiff_", timestamp, ".png", sep = "") # figure output filename
-ggsave(file = filename, width = 6, height = 8, units = "in")                    # saves the plot
+filename <- paste(work, "\\FIGURES\\Age_Comp_CompareDiff_", 
+                  timestamp, ".png", sep = "")                                  # figure output filename
+ggsave(file = filename, width = 8, height = 8, units = "in")                    # saves the plot
 
 #---- 
 # Side-by-side bar chart comparison of CRITFC vs ONA proportions by ocean age classes 1 and 2
 
-ocean_age_1_plotdata <- ocean_age_1 %>%                                         # focus on ocean age 1 (jacks)
-  dplyr::select(-diff_OA_comp) %>%
-  pivot_longer(cols = ends_with("_age_comp"),                                   # arranging the data to long format for plotting
-                              names_to = "Source",
-                              values_to = "Ocean_Age_1") %>%
-  dplyr::filter(return_year >= 1990) 
-
-ocean_age_2_plotdata <- ocean_age_2 %>%                                         # focus on ocean age 2 (42s and 53s)
-  dplyr::select(-diff_OA_comp) %>%
-  pivot_longer(cols = ends_with("_age_comp"),                                   #arranging the data to long format for plotting
-               names_to = "Source",
-               values_to = "Ocean_Age_2") %>%
-  dplyr::filter(return_year >= 1990) 
-
-ocean_age_3_plotdata <- ocean_age_3 %>%                                         # focus on ocean age 3 (52s and 63s
-  dplyr::select(-diff_OA_comp) %>%
-  pivot_longer(cols = ends_with("_age_comp"),                                   #arranging the data to long format for plotting
-               names_to = "Source",
-               values_to = "Ocean_Age_3") %>%
-  dplyr::filter(return_year >= 1990) 
-
-ggplot(ocean_age_1_plotdata, aes(x = factor(return_year), y = Ocean_Age_1, fill = Source)) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.80) +
-  xlab(NULL) +
-  ylab(NULL) +
-  ggtitle("Compare Proportions at Ocean Age 1") +
-  scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+
-  scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
-  scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
-  theme_pt(major_grid = TRUE)+
-  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5)) +            # theme_pt centers main title but not subtitle
-  theme(legend.position="none") +
-  
-ggplot(ocean_age_2_plotdata, aes(x = factor(return_year), y = Ocean_Age_2, fill = Source)) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.80) +
-  xlab(NULL) +
-  ylab(NULL) +
-  ggtitle("Compare Proportions at Ocean Age 2") +
-  scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+ 
-  scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
-  scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
-  theme_pt(major_grid = TRUE)+
-  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.75))+
-  theme(legend.position="none") +
-
-ggplot(ocean_age_3_plotdata, aes(x = factor(return_year), y = Ocean_Age_3, fill = Source)) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.80) +
-  xlab(NULL) +
-  ylab(NULL) +
-  ggtitle("Compare Proportions at Ocean Age 3") +
-  scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+
-  scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
-  scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
-  theme_pt(major_grid = TRUE)+
-  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))+
-  theme(legend.position="bottom")+
-  
-  plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
-  plot_layout(nrow = 3)                                                         # stack figures
-
-filename <- paste(work, "\\FIGURES\\Age_Comp_Compare_by_Age_", timestamp, ".png", sep = "") # figure output filename
-ggsave(file = filename, width = 6, height = 8, units = "in")                    # saves the plot
+# ocean_age_1_plotdata <- ocean_age_1 %>%                                         # focus on ocean age 1 (jacks)
+#   dplyr::select(-diff_OA_comp) %>%
+#   pivot_longer(cols = ends_with("_age_comp"),                                   # arranging the data to long format for plotting
+#                               names_to = "Source",
+#                               values_to = "Ocean_Age_1") %>%
+#   dplyr::filter(return_year >= 1990) 
+# 
+# ocean_age_2_plotdata <- ocean_age_2 %>%                                         # focus on ocean age 2 (42s and 53s)
+#   dplyr::select(-diff_OA_comp) %>%
+#   pivot_longer(cols = ends_with("_age_comp"),                                   #arranging the data to long format for plotting
+#                names_to = "Source",
+#                values_to = "Ocean_Age_2") %>%
+#   dplyr::filter(return_year >= 1990) 
+# 
+# ocean_age_3_plotdata <- ocean_age_3 %>%                                         # focus on ocean age 3 (52s and 63s
+#   dplyr::select(-diff_OA_comp) %>%
+#   pivot_longer(cols = ends_with("_age_comp"),                                   #arranging the data to long format for plotting
+#                names_to = "Source",
+#                values_to = "Ocean_Age_3") %>%
+#   dplyr::filter(return_year >= 1990) 
+# 
+# ggplot(ocean_age_1_plotdata, aes(x = factor(return_year), y = Ocean_Age_1, fill = Source)) +
+#   geom_bar(stat = "identity", position = "dodge", width = 0.80) +
+#   xlab(NULL) +
+#   ylab(NULL) +
+#   ggtitle("Compare Proportions at Ocean Age 1") +
+#   scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+
+#   scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
+#   scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
+#   theme_pt(major_grid = TRUE)+
+#   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5)) +            # theme_pt centers main title but not subtitle
+#   theme(legend.position="none") +
+#   
+# ggplot(ocean_age_2_plotdata, aes(x = factor(return_year), y = Ocean_Age_2, fill = Source)) +
+#   geom_bar(stat = "identity", position = "dodge", width = 0.80) +
+#   xlab(NULL) +
+#   ylab(NULL) +
+#   ggtitle("Compare Proportions at Ocean Age 2") +
+#   scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+ 
+#   scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
+#   scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
+#   theme_pt(major_grid = TRUE)+
+#   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.75))+
+#   theme(legend.position="none") +
+# 
+# ggplot(ocean_age_3_plotdata, aes(x = factor(return_year), y = Ocean_Age_3, fill = Source)) +
+#   geom_bar(stat = "identity", position = "dodge", width = 0.80) +
+#   xlab(NULL) +
+#   ylab(NULL) +
+#   ggtitle("Compare Proportions at Ocean Age 3") +
+#   scale_y_continuous(breaks = c(seq(from = 0, to = 1, by = 0.1)))+ ylim(0, 1)+
+#   scale_x_discrete(breaks = c(seq(from = 1990, to = 2024, by = 2)))+            # omit 1980-1999 as only CRITFC or M-Yr ONA
+#   scale_fill_discrete(name = "Source", labels = c("CRITFC", "ONA")) +
+#   theme_pt(major_grid = TRUE)+
+#   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))+
+#   theme(legend.position="bottom")+
+#   
+#   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
+#   plot_layout(nrow = 3)                                                         # stack figures
+# 
+# filename <- paste(work, "\\FIGURES\\Age_Comp_Compare_by_Age_", 
+#                   timestamp, ".png", sep = "")                                  # figure output filename
+# ggsave(file = filename, width = 6, height = 8, units = "in")                    # saves the plot
 
