@@ -11,6 +11,21 @@
 ## Issues:  see statements where triple hash marks (###) exist.
 ## ---------------------------------------------------------------------------------------------------------------------------
 
+library(ggplot2)
+library(ggpubr)       # for adding text boxes with regression coefficients to plots
+library(ggrepel)
+library(rvest)
+library(MASS)
+library(mgcv)
+library(patchwork)
+library(psych)
+library(readxl)
+library(scales)
+library(SiREfunctions)
+library(splines)
+library(stringi)
+library(tidyverse)
+
 work <- "C:\\Users\\StiffH\\Documents\\Rcode\\Osoyoos_recruits_SAR"             # working directory
 
 timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
