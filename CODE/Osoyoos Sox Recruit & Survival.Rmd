@@ -1,5 +1,5 @@
 ```{r setup, include=FALSE}
-#####
+#
 # title:  "Osoyoos Sockeye Recruitment Estimation"
 # author: "Colin Bailey, Patrick Thompson, Howard Stiff"
 # date:   '2024-06-24'
@@ -20,7 +20,7 @@
 # update: 240524 + see GitHub
 # update: TO DO  - incorporate RY2022 and 2023 data to extend mar-surv time-series to SY2021 - DONE
 # update: 240701 - dam counts now retrieved from CBR-DART web data portal - requires execution of "Download Sockeye Dam Counts from CBR-DATA.R"
-#####
+#
 
 timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
 
@@ -124,12 +124,12 @@ snake_sockeye_estimates <- read_xlsx(filename, sheet=worksheet) %>%
 
 ```{r calculate oka-bound sockeye abundance}
 
-Columbia_Sockeye_Dam_Counts_Adj <- 
+Columbia_Sockeye_Dam_Counts_Adj <-                                              #   Import expanded & adjusted mainstem dam counts
   read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240718.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
   janitor::clean_names()                                                        ###     unless version 240718 exists in DATA subdirectory already
 
 dam_counts <- Columbia_Sockeye_Dam_Counts_Adj %>%                               
-  dplyr::select(return_year,                  bon_sox = bonn_sockeye_adj, 
+  dplyr::select(return_year,                  bon_sox = bonn_sockeye_adj,       # obtain ADJusted Sockeye estimates from mainstem dams
                 rid_sox = rock_i_sockeye_adj, rrh_sox = rrh_sockeye_adj, 
                 tum_sox = tum_sockeye_adj,    wel_sox = wells_sockeye_adj)
 
@@ -140,17 +140,18 @@ Columbia_Sockeye_Stock_Comp <-
 stock_comp <- Columbia_Sockeye_Stock_Comp %>% 
   dplyr::select(return_year, ok_stock_comp = ok_stock_comp_best)                # select best annual Okanagan Sockeye stock comp estimate
 
-annual_returns <- dam_counts %>%
+annual_returns <- dam_counts %>%                                                # get annual Okanagan-bound Sockeye recruitment estimates 
   full_join(columbia_sockeye_harvest_below_bonn, by = "return_year") %>%
   full_join(snake_sockeye_estimates, by = "return_year") %>%
   full_join(stock_comp, by = "return_year") %>%
   dplyr::rename(snake_sox = total_snake_sockeye) %>%
   arrange(return_year) %>%
-  mutate(bon_sox = round(bon_sox, 0)) %>%
-  mutate(columbia_sox = bon_sox + ifelse(is.na(total_harvest_below_bonn), 0, total_harvest_below_bonn)) %>%
-  mutate(mid_columbia_sox = columbia_sox - snake_sox) %>%
-  mutate(oka_sox = round(mid_columbia_sox * ok_stock_comp, 0)) %>%
-  dplyr::select(return_year, columbia_sox, total_harvest_below_bonn, bon_sox, 
+  mutate(bon_sox = round(bon_sox, 0)) %>%                                       # derive Okanagan-bound Sockeye recruits based on:
+  mutate(columbia_sox = bon_sox +                                               #   adjusted Bonneville Sockeye estimates 
+         ifelse(is.na(total_harvest_below_bonn),0,total_harvest_below_bonn)) %>%# + downstream harvest (Zones 1-5) in Columbia estuary  
+  mutate(mid_columbia_sox = columbia_sox - snake_sox) %>%                       # - Snake Sockeye estimates 
+  mutate(oka_sox = round(mid_columbia_sox * ok_stock_comp, 0)) %>%              # x "best" Okanagan-bound stock proportion
+  dplyr::select(return_year, columbia_sox, total_harvest_below_bonn, bon_sox,   
                 snake_sox, mid_columbia_sox, 
                 ok_stock_comp, oka_sox)
 ```
@@ -168,7 +169,7 @@ ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240524.csv")        
 pen_channel_deadpitch <- read.csv("../data/skaha_deadpitch_tidy_240227.csv") %>%                 # deadpitch version with 26 obs in Section "Skaha Beach" chngd to Pen channel  
   janitor::clean_names() %>%                                                                     #           (i.e., 26 SK records in 2016: 25N-O, 1H-O)
   filter(location == "penticton channel") %>%                                                
-  mutate(location = "Penticton Channel")
+  mutate(location  = "Penticton Channel")
 
 shingle_deadpitch <- read.csv("../data/shingle_deadpitch.csv") %>%                               # deadpitch for Shingle Ck fish with thermal marks 
   janitor::clean_names()
@@ -206,8 +207,8 @@ deadpitch_shingle <- shingle_deadpitch %>%                          # process Sh
   mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
   mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))       # H-O fry released into both Osoyoos and Skaha lakes in 2013
 
-deadpitch_2022_2023 <- data.frame(                                  # append summary values for 2022 and 2023 till raw data obtained [24.07.04]
-  year = c(2022, 2023, 2022, 2022),  # 
+deadpitch_2022_2023 <- data.frame(                              ### append summary values for 2022 and 2023 till raw data obtained [24.07.04]
+  year = c(2022, 2023, 2022, 2022),                             # 
   section = c("Lower Ok River", "Lower Ok River",                           # Lower Ok River
               "Penticton Channel", "Shingle Creek"),                        # Skaha River and Shingle Creek section
   n_natural = c(388, 311, 360, 35),                                         # natural origin count from AO
@@ -311,7 +312,7 @@ spawning_location <- AUC_data %>%
 
 prop_oso_strays_by_year <- spawning_location %>%          # calculate OSO stray rate based on years where no SKA N-O returns exist (2009-2012)
   filter(year > 2008, year < 2013) %>%                    # N-O fish in mid-OkR from 2009-2012 MUST be OSO strays, since dam prevented SKA to spawn <2011
-  filter(spawning_location != "Penticton Channel") %>%    # omit Pen Chan data from calculation of proportion OSO strays
+  filter(spawning_location != "Penticton Channel") %>%    # omit Pen Chan data from calculation of proportion OSO strays   ### <-- [hs: can't recall why we omit PEN]
   left_join(prop_natural %>% dplyr::select(year, spawning_location = section, p_nat)) %>% 
   mutate(natural_sockeye = total_sockeye * p_nat) %>% 
   group_by(year) %>%                                      # for true stray rate, include OSO strays in the denominator [PT 240411]
@@ -490,8 +491,8 @@ oso_recruits.df <- oso_recruits %>%
   mutate(oso_origin_nat_returns = round(okanagan * prop_oso_origin_nat,0)) %>%                                 # OSO N-O abundance
   mutate(ska_origin_nat_returns = round(okanagan * prop_ska_origin_nat,0)) %>%                                 # SKA N-O abundance
   mutate(hatchery_returns = round(okanagan - oso_origin_nat_returns - ska_origin_nat_returns,0)) %>%           # SKA H-O abundance
-  mutate(ska_total_returns = ifelse(return_year == 2013, ska_origin_nat_returns + 0.5 * hatchery_returns,      # SKA total = H-O + N-O (presuming 50% of H-O returns in RY2013 --> SKA (since half or BY2009 releases were in SKA and half in OSO lake...
-                                    ifelse(return_year %in% c(2015, 2016, 2017), ska_origin_nat_returns,       #                        whereas in RY2015 & 2016, all H-O returns were of OSO origin, so add nont to Skaha...
+  mutate(ska_total_returns = ifelse(return_year == 2013, ska_origin_nat_returns + 0.5 * hatchery_returns,      # SKA total = H-O + N-O (presuming 50% of H-O returns in RY2013 --> SKA (since half of BY2009 releases were in SKA and half in OSO lake...
+                                    ifelse(return_year %in% c(2015, 2016, 2017), ska_origin_nat_returns,       #                        whereas in RY2015 & 2016, all H-O returns were of OSO origin, so add none to Skaha...
                                            ska_origin_nat_returns + hatchery_returns))) %>%                    #                        otherwise, for all other years, set SKA Total Recruits = SKA N-O + H-O 
   mutate(prop_oso_strays = round(prop_oso_strays,3)) %>%
   mutate(prop_ska_strays = round(prop_ska_strays,3)) %>%                                                       # these next statements refer to spawning ground totals... 
@@ -531,10 +532,10 @@ oso_recruits.df %>%                                                             
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
 filename <- paste("../figures/Okanagan_Recruits_", timestamp, ".png", sep = "") # filename for figure output 
-ggsave(file = filename, width = 6, height = 10, units = "in")                    # saves the plot to filename
+ggsave(file = filename, width = 6, height = 10, units = "in")                   # saves the plot to filename
 
-# filename <- paste("../output/_Recruits_", timestamp, ".csv", sep = "")       # filename for recruitment output 
-# write.csv(oka_recruits, filename)                                               # saves the data to filename
+# filename <- paste("../output/_Recruits_", timestamp, ".csv", sep = "")        # filename for recruitment output 
+# write.csv(oka_recruits, filename)                                             # saves the data to filename
 
 # geometric mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns  
 pre_fwmt  <- median(oso_recruits.df[oso_recruits.df$return_year %in% c(1977:2007),]$oso_origin_nat_returns)/1000
@@ -559,9 +560,20 @@ oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000)
 filename <- paste("../figures/OSO_Recruits_", timestamp, ".png", sep = "")      # filename for figure output 
 ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
 
+columbia_recruits <- oso_recruits.df %>%
+  dplyr::select(return_year, bon24_counts = bon_sox, 
+                harv_downstream = total_harvest_below_bonn, snake_sox,
+                mid_columbia_sox, ok_stock_comp, oka_sox, prop_oso_origin_nat,
+                prop_oso_strays, oso_origin_nat_returns)
+
+filename <- paste("../output/Columbia_Recruits_", timestamp, ".csv", sep = "")  # filename for recruitment output 
+write.csv(columbia_recruits, filename)                                          # saves the data to filename
+                
 # create timeseries of return year and number of total okanagan, osoyoos & skaha sub-stock recruits, and write to a CSV file
 oka_recruits <- oso_recruits.df %>% 
-  dplyr::select(return_year, columbia=columbia_sox, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns, ska_total_returns)
+  dplyr::select(return_year, columbia=columbia_sox, okanagan, 
+                oso_origin_nat_returns, ska_origin_nat_returns, 
+                hatchery_returns, ska_total_returns)
 
 filename <- paste("../output/OKA_Recruits_", timestamp, ".csv", sep = "")       # filename for recruitment output 
 write.csv(oka_recruits, filename)                                               # saves the data to filename
@@ -691,6 +703,7 @@ age_data_new <- age_proportions_ONA_CRITFC %>%
 #--- NEW age comp assignments... 
 
 age_data.df <- age_data_new %>% 
+  filter(return_year != 1986) %>%
   mutate(ocean_age = str_sub(Age, start = -1)) %>% 
   group_by(return_year, ocean_age, best_source) %>% 
   summarise(CRITFC_prop_at_age = sum(CRITFC_prop_at_age, na.rm = TRUE), 
@@ -708,7 +721,7 @@ age_prop_chk <- age_data.df %>%                                                 
 # Following plots check the age composition visually.  First one shows selected proportions by ocean age with annual assignment source
 ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   #stacked 100% bar plot of annual age composition
   geom_point(data = age_data.df %>% ungroup() %>% 
-#              filter(return_year >= 1985) %>%
+#              filter(return_year != 1986) %>%
                dplyr::select(return_year, best_source) %>% 
                unique(), aes(x = return_year, y = -0.02, 
                              color = best_source), size = 3, pch = 15)+
@@ -719,7 +732,7 @@ ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   
            fill = guide_legend(order = 1))+
 # coord_cartesian(expand = FALSE)+
 # coord_cartesian(xlim = c(1986, last_year)) +
-  scale_x_continuous(breaks = c(seq(from = 1984, to = last_year, by = 4))) +
+  scale_x_continuous(breaks = c(seq(from = 1985, to = last_year, by = 4))) +
   labs(title = "Osoyoos Sockeye Ocean Age Composition", subtitle = "By Return Year")+
   ylab("Proportion at Age")+
   xlab("")+
@@ -829,7 +842,7 @@ oso_age_at_return <- left_join(oso_recruits.df %>%
                 best_source, sox_age_best, sox_age_critfc, sox_age_sire)
   oso_age_at_return[is.na(oso_age_at_return)] <- 0 
 
-oso_marine_survival <- oso_age_at_return %>%                                    # gathering marine survival terms together for report
+oso_marine_survival_by_source <- oso_age_at_return %>%                          # gathering marine survival terms together for report
   group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
                                      oso_sox_sire   = sum(sox_age_sire),
                                      oso_sox_best   = sum(sox_age_best)) %>% 
@@ -838,17 +851,28 @@ oso_marine_survival <- oso_age_at_return %>%                                    
   mutate(critfc_surv  = oso_sox_critfc / no_smolt,                              # calculating marine survival
          sire_surv    = oso_sox_sire   / no_smolt,
          best_surv    = oso_sox_best   / no_smolt,
-         oso_sox_survival = best_surv, oso_juv_presmolt = no_smolt) %>%
-  dplyr::select(smolt_year, critfc_surv, sire_surv, best_surv,     # streamlining the dataset to the relevant columns
+         oso_sox_survival = best_surv, 
+         oso_juv_presmolt = no_smolt) %>%
+  dplyr::select(smolt_year, critfc_surv, sire_surv, best_surv,                  # streamlining the dataset to the relevant columns
                 oso_sox_critfc, oso_sox_sire, oso_sox_best, oso_juv_presmolt,
                 critfc_surv, sire_surv, best_surv, oso_sox_survival)  
 
-filename <- paste("../output/OSO_Marine_Survival_", timestamp, ".csv", sep = "")# filename for survival time-series output 
-write.csv(oso_marine_survival,filename)
+filename <- paste("../output/OSO_Marine_Survival_Source_", 
+                  timestamp, ".csv", sep = "")                                  # filename for CRITFC/ONA survival time-series output 
+write.csv(oso_marine_survival_by_source,filename)                               # for report APPENDIX
+
+mar_surv_table <- oso_marine_survival_by_source %>%
+  dplyr::select(smolt_year, oso_juv_presmolt, adults_select = oso_sox_best,
+                survival_select = oso_sox_survival)
+
+filename <- paste("../output/OSO_Marine_Surv_for_Report_", 
+                  timestamp, ".csv", sep = "")                                  # filename for SELECT survival time-series output 
+write.csv(mar_surv_table, filename)                                             # for report TABLE
+
 
 # oso_marine_survival_long <- oso_marine_survival %>%     
 #   group_by(smolt_year) %>%
-#   pivot_longer(cols = ends_with("_surv"),                                       # arranging the data to long format for plotting
+#   pivot_longer(cols = ends_with("_surv"),                                     # arranging the data to long format for plotting
 #                names_to = "source",
 #                values_to = "survival") %>%
 #   arrange(source, smolt_year)
@@ -871,20 +895,22 @@ write.csv(oso_marine_survival,filename)
 #   theme_pt(major_grid=TRUE)+
 #   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
-mar_surv_table <- oso_age_at_return %>%
-  filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
-  group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
-                                     oso_sox_sire   = sum(sox_age_sire),
-                                     oso_sox_best   = sum(sox_age_best)) %>% 
-  left_join(., j_dat, by = "smolt_year") %>%                                    # joining the juvenile dataframe
-  filter(smolt_year > 1997) %>%                                                 # no juvenile abund data prior to 1998
-  mutate(survival_critfc = oso_sox_critfc / no_smolt,                               # calculating marine survival
-         survival_ona    = oso_sox_sire   / no_smolt,
-         survival_select = oso_sox_best   / no_smolt) %>%
-  dplyr::select(smolt_year, no_smolt, 
-                adults_critfc = oso_sox_critfc, adults_ona = oso_sox_sire, adults_select = oso_sox_best,
-                survival_critfc, survival_ona, survival_select)
-  
+# mar_surv_table <- oso_age_at_return %>%
+#   filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
+#   group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
+#                                      oso_sox_sire   = sum(sox_age_sire),
+#                                      oso_sox_best   = sum(sox_age_best)) %>% 
+#   left_join(., j_dat, by = "smolt_year") %>%                                    # joining the juvenile dataframe
+#   filter(smolt_year > 1997) %>%                                                 # no juvenile abund data prior to 1998
+#   mutate(survival_critfc = oso_sox_critfc / no_smolt,                               # calculating marine survival
+#          survival_ona    = oso_sox_sire   / no_smolt,
+#          survival_select = oso_sox_best   / no_smolt) %>%
+#   dplyr::select(smolt_year, no_smolt, 
+#                 adults_critfc = oso_sox_critfc, adults_ona = oso_sox_sire, adults_select = oso_sox_best,
+#                 survival_critfc, survival_ona, survival_select)
+
+# filename <- paste("../output/OSO_Marine_Surv_for_Report_", timestamp, ".csv", sep = "")# filename for survival time-series output 
+# write.csv(mar_surv_table, filename)
   
 radat2_new <- oso_age_at_return %>%
   filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
