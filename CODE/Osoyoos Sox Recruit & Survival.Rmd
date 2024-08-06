@@ -225,24 +225,24 @@ cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(y
 cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 4))
 cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 5))
 cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 6))
-#lowest mean square error is for model with 3 df on spline (was 4 df before 2022 & 2023 estimates added [HS 24.07.04]) 
+#lowest MSE is for model with 3 df on spline (was 4 df before 2022 & 2023 estimates added [HS 24.07.04]) 
 
 cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 3))
 cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 4))
 cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 5))
 cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 6))
-#lowest mean square error is for model with 5 df on spline (same after 2022 & 2023 estimates added [HS 24.07.24])
+#lowest MSE is for model with 5 df on spline (same after 2022 & 2023 estimates added [HS 24.07.24])
 
 cv_gam_loo(data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011), formula = p_nat ~ bs(year, 3))
 cv_gam_loo(data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011), formula = p_nat ~ bs(year, 4))
 cv_gam_loo(data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011), formula = p_nat ~ bs(year, 5))
 cv_gam_loo(data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011), formula = p_nat ~ bs(year, 6))
-#lowest Pen Channel mean square error is for model with 4 df on spline [HS 24.07.24]
+#lowest Pen Channel MSE is for model with 4 df on spline [HS 24.07.24]
 
 # fit gam to impute missing values
 pnat_low_m <- gam(p_nat ~ bs(year, 3), data = deadpitch %>% filter(section == "Lower Ok River")  %>% filter(year!=2013), family = binomial(link = "logit"))
 pnat_mid_m <- gam(p_nat ~ bs(year, 5), data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), family = binomial(link = "logit"))
-pnat_pen_m <- gam(p_nat ~ bs(year, 5), data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011),family = binomial(link = "logit"))
+pnat_pen_m <- gam(p_nat ~ bs(year, 4), data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011),family = binomial(link = "logit"))
 ### NOTE: to be clear, Osoyoos was stocked with H-O fish in 2012 and 2013 also, returning primarily in 2015 and 2016 (in addition to 2013)...
 
 ggplot(deadpitch, aes(x = year, y = p_nat))+
@@ -324,18 +324,18 @@ prop_oso_strays_mean <- sum(prop_oso_strays_by_year$strays)/sum(prop_oso_strays_
 
 prop_oso_strays <- prop_oso_strays_by_year %>% 
   dplyr::select(-strays, -lower_river) %>% 
-  bind_rows(data.frame(spawning_location = "Lower Ok River", year = 2013:last_year,            # apply mean stray rate to later years (was 2013:2021)
+  bind_rows(data.frame(spawning_location = "Lower Ok River", year = 2013:last_year,  # apply mean OSO stray rate to later years (was 2013:2021)
                        prop_oso_strays = prop_oso_strays_mean)) %>%
-  bind_rows(data.frame(spawning_location = "Lower Ok River", year = 2011,            # apply mean stray rate to later years (was 2013:2021)
+  bind_rows(data.frame(spawning_location = "Lower Ok River", year = 2011,            # add in mean stray rate for 2011
                        prop_oso_strays = prop_oso_strays_mean)) %>%
   arrange(year)
 ```  
 
 ```{r ska strays} 
 
-###  H-O fish in lower-OkR from 2018-2021 likely SKA or OKA strays, from which we can calc annual -- and weighted Multi-Yr avg -- "SKA stray rate" relative to total H-O on all SGs 
+#  H-O fish in lower-OkR from 2018-2021 likely SKA or OKA strays, from which we can calc annual -- and weighted Multi-Yr avg -- "SKA stray rate" relative to total H-O on all SGs 
 
-#    PLT - calculate proportion of all HO in lower river in each year
+#  PLT - calculate proportion of all HO in lower river in each year
 prop_ska_strays_by_year <- prop_natural %>% 
   filter(year >=2018, year <= 2020) %>%                                                    # based on 2018 and 2020 only (2019 insufficient data)
   mutate(rearing_lake = ifelse(section == "Lower Ok River", "Osoyoos", "Skaha")) %>% 
@@ -357,7 +357,7 @@ prop_ska_strays <- prop_ska_strays_by_year %>%                                  
 
 ```{r prop_nat_origin after strays} 
 
-spawning_table <- spawning_location %>%                                                    # populate Spawning Table from count of spawners in...   
+spawning_table <- spawning_location %>%                                                    # populate Spawning Table from AUC count of spawners in...   
   left_join(prop_natural %>% dplyr::select(year, spawning_location = section, p_nat)) %>%  # ...lower (Osoyoos) and upper (Skaha) sections of the river
   mutate(p_nat = ifelse(is.na(p_nat) & rearing_lake == "Osoyoos", 1, p_nat)) %>%           # apply proportion N-O to OSO spawners 
   mutate(total_sockeye = ifelse(spawning_location == "Lower Ok River" & year == 2022, 
@@ -371,10 +371,11 @@ spawning_table <- spawning_location %>%                                         
   group_by(rearing_lake, year) %>% 
   summarise(total_sockeye = sum(total_sockeye), natural_sockeye = sum(natural_sockeye))    # aggregate by rearing lake
   
-stray_correct <- function(obs_focal, obs_other, stray_focal, stray_other){
-  ((stray_other - 1) * obs_focal + stray_other * obs_other)/(stray_focal + stray_other - 1)}  ### move this function to top of code?
+stray_correct <- function(obs_focal, obs_other, stray_focal, stray_other){                 # function to adjust for strays in both directions
+  max(0,((stray_other - 1) * obs_focal + stray_other * obs_other)/(stray_focal + stray_other - 1))}
 
-spawning_totals_no2011 <- spawning_table %>%                                               # tabulate spawning ground data (total sox, prop. natural, strays, etc) by year
+spawning_totals_no2011 <- spawning_table %>%   # tabulate spawning ground data (total sox, prop. natural, strays, etc) by year
+  group_by(rearing_lake, year) %>%
   dplyr::select(-natural_sockeye) %>% 
   spread(key = rearing_lake, value = total_sockeye, fill = 0) %>% 
   rename(oso_total = Osoyoos, ska_total = Skaha) %>% 
@@ -386,12 +387,6 @@ spawning_totals_no2011 <- spawning_table %>%                                    
   mutate(prop_oso_strays = ifelse(is.na(prop_oso_strays), 0, prop_oso_strays)) %>%         # set proportion to zero where NA
   left_join(prop_ska_strays) %>%                                                           # merge ska stray proportions and
   mutate(prop_ska_strays = ifelse(is.na(prop_ska_strays), 0, prop_ska_strays)) %>%         # set proportion to zero where NA
-# mutate(oso_strays = min(oso_nat * prop_oso_strays, ska_nat)) %>%                         # this sets OSO strays to zero! ### not necessary but probably good practice to ensure that the strays don't exceed the total number of fish in the pop
-# mutate(ska_strays = min(ska_nat * prop_ska_strays, oso_nat)) %>%                         # this sets SKA strays to zero! ### not necessary but probably good practice to ensure that the strays don't exceed the total number of fish in the pop
-# mutate(oso_strays = oso_nat * prop_oso_strays) %>%                                       # simplified OSO stray calculation
-# mutate(ska_strays = ska_nat * prop_ska_strays) %>%                                       # simplified SKA stray calculation
-# mutate(oso_nat_origin = oso_nat - ska_strays + oso_strays) %>%                           # calculate total osoyoos origin natural fish
-# mutate(ska_nat_origin = ska_nat - oso_strays + ska_strays) %>%                           # calculate total skaha origin natural fish
   mutate(oso_nat_origin = stray_correct(oso_nat, ska_nat, prop_oso_strays, prop_ska_strays)) %>%   # estimate OSO N-O taking into account OSO->SKA and SKA->OSO stray rates                        
   mutate(ska_nat_origin = stray_correct(ska_nat, oso_nat, prop_ska_strays, prop_oso_strays)) %>%   # estimate SKA N-O taking into account OSO->SKA and SKA->OSO stray rates 
   mutate(oso_strays = oso_nat_origin * prop_oso_strays) %>%                                      
@@ -401,31 +396,61 @@ spawning_totals_no2011 <- spawning_table %>%                                    
 
 #fit gam to impute missing 2011 data
 #perform cross validation to determine appropriate df on year spline
-#filtering out early years where the proportion is 1
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year < 2022), formula = prop_oso_origin_nat ~ bs(year, 3)) # years 2022 and 2023 not yet ready for analysis as spawners data not up-to-date [hs 240705]
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year < 2022), formula = prop_oso_origin_nat ~ bs(year, 4)) # ditto
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year < 2022), formula = prop_oso_origin_nat ~ bs(year, 5))
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year < 2022), formula = prop_oso_origin_nat ~ bs(year, 6)) # 6 df gives lowest mean square error
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year < 2022), formula = prop_oso_origin_nat ~ bs(year, 7))
+#restricting last year (i.e., gam_endyear) of analysis depending on availability of data (was 2021)
 
-#filtering out early years where the proportion is 0
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year < 2022), formula = prop_ska_origin_nat ~ bs(year, 3)) # years 2022 and 2023 not yet ready for analysis as spawners data not up-to-date [hs 240705]
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year < 2022), formula = prop_ska_origin_nat ~ bs(year, 4)) # 4 df gives lowest mean square error
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year < 2022), formula = prop_ska_origin_nat ~ bs(year, 5))
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year < 2022), formula = prop_ska_origin_nat ~ bs(year, 6))
-cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year < 2022), formula = prop_ska_origin_nat ~ bs(year, 7))
+  gam_endyear <- 2021       ### years 2022 and 2023 not yet ready for analysis as spawners data not up-to-date [hs 240705] 
+  gam_endyear <- last_year  ### years 2022 and 2023 now available from AO summary data (though not from raw AUC data) [hs 240801]
+  
+#For Osoyoos...filtering out early years where the proportion OSO is 1
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year <= gam_endyear), formula = prop_oso_origin_nat ~ bs(year, 3)) 
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year <= gam_endyear), formula = prop_oso_origin_nat ~ bs(year, 4)) 
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year <= gam_endyear), formula = prop_oso_origin_nat ~ bs(year, 5)) # 5 df gives lowest MSE <= 2023
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year <= gam_endyear), formula = prop_oso_origin_nat ~ bs(year, 6)) # 6 df gives lowest MSE <= 2021
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2006, year <= gam_endyear), formula = prop_oso_origin_nat ~ bs(year, 7))
 
-prop_oso_natural_m <- gam(prop_oso_origin_nat ~ bs(year, 6), data = spawning_totals_no2011 %>% 
-                            filter(year > 2006, year < 2022), family = binomial(link = "logit"))  # OSO imputation model ### restricted to <2022 ?
-prop_ska_natural_m <- gam(prop_ska_origin_nat ~ bs(year, 4), data = spawning_totals_no2011 %>% 
-                            filter(year > 2010, year < 2022), family = binomial(link = "logit"))  # SKA imputation model ### restricted to <2022 ?
+#For Skaha, filtering out early years where the proportion SKA is 0
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year <= gam_endyear), formula = prop_ska_origin_nat ~ bs(year, 3)) # 3 df gives lowest MSE <= 2023
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year <= gam_endyear), formula = prop_ska_origin_nat ~ bs(year, 4)) # 4 df gives lowest MSE <= 2021
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year <= gam_endyear), formula = prop_ska_origin_nat ~ bs(year, 5))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year <= gam_endyear), formula = prop_ska_origin_nat ~ bs(year, 6))
+cv_gam_loo(data = spawning_totals_no2011 %>% filter(year > 2011, year <= gam_endyear), formula = prop_ska_origin_nat ~ bs(year, 7))
+
+### Assign degrees of freedom for prop_oso_natural_m gam models below based on LOO analyses above...
+if(gam_endyear == 2021) {            # if using original data restricted to <2022
+  oso_df <- 6                        # use these df's
+  ska_df <- 4
+} else {                             # otherwise assign these df's based on data up to and including 2023
+  oso_df <- 5
+  ska_df <- 3
+}
+prop_oso_natural_m <- gam(prop_oso_origin_nat ~ bs(year, oso_df), data = spawning_totals_no2011 %>% 
+                            filter(year > 2006, year <= gam_endyear), family = binomial(link = "logit"))  # OSO imputation model for data up to 2023
+prop_ska_natural_m <- gam(prop_ska_origin_nat ~ bs(year, ska_df), data = spawning_totals_no2011 %>% 
+                            filter(year > 2010, year <= gam_endyear), family = binomial(link = "logit"))  # SKA imputation model for data up to 2023
 
 spawning_totals <- bind_rows(spawning_totals_no2011 %>% mutate(prop_natural_origin_type = "sampled"),   # incorporate 2011 estimates into spawn totals 
                               data.frame(prop_oso_origin_nat = predict(prop_oso_natural_m, data.frame(year = 2011), type = "response"), 
                                          prop_ska_origin_nat = predict(prop_ska_natural_m, data.frame(year = 2011), type = "response"),
                                          year = 2011, prop_natural_origin_type = "imputed")) %>% 
-# filter(year < 2022) %>%   # filter was probably needed to omit missing 2022 and 2023 years...  [hs 240801]
+    arrange(year)
+
+spawning_totals_fix2011 <- spawning_totals %>%
+  group_by(year) %>%
+  mutate(oso_total = ifelse(year == 2011, 35900, round(oso_total,0))) %>%                               ### hardwire OSO spawner numbers for 2011
+  mutate(ska_total = ifelse(year == 2011,  9426, round(ska_total,0))) %>%                               ### hardwire OSO spawner numbers for 2011
+  mutate(oso_nat = round(ifelse(year == 2011, oso_total * prop_oso_origin_nat, oso_nat),0)) %>%         ### update   OSO N-O     numbers for 2011
+  mutate(ska_nat = round(ifelse(year == 2011, ska_total * prop_ska_origin_nat, ska_nat),0)) %>%         ### update   OSO N-O     numbers for 2011
+  mutate(prop_oso_strays = ifelse(year == 2011, prop_oso_strays_mean, prop_oso_strays)) %>%             ### update   OSO stray proport'n for 2011
+  mutate(prop_ska_strays = ifelse(year == 2011, wmean_ska_stray_prop, prop_ska_strays)) %>%             ### update   SKA stray proport'n for 2011
+  mutate(oso_nat_origin = round(ifelse(year == 2011, stray_correct(oso_nat, ska_nat, prop_oso_strays, prop_ska_strays),oso_nat_origin),0)) %>%   # estimate OSO N-O taking into account OSO->SKA and SKA->OSO stray rates                        
+  mutate(ska_nat_origin = round(ifelse(year == 2011, stray_correct(ska_nat, oso_nat, prop_ska_strays, prop_oso_strays),ska_nat_origin),0)) %>%   # estimate SKA N-O taking into account OSO->SKA and SKA->OSO stray rates 
+  mutate(oso_strays     = round(ifelse(year == 2011, oso_nat_origin * prop_oso_strays, oso_strays),0)) %>%                                      
+  mutate(ska_strays     = round(ifelse(year == 2011, ska_nat_origin * prop_ska_strays, ska_strays),0)) %>%
+  mutate(prop_oso_origin_nat =  ifelse(year == 2011, oso_nat_origin/(oso_total + ska_total), prop_oso_origin_nat)) %>%
+  mutate(prop_ska_origin_nat =  ifelse(year == 2011, ska_nat_origin/(oso_total + ska_total), prop_ska_origin_nat)) %>%
   arrange(year)
+
+spawning_totals <- spawning_totals_fix2011
 
 spawning_totals %>% 
   ggplot(aes(x = year, y = prop_oso_origin_nat, color = prop_natural_origin_type))+
@@ -461,71 +486,38 @@ filename <- paste("../output/Spawning_Totals_", timestamp, ".csv", sep = "")    
 write.csv(spawning_totals, filename)                                            # saves the data to filename
 ```  
 
-```{r oso recruitment}  
+```{r columbia/okanagan recruitment}  
 #calculate recruits
-#bonn_pred <- data.frame(year = returns_select$return_year,
-#             bonn_24hr  = returns_select$tot_bonn_16hr + predict(bonn_model,    # use known 24-hr counts instead of estimates where they exist (i.e., 1994-2000, 2002, 2013-2022)
-#                          data.frame(tot_16 = returns_select$tot_bonn_16hr),
-#                          type = "response"))
-#
-#bonn_merge <- bonn_pred %>%                                                     # ...get predicted BON 24-hr estimates and..
-#  dplyr::select(return_year=year, bonn_24hr_est=bonn_24hr) %>%                  # rename variables...
-#  left_join(bonn_16_v_24 %>% dplyr::select(return_year=ret_year, tot_24)) %>%   # merge in actual 24-hr counts from bonn_16_v_24..
-#  mutate(bonn_24hr = round(ifelse(is.na(tot_24), bonn_24hr_est, tot_24 ),0))    # and assign actual tot_24s to bonn_24hr count for available return_years, predictive estimates otherwise
-#
-# ggplot(bonn_merge, aes(x = return_year, y = bonn_24hr)) +
-#        geom_line(color="blue", linewidth = 0.1)
-# ggplot(bonn_merge, aes(x = return_year, y = bonn_24hr_est)) +
-#        geom_line(color="red", linewidth = 0.1)
-#   scale_x_continuous(breaks = c(seq(from = 2000, to = 2022, by = 4)))
-
-#oso_recruits <- returns_select %>% 
-##left_join(bonn_pred  %>% dplyr::select(return_year = year, bonn_dam_est = bonn_24hr)) %>%           # Bonn 24-hr estimates using predicted values for all years...
-# left_join(bonn_merge %>% dplyr::select(return_year,        bonn_dam_est = bonn_24hr)) %>%           # Bonn 24-hr counts where available & estimates where not [24.05.01 (HS)}
-# left_join(spawning_totals %>% dplyr::rename(return_year = year)) %>% 
-# mutate(prop_oso_origin_nat  = ifelse(is.na(prop_oso_origin_nat ), 1, round(prop_oso_origin_nat,3))) %>% 
-# mutate(prop_ska_origin_nat  = ifelse(is.na(prop_ska_origin_nat ), 0, round(prop_ska_origin_nat,3))) %>% 
-# mutate(total_comm_harvest_below_bonn =                                                              # this var is actually ALL harvest below BON (REC, COMM, TREATY) - data update (Ryan Lothrop WDFW May 2024)
-#        ifelse(is.na(total_comm_harvest_below_bonn), 0, total_comm_harvest_below_bonn))              # set missing harvest to 0 # revisit decision to set harvest=0 when NA 
-#so_recruits$X <- NULL                                                                                # drop X (extra observation counter?)
-
-oso_recruits <- annual_returns %>%
+columbia_okanagan_recruits <- annual_returns %>% ungroup() %>%
   left_join(spawning_totals %>% dplyr::rename(return_year = year)) %>% 
-  mutate(prop_oso_origin_nat  = ifelse(is.na(prop_oso_origin_nat), 1, round(prop_oso_origin_nat,3))) %>% 
-  mutate(prop_oso_origin_nat  = ifelse(return_year == 2022, 0.719, prop_oso_origin_nat)) %>%          ### Hardwire Prop OSO for 2022 till raw input data are available
-  mutate(prop_oso_origin_nat  = ifelse(return_year == 2023, 0.542, prop_oso_origin_nat)) %>%          ### Hardwire Prop OSO for 2023 till raw input data are available
-  mutate(prop_ska_origin_nat  = ifelse(is.na(prop_ska_origin_nat), 0, round(prop_ska_origin_nat,3))) %>%
-  dplyr::select(return_year, total_harvest_below_bonn, bon_sox, snake_sox, mid_columbia_sox, 
-                ok_stock_comp, oka_sox, prop_oso_origin_nat, prop_ska_origin_nat,  
-                oso_strays, ska_strays) %>%
-  mutate(oso_strays = round(oso_strays, 0), ska_strays = round(ska_strays, 0)) 
+  mutate(oka_recruits = oka_sox) %>%                                                                          # Oka-bound SK at mouth of Columbia
+  mutate(wen_recruits = mid_columbia_sox - oka_recruits) %>%                                                  # Wen-bound SK at mouth of Columbia
+  mutate(prop_oso_origin_nat = ifelse(is.na(prop_oso_origin_nat), 1, round(prop_oso_origin_nat,3))) %>% 
+  mutate(prop_ska_origin_nat = ifelse(is.na(prop_ska_origin_nat), 0, round(prop_ska_origin_nat,5))) %>%
+  mutate(oso_nat_recruits = round(oka_recruits * prop_oso_origin_nat, 0),                                     # tidy up early years
+         ska_nat_recruits = round(oka_recruits * prop_ska_origin_nat, 0)) %>%  
+  mutate(hatchery_recruits = round(oka_recruits - oso_nat_recruits - ska_nat_recruits, 0)) %>%                # SKA H-O abundance
+  mutate(ska_total_recruits = ifelse(return_year == 2013, ska_nat_recruits + 0.5 * hatchery_recruits,         # SKA total = H-O + N-O (presuming 50% of H-O returns in RY2013 --> SKA (since half of BY2009 releases were in SKA and half in OSO lake...
+                              ifelse(return_year %in% c(2015, 2016, 2017), ska_nat_recruits,                  #                        whereas in RY2015 & 2016, all H-O returns were of OSO origin, so add none to Skaha...
+                                     ska_nat_recruits + hatchery_recruits)))  %>%                             #                        otherwise, for all other years, set SKA Total Recruits = SKA N-O + H-O
+  mutate(oso_total_recruits = ifelse(return_year == 2013, oso_nat_recruits + 0.5 * hatchery_recruits,         # OSO total = H-O + N-O (presuming 50% of H-O returns in RY2013 --> OSO (since half of BY2009 releases were in OSO and half in SKA lake...
+                              ifelse(return_year %in% c(2015, 2016, 2017),                                    #                        whereas in RY2015 & 2016, all H-O returns were of OSO origin, so add all to Osoyoos...
+                                     oso_nat_recruits + hatchery_recruits, oso_nat_recruits))) %>%            #                        otherwise, for all other years, set OSO Total Recruits = OSO N-O
+  mutate(prop_hatch_origin = round(hatchery_recruits / (oso_total_recruits + ska_total_recruits), 3)) %>%     # calc prop H-O of all Oka sox
+  mutate(prop_hatch_of_ska = ifelse(return_year %in% c(2007, 2015, 2016, 2017), 0,                            # calc prop H-O of SKA sox, zeroing early years (no SKA sox) & also 2015-2017 since H-O were OSO-origin
+                                    round(ifelse(return_year == 2013,                                         #                        and adjusting for half-n-half distn of H-O in OSO & SKA in 2013
+                                                 hatchery_recruits * 0.5, hatchery_recruits) / 
+                                                 ska_total_recruits, 3))) %>%  
+  mutate(prop_hatch_of_ska = ifelse(is.nan(prop_hatch_of_ska), 0, prop_hatch_of_ska)) %>%
+  dplyr::select(return_year, total_harvest_below_bonn, bon_sox, columbia_recruits=columbia_sox, 
+                snake_recruits = snake_sox, 
+                mid_columbia_recruits = mid_columbia_sox, ok_stock_comp, wen_recruits, oka_recruits,  
+                prop_oso_origin_nat, oso_nat_recruits, oso_total_recruits, 
+                prop_ska_origin_nat, ska_nat_recruits, ska_total_recruits, 
+                hatchery_recruits, prop_hatch_origin, prop_hatch_of_ska) 
 
-
-oso_recruits.df <- oso_recruits %>% 
-  mutate(prop_oso_strays = round(prop_oso_strays,3)) %>%                                             # rounding off props and totals from spawning ground data...
-  mutate(prop_ska_strays = round(prop_ska_strays,3)) %>%                                                        
-  mutate(oso_total = round(oso_total,0)) %>%
-  mutate(ska_total = round(ska_total,0)) %>%
-  mutate(oso_nat = round(oso_nat,0)) %>%
-  mutate(ska_nat = round(ska_nat,0)) %>% 
-  mutate(oso_nat_origin = round(oso_nat_origin,0)) %>%
-  mutate(ska_nat_origin = round(ska_nat_origin,0)) %>%
-  mutate(oso_total = round(oso_total,0)) %>%
-  mutate(ska_total = round(ska_total,0)) %>%
-  mutate(oso_strays = round(oso_strays,0)) %>%
-  mutate(ska_strays = round(ska_strays,0)) %>%
-  
-  mutate(okanagan = oka_sox) %>%                                                                               # Oka-bound SK at mouth of Columbia
-  mutate(wenatchee = round(mid_columbia_sox * (1 - ok_stock_comp), 0)) %>%                                     # Wen-bound SK at mouth of Columbia
-  mutate(oso_origin_nat_returns = round(okanagan * prop_oso_origin_nat, 0) + oso_strays - ska_strays) %>%      # OSO recruits
-  mutate(ska_origin_nat_returns = round(okanagan * prop_ska_origin_nat,0)) %>%                                 # SKA N-O abundance
-  mutate(hatchery_returns = round(okanagan - oso_origin_nat_returns - ska_origin_nat_returns,0)) %>%           # SKA H-O abundance
-  mutate(ska_total_returns = ifelse(return_year == 2013, ska_origin_nat_returns + 0.5 * hatchery_returns,      # SKA total = H-O + N-O (presuming 50% of H-O returns in RY2013 --> SKA (since half of BY2009 releases were in SKA and half in OSO lake...
-                                    ifelse(return_year %in% c(2015, 2016, 2017), ska_origin_nat_returns,       #                        whereas in RY2015 & 2016, all H-O returns were of OSO origin, so add none to Skaha...
-                                           ska_origin_nat_returns + hatchery_returns)))                        #                        otherwise, for all other years, set SKA Total Recruits = SKA N-O + H-O 
-
-filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")   # filename for recruitment output 
-write.csv(oso_recruits.df, filename)                                                    # saves the data to filename
+filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")                 # filename for recruitment output 
+write.csv(columbia_okanagan_recruits, filename)                                                       # saves the data to filename
 
 oso_recruits.df %>%                                                                                   # facet plots
 # filter(return_year > 1984) %>% 
