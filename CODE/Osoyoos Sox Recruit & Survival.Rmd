@@ -290,7 +290,6 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 ```{r oso vs ska}  
 # osoyoos vs. skaha data     ### NOTE: initial AUC_data_Import import from XLSX should be commented out for final GitHub version. ###
 
-#UC_data_Import <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "OK AUC and Deadpitch Results") %>% 
 AUC_data_Import <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                           
   janitor::clean_names()   # comment out for GitHub
 write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240624.csv")          # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
@@ -398,7 +397,7 @@ spawning_totals_no2011 <- spawning_table %>%   # tabulate spawning ground data (
 #perform cross validation to determine appropriate df on year spline
 #restricting last year (i.e., gam_endyear) of analysis depending on availability of data (was 2021)
 
-  gam_endyear <- 2021       ### years 2022 and 2023 not yet ready for analysis as spawners data not up-to-date [hs 240705] 
+# gam_endyear <- 2021       ### years 2022 and 2023 not yet ready for analysis as spawners data not up-to-date [hs 240705] 
   gam_endyear <- last_year  ### years 2022 and 2023 now available from AO summary data (though not from raw AUC data) [hs 240801]
   
 #For Osoyoos...filtering out early years where the proportion OSO is 1
@@ -442,8 +441,12 @@ spawning_totals_fix2011 <- spawning_totals %>%
   mutate(ska_nat = round(ifelse(year == 2011, ska_total * prop_ska_origin_nat, ska_nat),0)) %>%         ### update   OSO N-O     numbers for 2011
   mutate(prop_oso_strays = ifelse(year == 2011, prop_oso_strays_mean, prop_oso_strays)) %>%             ### update   OSO stray proport'n for 2011
   mutate(prop_ska_strays = ifelse(year == 2011, wmean_ska_stray_prop, prop_ska_strays)) %>%             ### update   SKA stray proport'n for 2011
-  mutate(oso_nat_origin = round(ifelse(year == 2011, stray_correct(oso_nat, ska_nat, prop_oso_strays, prop_ska_strays),oso_nat_origin),0)) %>%   # estimate OSO N-O taking into account OSO->SKA and SKA->OSO stray rates                        
-  mutate(ska_nat_origin = round(ifelse(year == 2011, stray_correct(ska_nat, oso_nat, prop_ska_strays, prop_oso_strays),ska_nat_origin),0)) %>%   # estimate SKA N-O taking into account OSO->SKA and SKA->OSO stray rates 
+  mutate(oso_nat_origin = round(ifelse(year == 2011,                                                    
+                                       stray_correct(oso_nat,ska_nat,prop_oso_strays,prop_ska_strays),  # estimate OSO N-O taking into account OSO->SKA and SKA->OSO stray rates  
+                                       oso_nat_origin),0)) %>%                                                     
+  mutate(ska_nat_origin = round(ifelse(year == 2011, 
+                                       stray_correct(ska_nat,oso_nat,prop_ska_strays,prop_oso_strays),  # estimate SKA N-O taking into account OSO->SKA and SKA->OSO stray rates 
+                                       ska_nat_origin),0)) %>%   
   mutate(oso_strays     = round(ifelse(year == 2011, oso_nat_origin * prop_oso_strays, oso_strays),0)) %>%                                      
   mutate(ska_strays     = round(ifelse(year == 2011, ska_nat_origin * prop_ska_strays, ska_strays),0)) %>%
   mutate(prop_oso_origin_nat =  ifelse(year == 2011, oso_nat_origin/(oso_total + ska_total), prop_oso_origin_nat)) %>%
@@ -455,7 +458,7 @@ spawning_totals <- spawning_totals_fix2011
 spawning_totals %>% 
   ggplot(aes(x = year, y = prop_oso_origin_nat, color = prop_natural_origin_type))+
   geom_line()+
-  #geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
+# geom_smooth(method = "gam", formula = y ~ bs(x, 6), method.args = list(family = binomial(link = "logit")), se = FALSE)+
   geom_point(size=2)+
   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2)))+
   labs(title="Osoyoos Sockeye Natural Origin")+
@@ -519,35 +522,67 @@ columbia_okanagan_recruits <- annual_returns %>% ungroup() %>%
 filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")                 # filename for recruitment output 
 write.csv(columbia_okanagan_recruits, filename)                                                       # saves the data to filename
 
-columbia_okanagan_recruits %>%                                                                                   # facet plots
-# filter(return_year > 1984) %>% 
-# dplyr::select(return_year, columbia, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns) %>% 
-# dplyr::select(return_year, columbia, okanagan, osoyoos_origin_returns, osoyoos_origin_returns_no_strays, 
-#               osoyoos_natural_origin_no_strays, skaha_origin_returns) %>% 
-  # dplyr::select(return_year, columbia=columbia_sox, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, 
-  #               ska_origin_hatchery_returns = hatchery_returns) %>% 
-  dplyr::select(return_year, columbia_recruits, oka_recruits, oso_nat_recruits, ska_nat_recruits, 
-                hatchery_recruits) %>% 
-  gather(key = population, value = sockeye, -return_year) %>% 
-  ggplot(aes(x = return_year, y = sockeye))+
-  geom_line()+
-  scale_x_continuous(breaks = c(seq(from = 1975, to = 2025, by = 5)))+
-# scale_y_continuous(labels = scales::label_comma(trim = TRUE))+
-  scale_y_continuous(labels = label_number(suffix = "", scale = 1e-3))+
-# ylab(label = "Sockeye (thousands)")+
-# xlab(label = "Return Year") +
-# title(main="Sockeye Abundance (x1000) by Return Year",xlab=NULL, ylab=NULL)+
-  labs(title="Columbia/Okanagan Sockeye Recruits", subtitle = "by Return Year", x="", y = "Sockeye Recruit Abundance (1000s)")+
-  facet_wrap(~population, ncol=1)+
-  theme_pt(major_grid=TRUE)+
-  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+# columbia_okanagan_recruits %>%                                                                      # replaced with multi-line plot for all variables or
+#   dplyr::select(return_year, columbia_recruits, oka_recruits, oso_nat_recruits, ska_nat_recruits,   # stacked 100% barchart for Okanagan sub-stocks, below
+#                 hatchery_recruits) %>% 
+#   gather(key = population, value = sockeye, -return_year) %>% 
+#   ggplot(aes(x = return_year, y = sockeye))+
+#   geom_line()+
+#   scale_x_continuous(breaks = c(seq(from = 1975, to = 2025, by = 5)))+
+# # scale_y_continuous(labels = scales::label_comma(trim = TRUE))+
+#   scale_y_continuous(labels = label_number(suffix = "", scale = 1e-3))+
+# # ylab(label = "Sockeye (thousands)")+
+# # xlab(label = "Return Year") +
+# # title(main="Sockeye Abundance (x1000) by Return Year",xlab=NULL, ylab=NULL)+
+#   labs(title="Columbia/Okanagan Sockeye Recruits", subtitle = "by Return Year", 
+#                                 x="", y = "Sockeye Recruit Abundance (1000s)")+
+#   facet_wrap(~population, ncol=1)+
+#   theme_pt(major_grid=TRUE)+
+#   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
+columbia_okanagan_long <- columbia_okanagan_recruits %>%                        # long format for multi-line plot
+  dplyr::select(Year=return_year, Columbia=columbia_recruits, Okanagan=oka_recruits, 
+                Osoyoos_Natural=oso_nat_recruits, Skaha_Natural=ska_nat_recruits, 
+                Hatchery_Origin=hatchery_recruits) %>% 
+  pivot_longer(cols = -Year, names_to = "Group", values_to = "Recruits")
+
+ggplot(columbia_okanagan_long, aes(x=Year, y = Recruits/1000, color = Group))+  # multi-line plot of Columbia Sockeye recruits by sub-group
+  geom_line() +
+  scale_y_continuous(breaks       = c( 0, 100, 200, 300, 400, 500, 600, 700))+
+  scale_x_continuous(breaks = c(seq(from = 1976, to = last_year+1, by = 4)))+
+  labs(title="Columbia/Okanagan Sockeye Recruits", subtitle = "by Return Year", x="", y = "Abundance (1000s)")+
+  theme_pt(major_grid=TRUE)+theme(legend.position="bottom") +
+  theme(legend.background = element_rect(fill = "white", color = "black"),
+    legend.title = element_blank(),    legend.text = element_text(size = 10)) +
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+  
 filename <- paste("../figures/Columbia_Okanagan_Recruits_", timestamp, ".png", sep = "") # filename for figure output 
-ggsave(file = filename, width = 6, height = 10, units = "in")                   # saves the plot to filename
+ggsave(file = filename, width = 8, height = 8, units = "in")                    # saves the plot to filename
+
+okanagan_recruits_long <- columbia_okanagan_long %>%                            # set up data for stacked bar plot 
+  filter(Group %in% c("Osoyoos_Natural", "Skaha_Natural", "Hatchery_Origin")) %>%
+  group_by(Year) %>%
+  mutate(Group = replace(Group, Group == "Osoyoos_Natural", "3_Osoyoos_Natural")) %>%
+  mutate(Group = replace(Group, Group == "Skaha_Natural",   "2_Skaha_Natural")) %>%
+  mutate(Group = replace(Group, Group == "Hatchery_Origin", "1_Hatchery_Origin")) %>%
+  mutate(Proportion = Recruits / sum(Recruits))
+
+ggplot(okanagan_recruits_long,                                                  # stacked bar plot of Okanagan Sockeye recruits by sub-group
+       aes(x = factor(Year), y = Proportion, fill = Group)) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(labels = scales::percent, expand = c(0,0)) +               # format props as % and get rid of white space between data and plot borders
+  labs(x = "", y = "Proportion") +
+  scale_x_discrete(breaks = c(seq(from = 1976, to = last_year+1, by = 4))) +
+  labs(title="Okanagan Sockeye Recruitment Proportions", subtitle = "by Return Year")+
+  theme_minimal() +
+  theme(plot.title = element_text(hjust=0.5), legend.position = "bottom",
+        plot.subtitle = element_text(hjust=0.5), axis.ticks.x = element_line(color = "black"),
+        legend.title = element_blank(),    legend.text = element_text(size = 10))              
+
+filename <- paste("../figures/Oka_Substock_Recruitment_", timestamp, ".png", sep = "") # filename for figure output 
+ggsave(file = filename, width = 8, height = 8, units = "in")                           # saves the plot to filename
 
 # geometric mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns  
-# pre_fwmt  <- median(columbia_okanagan_recruits[columbia_okanagan_recruits$return_year %in% c(1977:2007),]$oso_nat_recruits)/1000
-# post_fwmt <- median(columbia_okanagan_recruits[columbia_okanagan_recruits$return_year %in% c(2008:last_year),]$oso_nat_recruits)/1000 
 pre_fwmt  <- geometric.mean(columbia_okanagan_recruits[columbia_okanagan_recruits$return_year %in% c(1977:2007),]$oso_nat_recruits)/1000
 post_fwmt <- geometric.mean(columbia_okanagan_recruits[columbia_okanagan_recruits$return_year %in% c(2008:last_year),]$oso_nat_recruits)/1000 ### compute geometric mean ###
 
@@ -555,11 +590,10 @@ post_fwmt <- geometric.mean(columbia_okanagan_recruits[columbia_okanagan_recruit
 columbia_okanagan_recruits %>% ggplot(aes(x = return_year, y = oso_nat_recruits/1000))+
   geom_line(linewidth = 0.5)+
   geom_point(size = 2)+
-  geom_segment(aes(x = 1977,   xend = 2007.5, y = pre_fwmt,  yend = pre_fwmt),  colour = "red",       linewidth = 1.5, linetype = 3)+ # CB: this is for the option of adding the pre- and current freshwater management tools era 
-  geom_segment(aes(x = 2007.5, xend = 2023,   y = post_fwmt, yend = post_fwmt), colour = "darkgreen", linewidth = 1.5, linetype = 3)+ #     to compare median recruits between the two time periods
-  geom_hline(yintercept = geometric.mean(oso_recruits.df$oso_origin_nat_returns)/1000,colour= "blue", linewidth = 1.0, linetype = 2)+
-  scale_y_continuous(breaks       = c( 0, 100, 200, 300, 400),
-                     minor_breaks = c(50, 150, 250, 350))+
+  geom_segment(aes(x = 1977,   xend = 2007.5, y = pre_fwmt,  yend = pre_fwmt),  colour = "red",       linewidth = 1, linetype = 2)+ # CB: this is for the option of adding the pre- and current freshwater management tools era 
+  geom_segment(aes(x = 2007.5, xend = 2023,   y = post_fwmt, yend = post_fwmt), colour = "darkgreen", linewidth = 1, linetype = 2)+ #     to compare median recruits between the two time periods
+  geom_hline(yintercept = geometric.mean(columbia_okanagan_recruits$oso_nat_recruits)/1000,colour= "blue", linewidth = 1, linetype = 2)+
+  scale_y_continuous(breaks       = c( 0, 100, 200, 300, 400, 500, 600))+
   scale_x_continuous(breaks = c(seq(from = 1976, to = last_year+1, by = 4)))+
   labs(title="Osoyoos Sockeye Recruits", subtitle = "by Return Year", x="", y = "Sockeye Recruit Abundance (1000s)")+
   theme_pt(major_grid=TRUE)+
@@ -579,39 +613,21 @@ write.csv(oka_recruits, filename)                                               
 ```  
 
 ```{r juvenile abund}
-#uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.01.12.xlsx", sheet = "Juvenile Data") #presmolt (was 23.09.26.xlsx)
-#uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
-#uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Juvenile Data") #presmolt (was 24.05.13.xlsx) [hs: 240517]
-#uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "Juvenile Data") #presmolt (was 24.05.17.xlsx) [hs: 240624]
 juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.07.24.xlsx", sheet = "Juvenile Data") #presmolt (was 24.06.24.xlsx) [hs: 240807]
 # #Pre-smolt abundance
-j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>% #grabbing the appropriate columns from the excel file
+j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>%         # grabbing the appropriate columns from the excel file
   dplyr::select(smolt_year = `Smolt Migration Year`, no_smolt = `...6`) %>%
-  mutate_at("no_smolt", as.numeric) %>% #selecting columns and converting no_smolt to numeric
+  mutate_at("no_smolt", as.numeric) %>%                 # selecting columns and converting no_smolt to numeric
   filter(smolt_year >=1998, smolt_year <= last_year)
-write.csv(j_dat,  "../data/juv_dat_xlsx_240624.csv")    # if juv data imported, re-write to CSV  # comment out for GitHub
+write.csv(j_dat,  "../data/juv_dat_xlsx_240624.csv")    # if juv data imported, re-write to CSV  ### comment out for GitHub
 
 j_dat <- read.csv("../data/juv_dat_xlsx_240624.csv")    # replaces import data from SIS-OSO xlsx workbook # keep for GitHub [240510]
 
 ```
 
 ```{r age composition}
-# Section on age_data from SIS...xlsx workbook NOT USED ANYMORE...           ### OBSOLETE
-# age_data <- read_xlsx("../DATA/SIS - Data - OSOYOOS - 24.05.17.xlsx",         # Import age comp data for CRITFC and SIRE
-#                       sheet = "Data at Age") %>%                              # sources along with "past" "Best Source" annual assignments
-#   dplyr::select(return_year = `Return Year`, prop_Fryer = `Age Comp (Fryer)`,
-#                 prop_SIRE = `Age Comp (SIRE)`, Age, best_source = `Best Source`,
-#                 Comments)
-# write.csv(age_data,file="../DATA/age_composition_data.csv")                   # write to csv
-# 
-# age_data <- read.csv("../DATA/age_composition_data.csv")  %>%                 # read csv & build on previous "best source" assignments to construct new source option...
-#   mutate(best_source_old = best_source) %>%                                   # first, copy prev "best source" to best_source_old variable to preserve old assignments
-#   mutate(best_source_new = ifelse(return_year %in% c(1985,1987:2001,2004:2022),# next, create best_source_new assignment variable by setting all years specified here to CRITFC...
-#                                   "CRITFC", best_source_old)) %>%
-#   mutate(best_source_new = ifelse(return_year %in% c(2002:2003, 2007, 2023),  # ...and all years specified here to SIRE...
-#                                   "SIRE", best_source_new))
 
-age_comp_ONA_CRITFC <- read.csv2("../data/age_comp_ona_critfc.csv", sep=",") ### see/run "Age Composition - ONA vs CRITFC.R" for source of age_comp_ONA_CRITFC ###     
+age_comp_ONA_CRITFC <- read.csv2("../data/age_comp_ona_critfc.csv", sep=",")    ### see/run "Age Composition - ONA vs CRITFC.R" for source of age_comp_ONA_CRITFC ###     
 
 age_proportions_ONA_CRITFC <- age_comp_ONA_CRITFC %>%                        
     dplyr::select(return_year, age_class,
@@ -694,8 +710,8 @@ age_data_new <- age_proportions_ONA_CRITFC %>%
 #   xlab("Return year")+
 #   scale_x_continuous(breaks = seq(1980, last_year, by = 4))+
 #   scale_y_continuous(limits = c(0, 1))+
-  # theme_pt(major_grid=TRUE)+
-  # ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+#   theme_pt(major_grid=TRUE)+
+#   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 # 
 # filename <- paste("../figures/Compare_SiRE_Fryer_Age_Comp_", timestamp, ".png", sep = "")   # filename for figure output 
 # ggsave(file = filename, width = 6, height = 6, units = "in")                                # saves the plot to filename
@@ -788,7 +804,7 @@ radat  <- left_join(oka_recruits %>%
          CRITFC_method   = ifelse(is.na(CRITFC_method), "None", CRITFC_method))     
   radat[is.na(radat)] <- 0 
 
-# check_radat_old <- radat %>% filter(smolt_year == 1999) %>%
+# check_radat_old <- radat %>% filter(smolt_year == 1999) %>%                   # quick check on returns at age calculations... 
 #   dplyr::select(smolt_year, return_year, best_source, oso_nat_recruits, sox_age_critfc, sox_age_sire, sox_age_best)
 
 radat2 <- radat %>%
@@ -810,10 +826,10 @@ radat2 <- radat %>%
 ggplot(radat2, aes(x = smolt_year, y = survival, colour = source))+
   geom_point(aes(size = source, alpha = source))+
   geom_line(aes(linewidth = source, alpha = source))+
-  scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
-  scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
-  scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
-  scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
+  scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
+  scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
+  scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
+  scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
   geom_hline(yintercept = sum(radat2[radat2$source == "best_surv", 3])/nrow(radat2[radat2$source == "best_surv", 3]), colour = "red", alpha = 0.5)+
   scale_x_continuous(breaks = c(seq(from = 1998, to = last_year, by = 4)))+
   labs(title="Osoyoos Sockeye SAR (OLD)", subtitle = "by Smolt Year", 
@@ -827,7 +843,7 @@ ggsave(file = filename, width = 6, height = 4, units = "in")                    
 
 ### NEW age comp ############################################################### 
 
-oso_age_at_return <- left_join(oka_recruits %>% 
+oso_age_at_return <- left_join(oka_recruits %>%                                 # generate selected "FINAL" age at return calculations used for report
                      filter(return_year >= 1980) %>%
                      dplyr::select(return_year, oso_nat_recruits), 
                      age_data_new, by = "return_year") %>%                      # joining the recruitment dataframe with the NEW age composition data frame 
@@ -860,57 +876,16 @@ filename <- paste("../output/OSO_Marine_Survival_Source_",
                   timestamp, ".csv", sep = "")                                  # filename for CRITFC/ONA survival time-series output 
 write.csv(oso_marine_survival_by_source,filename)                               # for report APPENDIX
 
-mar_surv_table <- oso_marine_survival_by_source %>%
-  dplyr::select(smolt_year, oso_juv_presmolt, adults_select = oso_sox_best,
-                survival_select = oso_sox_survival)
+mar_surv_table <- oso_marine_survival_by_source %>%                             # "Best" Marine Survival selected for output for report table 
+  dplyr::select(Smolt_Year = smolt_year, 
+                Presmolts = oso_juv_presmolt, 
+                Adults = oso_sox_best,
+                Survival = oso_sox_survival)
 
 filename <- paste("../output/OSO_Marine_Surv_for_Report_", 
                   timestamp, ".csv", sep = "")                                  # filename for SELECT survival time-series output 
 write.csv(mar_surv_table, filename)                                             # for report TABLE
 
-
-# oso_marine_survival_long <- oso_marine_survival %>%     
-#   group_by(smolt_year) %>%
-#   pivot_longer(cols = ends_with("_surv"),                                     # arranging the data to long format for plotting
-#                names_to = "source",
-#                values_to = "survival") %>%
-#   arrange(source, smolt_year)
-# 
-# #plotting marine survival
-# ggplot(oso_marine_survival_long, aes(x = smolt_year, y = survival, colour = source))+
-#   geom_point(aes(size = source, alpha = source))+
-#   geom_line(aes(linewidth = source, alpha = source))+
-#   scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
-#   scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
-#   scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
-#   scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "CRITFC", "SIRE"))+
-#   geom_hline(yintercept = 
-#              sum(oso_marine_survival_long[oso_marine_survival_long$source == "best_surv", 3]) /
-#              nrow(oso_marine_survival_long[oso_marine_survival_long$source == "best_surv", 3]), 
-#              colour = "red", alpha = 0.5)+
-#   scale_x_continuous(breaks = c(seq(from = 1998, to = last_year, by = 4)))+
-#   labs(title="Osoyoos Sockeye SAR (NEW)", subtitle = "by Smolt Year", 
-#        x="", y = "Annual Survival (proportion)")+
-#   theme_pt(major_grid=TRUE)+
-#   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
-
-# mar_surv_table <- oso_age_at_return %>%
-#   filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
-#   group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
-#                                      oso_sox_sire   = sum(sox_age_sire),
-#                                      oso_sox_best   = sum(sox_age_best)) %>% 
-#   left_join(., j_dat, by = "smolt_year") %>%                                    # joining the juvenile dataframe
-#   filter(smolt_year > 1997) %>%                                                 # no juvenile abund data prior to 1998
-#   mutate(survival_critfc = oso_sox_critfc / no_smolt,                               # calculating marine survival
-#          survival_ona    = oso_sox_sire   / no_smolt,
-#          survival_select = oso_sox_best   / no_smolt) %>%
-#   dplyr::select(smolt_year, no_smolt, 
-#                 adults_critfc = oso_sox_critfc, adults_ona = oso_sox_sire, adults_select = oso_sox_best,
-#                 survival_critfc, survival_ona, survival_select)
-
-# filename <- paste("../output/OSO_Marine_Surv_for_Report_", timestamp, ".csv", sep = "")# filename for survival time-series output 
-# write.csv(mar_surv_table, filename)
-  
 radat2_new <- oso_age_at_return %>%
   filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
   group_by(smolt_year) %>% summarize(oso_sox_critfc = sum(sox_age_critfc),      # summing the recruits by smolt year
@@ -943,7 +918,7 @@ ggplot(radat2_new, aes(x = smolt_year, y = survival, colour = source))+
 
 #saving the plot
 filename <- paste("../figures/OSO_SAR_Survival_(NEW)_", timestamp, ".png", sep = "")   # filename for figure output 
-ggsave(file = filename, width = 6, height = 4, units = "in")                     # saves the plot to filename
+ggsave(file = filename, width = 6, height = 4, units = "in")                           # saves the plot to filename
 
 #---------
 
@@ -951,22 +926,25 @@ radat2_final <- radat2_new %>% filter(source == "best_surv")                    
 
 #plotting FINAL marine survival time-series (comparison (NEW) with current ("BEST")
 ggplot(radat2_final, aes(x = smolt_year, y = survival, colour = source))+
-  geom_point(aes(size = source, alpha = source))+
   geom_line(aes(linewidth = source, alpha = source))+
-  scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
+  geom_point(aes(size = source, alpha = source, color="black"))+
+  scale_colour_manual(values = c("lightblue","black", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
   scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
-  scale_size_manual(values = c(3, 3, 3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
+  scale_size_manual(values = c(2, 3, 3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
   scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
-  geom_hline(yintercept = geometric.mean(radat2_final[radat2_final$source == "best_surv", 3]), colour = "red", alpha = 0.5)+
+  geom_hline(yintercept = geometric.mean(radat2_final[radat2_final$source == "best_surv", 3]),
+             colour = "red", alpha = 1, linetype = "dashed") + 
   scale_x_continuous(breaks = c(seq(from = 1998, to = last_year, by = 2)))+
-  labs(title="Osoyoos Sockeye SAR (FINAL)", subtitle = "by Smolt Year", 
-       x="", y = "Annual Survival (proportion)")+
+  scale_y_continuous(labels = percent_format()) +
+# labs(title="Osoyoos Sockeye SAR (FINAL)", subtitle = "by Smolt Year", 
+  labs(title="Osoyoos Sockeye Presmolt-to-Adult Survival", subtitle = "by Smolt Year", 
+       x="", y = "Survival (%)")+
   theme_pt(major_grid=TRUE)+theme(legend.position="none") +
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
 #saving the plot
 filename <- paste("../figures/OSO_SAR_Survival_(FINAL)_", timestamp, ".png", sep = "")   # filename for figure output 
-ggsave(file = filename, width = 6, height = 4, units = "in")                     # saves the plot to filename
+ggsave(file = filename, width = 6, height = 4, units = "in")                             # saves the plot to filename
 
 
 ```
