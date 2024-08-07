@@ -582,7 +582,8 @@ write.csv(oka_recruits, filename)                                               
 #uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.01.12.xlsx", sheet = "Juvenile Data") #presmolt (was 23.09.26.xlsx)
 #uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.02.12.xlsx", sheet = "Juvenile Data") #presmolt (was 24.01.12.xlsx) [hs: 240426]
 #uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.05.17.xlsx", sheet = "Juvenile Data") #presmolt (was 24.05.13.xlsx) [hs: 240517]
-juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "Juvenile Data") #presmolt (was 24.05.17.xlsx) [hs: 240624]
+#uv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "Juvenile Data") #presmolt (was 24.05.17.xlsx) [hs: 240624]
+juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.07.24.xlsx", sheet = "Juvenile Data") #presmolt (was 24.06.24.xlsx) [hs: 240807]
 # #Pre-smolt abundance
 j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>% #grabbing the appropriate columns from the excel file
   dplyr::select(smolt_year = `Smolt Migration Year`, no_smolt = `...6`) %>%
@@ -771,25 +772,24 @@ ggsave(file = filename, width = 8, height = 6, units = "in")                    
 ```{r marine survival}
 
 # calculating marine survival by age composition source 
-# NOTE that oso_sox_mouth here is the number of osoyoos recruits, not the total number of sockeye of all stocks below Bonneville
 
 ### OLD age comp ###
 
-radat  <- left_join(oso_recruits.df %>% 
+radat  <- left_join(oka_recruits %>% 
                     filter(return_year >= 1980) %>%
-                    dplyr::select(return_year, oso_sox_mouth = oso_origin_nat_returns), 
+                    dplyr::select(return_year, oso_nat_recruits), 
                     age_data_old, by = "return_year") %>%                       # joining the recruitment dataframe with the OLD age composition data frame 
   mutate(ocean_age       = as.numeric(str_sub(Age, start = -1)),
          smolt_year      = return_year - ocean_age,
-         sox_age_critfc  = oso_sox_mouth * CRITFC_prop_at_age,                  # calculating the number of recruits according to each age composition source
-         sox_age_sire    = oso_sox_mouth * ONA_prop_at_age,
-         sox_age_best    = oso_sox_mouth * ifelse(best_source == "CRITFC", CRITFC_prop_at_age, ONA_prop_at_age),
+         sox_age_critfc  = oso_nat_recruits * CRITFC_prop_at_age,               # calculating the number of recruits according to each age composition source
+         sox_age_sire    = oso_nat_recruits * ONA_prop_at_age,
+         sox_age_best    = oso_nat_recruits * ifelse(best_source == "CRITFC", CRITFC_prop_at_age, ONA_prop_at_age),
          ONA_method      = ifelse(is.na(ONA_method), "None", ONA_method),
          CRITFC_method   = ifelse(is.na(CRITFC_method), "None", CRITFC_method))     
   radat[is.na(radat)] <- 0 
 
-check_radat_old <- radat %>% filter(smolt_year == 1999) %>%
-  dplyr::select(smolt_year, return_year, best_source, oso_sox_mouth, sox_age_critfc, sox_age_sire, sox_age_best)
+# check_radat_old <- radat %>% filter(smolt_year == 1999) %>%
+#   dplyr::select(smolt_year, return_year, best_source, oso_nat_recruits, sox_age_critfc, sox_age_sire, sox_age_best)
 
 radat2 <- radat %>%
   filter(smolt_year <= last_year - 2) %>%                                       # drop last year since returns of major age classes not complete
@@ -823,21 +823,21 @@ ggplot(radat2, aes(x = smolt_year, y = survival, colour = source))+
 
 #saving the plot
 filename <- paste("../figures/OSO_SAR_Survival_(OLD)_", timestamp, ".png", sep = "")   # filename for figure output 
-ggsave(file = filename, width = 6, height = 4, units = "in")                     # saves the plot to filename
+ggsave(file = filename, width = 6, height = 4, units = "in")                           # saves the plot to filename
 
 ### NEW age comp ############################################################### 
 
-oso_age_at_return <- left_join(oso_recruits.df %>% 
+oso_age_at_return <- left_join(oka_recruits %>% 
                      filter(return_year >= 1980) %>%
-                     dplyr::select(return_year, oso_sox_mouth = oso_origin_nat_returns), 
+                     dplyr::select(return_year, oso_nat_recruits), 
                      age_data_new, by = "return_year") %>%                      # joining the recruitment dataframe with the NEW age composition data frame 
   mutate(ocean_age       = as.numeric(str_sub(Age, start = -1)),
          smolt_year      = return_year - ocean_age,
-         sox_age_critfc  = oso_sox_mouth * CRITFC_prop_at_age,                  # calculating the number of recruits according to each age composition source
-         sox_age_sire    = oso_sox_mouth * ONA_prop_at_age,
-         sox_age_best    = oso_sox_mouth * ifelse(best_source == "CRITFC", 
+         sox_age_critfc  = oso_nat_recruits * CRITFC_prop_at_age,               # calculating the number of recruits according to each age composition source
+         sox_age_sire    = oso_nat_recruits * ONA_prop_at_age,
+         sox_age_best    = oso_nat_recruits * ifelse(best_source == "CRITFC", 
                                            CRITFC_prop_at_age, ONA_prop_at_age)) %>%
-  dplyr::select(return_year, oso_sox_mouth, Age, ocean_age, smolt_year, 
+  dplyr::select(return_year, oso_nat_recruits, Age, ocean_age, smolt_year, 
                 best_source, sox_age_best, sox_age_critfc, sox_age_sire)
   oso_age_at_return[is.na(oso_age_at_return)] <- 0 
 
