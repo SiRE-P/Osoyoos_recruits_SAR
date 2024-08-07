@@ -519,13 +519,15 @@ columbia_okanagan_recruits <- annual_returns %>% ungroup() %>%
 filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")                 # filename for recruitment output 
 write.csv(columbia_okanagan_recruits, filename)                                                       # saves the data to filename
 
-oso_recruits.df %>%                                                                                   # facet plots
+columbia_okanagan_recruits %>%                                                                                   # facet plots
 # filter(return_year > 1984) %>% 
 # dplyr::select(return_year, columbia, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, hatchery_returns) %>% 
 # dplyr::select(return_year, columbia, okanagan, osoyoos_origin_returns, osoyoos_origin_returns_no_strays, 
 #               osoyoos_natural_origin_no_strays, skaha_origin_returns) %>% 
-  dplyr::select(return_year, columbia=columbia_sox, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, 
-                ska_origin_hatchery_returns = hatchery_returns) %>% 
+  # dplyr::select(return_year, columbia=columbia_sox, okanagan, oso_origin_nat_returns, ska_origin_nat_returns, 
+  #               ska_origin_hatchery_returns = hatchery_returns) %>% 
+  dplyr::select(return_year, columbia_recruits, oka_recruits, oso_nat_recruits, ska_nat_recruits, 
+                hatchery_recruits) %>% 
   gather(key = population, value = sockeye, -return_year) %>% 
   ggplot(aes(x = return_year, y = sockeye))+
   geom_line()+
@@ -540,20 +542,17 @@ oso_recruits.df %>%                                                             
   theme_pt(major_grid=TRUE)+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
-filename <- paste("../figures/Okanagan_Recruits_", timestamp, ".png", sep = "") # filename for figure output 
+filename <- paste("../figures/Columbia_Okanagan_Recruits_", timestamp, ".png", sep = "") # filename for figure output 
 ggsave(file = filename, width = 6, height = 10, units = "in")                   # saves the plot to filename
 
-# filename <- paste("../output/_Recruits_", timestamp, ".csv", sep = "")        # filename for recruitment output 
-# write.csv(oka_recruits, filename)                                             # saves the data to filename
-
 # geometric mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns  
-pre_fwmt  <- median(oso_recruits.df[oso_recruits.df$return_year %in% c(1977:2007),]$oso_origin_nat_returns)/1000
-post_fwmt <- median(oso_recruits.df[oso_recruits.df$return_year %in% c(2008:last_year),]$oso_origin_nat_returns)/1000 
-pre_fwmt  <- geometric.mean(oso_recruits.df[oso_recruits.df$return_year %in% c(1977:2007),]$oso_origin_nat_returns)/1000
-post_fwmt <- geometric.mean(oso_recruits.df[oso_recruits.df$return_year %in% c(2008:last_year),]$oso_origin_nat_returns)/1000 ### compute geometric mean ###
+# pre_fwmt  <- median(columbia_okanagan_recruits[columbia_okanagan_recruits$return_year %in% c(1977:2007),]$oso_nat_recruits)/1000
+# post_fwmt <- median(columbia_okanagan_recruits[columbia_okanagan_recruits$return_year %in% c(2008:last_year),]$oso_nat_recruits)/1000 
+pre_fwmt  <- geometric.mean(columbia_okanagan_recruits[columbia_okanagan_recruits$return_year %in% c(1977:2007),]$oso_nat_recruits)/1000
+post_fwmt <- geometric.mean(columbia_okanagan_recruits[columbia_okanagan_recruits$return_year %in% c(2008:last_year),]$oso_nat_recruits)/1000 ### compute geometric mean ###
 
 # plot recruits through time
-oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000))+
+columbia_okanagan_recruits %>% ggplot(aes(x = return_year, y = oso_nat_recruits/1000))+
   geom_line(linewidth = 0.5)+
   geom_point(size = 2)+
   geom_segment(aes(x = 1977,   xend = 2007.5, y = pre_fwmt,  yend = pre_fwmt),  colour = "red",       linewidth = 1.5, linetype = 3)+ # CB: this is for the option of adding the pre- and current freshwater management tools era 
@@ -569,22 +568,13 @@ oso_recruits.df %>% ggplot(aes(x = return_year, y = oso_origin_nat_returns/1000)
 filename <- paste("../figures/OSO_Recruits_", timestamp, ".png", sep = "")      # filename for figure output 
 ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
 
-columbia_recruits <- oso_recruits.df %>%
-  dplyr::select(return_year, bon24_counts = bon_sox, 
-                harv_downstream = total_harvest_below_bonn, snake_sox,
-                mid_columbia_sox, ok_stock_comp, oka_sox, prop_oso_origin_nat,
-                prop_oso_strays, oso_origin_nat_returns)
-
-filename <- paste("../output/Columbia_Recruits_", timestamp, ".csv", sep = "")  # filename for recruitment output 
-write.csv(columbia_recruits, filename)                                          # saves the data to filename
-                
 # create timeseries of return year and number of total okanagan, osoyoos & skaha sub-stock recruits, and write to a CSV file
-oka_recruits <- oso_recruits.df %>% 
-  dplyr::select(return_year, columbia=columbia_sox, okanagan, 
-                oso_origin_nat_returns, ska_origin_nat_returns, 
-                hatchery_returns, ska_total_returns)
+oka_recruits <- columbia_okanagan_recruits %>% 
+  dplyr::select(return_year, oka_recruits, hatchery_recruits, 
+                oso_nat_recruits, oso_total_recruits,
+                ska_nat_recruits, ska_total_recruits)
 
-filename <- paste("../output/OKA_Recruits_", timestamp, ".csv", sep = "")       # filename for recruitment output 
+filename <- paste("../output/Oka_Recruits_", timestamp, ".csv", sep = "")       # filename for recruitment output 
 write.csv(oka_recruits, filename)                                               # saves the data to filename
 ```  
 
