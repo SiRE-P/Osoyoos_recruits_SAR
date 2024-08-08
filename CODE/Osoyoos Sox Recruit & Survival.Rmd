@@ -557,14 +557,14 @@ ggplot(columbia_okanagan_long, aes(x=Year, y = Recruits/1000, color = Group))+  
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
   
 filename <- paste("../figures/Columbia_Okanagan_Recruits_", timestamp, ".png", sep = "") # filename for figure output 
-ggsave(file = filename, width = 8, height = 8, units = "in")                    # saves the plot to filename
+ggsave(file = filename, width = 8, height = 4, units = "in")                    # saves the plot to filename
 
 okanagan_recruits_long <- columbia_okanagan_long %>%                            # set up data for stacked bar plot 
   filter(Group %in% c("Osoyoos_Natural", "Skaha_Natural", "Hatchery_Origin")) %>%
   group_by(Year) %>%
-  mutate(Group = replace(Group, Group == "Osoyoos_Natural", "3_Osoyoos_Natural")) %>%
+  mutate(Group = replace(Group, Group == "Osoyoos_Natural", "1_Osoyoos_Natural")) %>%
   mutate(Group = replace(Group, Group == "Skaha_Natural",   "2_Skaha_Natural")) %>%
-  mutate(Group = replace(Group, Group == "Hatchery_Origin", "1_Hatchery_Origin")) %>%
+  mutate(Group = replace(Group, Group == "Hatchery_Origin", "3_Hatchery_Origin")) %>%
   mutate(Proportion = Recruits / sum(Recruits))
 
 ggplot(okanagan_recruits_long,                                                  # stacked bar plot of Okanagan Sockeye recruits by sub-group
@@ -575,12 +575,13 @@ ggplot(okanagan_recruits_long,                                                  
   scale_x_discrete(breaks = c(seq(from = 1976, to = last_year+1, by = 4))) +
   labs(title="Okanagan Sockeye Recruitment Proportions", subtitle = "by Return Year")+
   theme_minimal() +
+  scale_color_manual(values = c("white", "red", "gray"))+               ### can't seem to change bars to these colours... 
   theme(plot.title = element_text(hjust=0.5), legend.position = "bottom",
         plot.subtitle = element_text(hjust=0.5), axis.ticks.x = element_line(color = "black"),
         legend.title = element_blank(),    legend.text = element_text(size = 10))              
 
 filename <- paste("../figures/Oka_Substock_Recruitment_", timestamp, ".png", sep = "") # filename for figure output 
-ggsave(file = filename, width = 8, height = 8, units = "in")                           # saves the plot to filename
+ggsave(file = filename, width = 8, height = 4, units = "in")                           # saves the plot to filename
 
 # geometric mean before and after FWMT implementation - note, 2008 is first year where we might expect to see difference in adult returns  
 pre_fwmt  <- geometric.mean(columbia_okanagan_recruits[columbia_okanagan_recruits$return_year %in% c(1977:2007),]$oso_nat_recruits)/1000
