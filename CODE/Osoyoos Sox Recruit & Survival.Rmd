@@ -159,10 +159,9 @@ annual_returns <- dam_counts %>%                                                
 ```{r proportion hatch and natch}  
 # estimates of hatchery numbers      ### NOTE: initial ok_riv_deadpitch import from XLSX should be commented out for final GitHub version. ###
 
-# ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 23.11.30.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
-  ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 24.05.24.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
-    janitor::clean_names()                                                                       # detection of thermal marks (was 24.05.24)                # comment out for GitHub
-write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                         # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
+#   ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 24.05.24.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
+#     janitor::clean_names()                                                                       # detection of thermal marks (was 24.05.24)                # comment out for GitHub
+# write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                         # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
 ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240524.csv")                         # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
 
 #pen_channel_deadpitch <-read.csv("../data/skaha_deadpitch_tidy_240208.csv") %>%                 # deadpitch for Pen channel fish with thermal mark data 
@@ -290,9 +289,9 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 ```{r oso vs ska}  
 # osoyoos vs. skaha data     ### NOTE: initial AUC_data_Import import from XLSX should be commented out for final GitHub version. ###
 
-AUC_data_Import <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                           
-  janitor::clean_names()   # comment out for GitHub
-write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240624.csv")          # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
+# AUC_data_Import <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                           
+#   janitor::clean_names()   # comment out for GitHub
+# write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240624.csv")          # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
 AUC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_240624.csv")          # replaces AUC data from SIS xlsx workbook (was 240516)          # keep for GitHub [240510]
 
 AUC_data <- AUC_data_Import %>% 
@@ -614,13 +613,14 @@ write.csv(oka_recruits, filename)                                               
 ```  
 
 ```{r juvenile abund}
-juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.07.24.xlsx", sheet = "Juvenile Data") #presmolt (was 24.06.24.xlsx) [hs: 240807]
+
 # #Pre-smolt abundance
-j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>%         # grabbing the appropriate columns from the excel file
-  dplyr::select(smolt_year = `Smolt Migration Year`, no_smolt = `...6`) %>%
-  mutate_at("no_smolt", as.numeric) %>%                 # selecting columns and converting no_smolt to numeric
-  filter(smolt_year >=1998, smolt_year <= last_year)
-write.csv(j_dat,  "../data/juv_dat_xlsx_240624.csv")    # if juv data imported, re-write to CSV  ### comment out for GitHub
+# juv_dat <- read_excel("../data/SIS - Data - OSOYOOS - 24.07.24.xlsx", sheet = "Juvenile Data") #presmolt (was 24.06.24.xlsx) [hs: 240807]
+# j_dat <- juv_dat[c(3:nrow(juv_dat)),c(2,6)] %>%         # grabbing the appropriate columns from the excel file
+#   dplyr::select(smolt_year = `Smolt Migration Year`, no_smolt = `...6`) %>%
+#   mutate_at("no_smolt", as.numeric) %>%                 # selecting columns and converting no_smolt to numeric
+#   filter(smolt_year >=1998, smolt_year <= last_year)
+# write.csv(j_dat,  "../data/juv_dat_xlsx_240624.csv")    # if juv data imported, re-write to CSV  ### comment out for GitHub
 
 j_dat <- read.csv("../data/juv_dat_xlsx_240624.csv")    # replaces import data from SIS-OSO xlsx workbook # keep for GitHub [240510]
 
