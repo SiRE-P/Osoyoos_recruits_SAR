@@ -215,8 +215,9 @@ deadpitch_2022_2023 <- data.frame(                              ### append summa
   mutate(p_nat = n_natural / n) %>%
   mutate(osoyoos_stocked = FALSE)
   
-deadpitch <- bind_rows(deadpitch_low_mid, deadpitch_pen, deadpitch_shingle,     # combine deadpitch data
+deadpitch <- bind_rows(deadpitch_low_mid, deadpitch_pen, deadpitch_shingle, # combine deadpitch data
                        deadpitch_2022_2023) %>% 
+  dplyr::filter(section != "Shingle Creek") %>%
   arrange (section, year)   
 
 #run cross validation to determine df of year spline
@@ -250,7 +251,7 @@ ggplot(deadpitch, aes(x = year, y = p_nat))+
                               p_nat = predict(pnat_low_m, data.frame(year = 2007:last_year, osoyoos_stocked = FALSE), type = "response")))+
   geom_line(data = data.frame(section = "Middle Ok River", year = 2009:last_year, 
                               p_nat = predict(pnat_mid_m, data.frame(year = 2009:last_year, osoyoos_stocked = FALSE), type = "response")))+
-  facet_wrap(~section)+
+  facet_wrap(~section, ncol=1)+
   scale_x_continuous(breaks = c(seq(from = 2007, to = last_year, by = 2)))+
   theme_pt(major_grid=TRUE) +
   theme(legend.position = "bottom", legend.title = element_text(size=9),
@@ -269,14 +270,17 @@ prop_natural <- bind_rows(deadpitch %>% mutate(type = "Sampled"),
 ggplot(prop_natural, aes(x = year, y = p_nat))+
   geom_line()+
   geom_point(aes(color = type))+
-  facet_wrap(~section)+
+#  dplyr::filter(section != "Shingle Creek") +
+  facet_wrap(~section, ncol=1)+
   scale_x_continuous(breaks = c(seq(from = 2007, to = last_year, by = 2)))+
   labs(title="Proportion Natural Origin")+
   ylab("Proportion")+
   xlab(NULL)+
   labs(type="Sample Type")+                                                     # label for legend? ### doesn't work
   theme_pt(major_grid=TRUE)+
-  theme(legend.position = "bottom", legend.title = element_text(size=9),
+  theme(legend.position = "bottom", 
+        legend.title = element_blank(),    
+        legend.text = element_text(size = 10),              
         legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
 
 filename <- paste("../figures/Prop_Nat_Origin_", timestamp, ".png", sep = "")   # filename for figure output 
@@ -559,10 +563,10 @@ filename <- paste("../figures/Columbia_Okanagan_Recruits_", timestamp, ".png", s
 ggsave(file = filename, width = 8, height = 4, units = "in")                    # saves the plot to filename
 
 okanagan_recruits_long <- columbia_okanagan_long %>%                            # set up data for stacked bar plot 
-  filter(Group %in% c("Osoyoos_Natural", "Skaha_Natural", "Hatchery_Origin")) %>%
+  filter(Group %in% c("Osoyoos_Natural", "Skaha_Natural", "Hatchery_Origin"))%>%
   group_by(Year) %>%
   mutate(Group = replace(Group, Group == "Osoyoos_Natural", "1_Osoyoos_Natural")) %>%
-  mutate(Group = replace(Group, Group == "Skaha_Natural",   "2_Skaha_Natural")) %>%
+  mutate(Group = replace(Group, Group == "Skaha_Natural",   "2_Skaha_Natural"))   %>%
   mutate(Group = replace(Group, Group == "Hatchery_Origin", "3_Hatchery_Origin")) %>%
   mutate(Proportion = Recruits / sum(Recruits))
 
@@ -574,7 +578,7 @@ ggplot(okanagan_recruits_long,                                                  
   scale_x_discrete(breaks = c(seq(from = 1976, to = last_year+1, by = 4))) +
   labs(title="Okanagan Sockeye Recruitment Proportions", subtitle = "by Return Year")+
   theme_minimal() +
-  scale_color_manual(values = c("white", "red", "gray"))+               ### can't seem to change bars to these colours... 
+  scale_color_manual(values = c("white", "red", "gray"))+                       ### can't seem to change bars to these colours... 
   theme(plot.title = element_text(hjust=0.5), legend.position = "bottom",
         plot.subtitle = element_text(hjust=0.5), axis.ticks.x = element_line(color = "black"),
         legend.title = element_blank(),    legend.text = element_text(size = 10))              
