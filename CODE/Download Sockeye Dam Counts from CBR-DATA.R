@@ -188,10 +188,10 @@ tot16_seq <- data.frame(tot_16 = seq(min(bonn_16_v_24$tot_16), max(bonn_16_v_24$
 bonn_pred_seq <- data.frame(tot_16 = tot16_seq, 
                             diff = predict(bonn_model, newdata = tot16_seq, type = "response"))                # type = "response" reverts to the scale of original data
 
-ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+
-  geom_point()+
-  # geom_smooth(method = "glm.nb", color="gray", se=TRUE) +                      
-  geom_line(data = bonn_pred_seq, color="red", linewidth=1, linetype=1) +
+ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+                      ### Now getting ERROR in stacked plot creation...
+  geom_point()+                                                                 ###   Error in Ops.data.frame(guide_loc, panel_loc) : 
+  # geom_smooth(method = "glm.nb", color="gray", se=TRUE) +                     ###   ‘==’ only defined for equally-sized data frames 
+  geom_line(data = bonn_pred_seq, color="red", linewidth=1, linetype=1) +       ### ......................................[hs 240812]
   geom_point(colour="black", size=2.5)+
   # geom_jitter(height=1) +
   geom_label_repel(aes(label = ret_year), fill = "white", colour = "black", size = 3)+ #, nudge_y = 5, nudge_x = -80)+
@@ -233,8 +233,8 @@ bon_16_to_24 <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>%
   rename(Return_Year = ret_year)
 
 filename <- paste("./output/bon_16_to_24_", timestamp, 
-                  ".csv", sep = "")                                                       # filename for relevant adjusted dam counts output 
-write.csv(bon_16_to_24, filename)                                      # saves the adj dam count data (1977-2023) to filename
+                  ".csv", sep = "")                                             # filename for relevant adjusted dam counts output 
+write.csv(bon_16_to_24, filename)                                               # saves the adj dam count data (1977-2023) to filename
 
 Columbia_Sockeye_Dam_Counts_24hr <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>%           # expand dam counts from 16-to-24 hr counts where applicable
   full_join(bon_16_to_24, by = "Return_Year") %>%                                         # Bon 24-hr counts drawn from bon_16_to_24 data step
@@ -294,9 +294,12 @@ write.csv(Columbia_Sockeye_Dam_Counts_Adj, filename)                            
 Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%                        # Get best mid-Columbia stock composition proportions ####
   mutate(Ok_Stock_Comp_1  = round(RRH_Sockeye_adj / RockI_Sockeye_adj,2)) %>%             # Ok-bound stock is typically calc'd from ratio of RRH:RockI dam counts.
   mutate(Wen_Stock_Comp_1 = round(1 - (RRH_Sockeye_adj / RockI_Sockeye_adj),2)) %>%       # Wen stock is usually calc'd by subtracting the Ok proportion from 1...
-  mutate(Wen_Stock_Comp_2 = ifelse(is.na(Tum_Sockeye_24hr), 0,                            # but if counts at Tumwater are large enough to indicate a higher proportion
-                                   round(Tum_Sockeye_24hr / RockI_Sockeye_adj, 2))) %>%   # of Wen fish than the RRH:RockI ratio, then maybe that is a better indicator &
-  mutate(Wen_Stock_Comp_Best = pmax(Wen_Stock_Comp_1, Wen_Stock_Comp_2)) %>%              # so the best Wen stock comp is set to the max of the two estimates,
+  mutate(Wen_Stock_Comp_2 = ifelse(is.na(Tum_Sockeye_24hr), 0,                            # but if counts at Tumwater (since 2000) are large enough to indicate a higher proportion
+                                   round(Tum_Sockeye_24hr / RockI_Sockeye_adj, 2))) %>%   # of Wen fish than the RRH:RockI ratio, that then adds more information &
+  mutate(Wen_Stock_Comp_Avg = (Wen_Stock_Comp_1 + Wen_Stock_Comp_2) / 2) %>%
+  mutate(Wen_Stock_Comp_Best = ifelse(Return_Year < 2000,                                 # then, depending on year (Tumwater counts effective as of 2000)
+                                      pmax(Wen_Stock_Comp_1, Wen_Stock_Comp_2),           # the RRH:RI ratio is used up to 1999 and
+                                      Wen_Stock_Comp_Avg)) %>%                            # the annual average of the RRH:RI and TUM:RI ratios is used where both exist       
   mutate(Ok_Stock_Comp_Best = 1 - Wen_Stock_Comp_Best) %>%                                # and the best Ok stock comp is 100 - Best_Wen%.
   mutate(Stock_Comp_Total = Wen_Stock_Comp_Best + Ok_Stock_Comp_Best) %>%                 # This is all a bit arbitrary, as it is not clear without dam count error data,
   dplyr::select(Return_Year, RockI_Sockeye_adj, RRH_Sockeye_adj, Tum_Sockeye_adj,         # fall-back (and over-shoot) estimates, and spatially-resolved harvest data, to
