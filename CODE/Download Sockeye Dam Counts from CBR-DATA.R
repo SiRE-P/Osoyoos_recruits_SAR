@@ -170,12 +170,12 @@ write.csv(Columbia_Sockeye_Dam_Counts_by_Year_All, filename)                    
 #-------------------------------------------------------------------------------
 # Bonn 16-to-24 hr Model ####
 
-bonn_16_v_24 <- read.csv("./data/Bonneville_16_v_24.csv")              # input data for years with 24 and 16 hour sockeye counts at Bonneville Dam
-bonn_16_v_24 <- bonn_16_v_24 %>%                                       # BON has two fish ladders: Bradford (OR) and Washington (WA)
+bonn_16_v_24 <- read.csv("./data/Bonneville_16_v_24.csv")                       # input data for years with 24 and 16 hour sockeye counts at Bonneville Dam
+bonn_16_v_24 <- bonn_16_v_24 %>%                                                # BON has two fish ladders: Bradford (OR) and Washington (WA)
   mutate(tot_16 = ifelse(!is.na(tot_16), tot_16, bradford_16hr + washington_16hr),
          tot_24 = ifelse(!is.na(tot_24), tot_24, bradford_24hr + washington_24hr)) %>% 
   dplyr::select(ret_year, tot_16, tot_24) %>% 
-  mutate(diff = tot_24 - tot_16) %>%                                   # derive response variable = difference between 16 and 24-hr counts
+  mutate(diff = tot_24 - tot_16) %>%                                            # derive response variable = difference between 16 and 24-hr counts
   arrange(ret_year)
 
 bonn_model <- glm.nb((diff) ~ log(tot_16), data = bonn_16_v_24, link = "log") # predictive model: diff as func of log(16-hr counts); link=log applies only to response var
@@ -297,10 +297,10 @@ Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%              
   mutate(Wen_Stock_Comp_2 = ifelse(is.na(Tum_Sockeye_24hr), 0,                            # but if counts at Tumwater (since 2000) are large enough to indicate a higher proportion
                                    round(Tum_Sockeye_24hr / RockI_Sockeye_adj, 2))) %>%   # of Wen fish than the RRH:RockI ratio, that then adds more information &
   mutate(Wen_Stock_Comp_Avg = (Wen_Stock_Comp_1 + Wen_Stock_Comp_2) / 2) %>%
-  mutate(Wen_Stock_Comp_Best = ifelse(Return_Year < 2000,                                 # then, depending on year (Tumwater counts effective as of 2000)
-                                      pmax(Wen_Stock_Comp_1, Wen_Stock_Comp_2),           # the RRH:RI ratio is used up to 1999 and
+  mutate(Wen_Stock_Comp_Best = ifelse(Return_Year < 2000,                                 # then, depending on year (Tumwater counts available as of 2000)
+                                      pmax(Wen_Stock_Comp_1, Wen_Stock_Comp_2),           # the regular RRH:RI ratio is used up to 1999 and
                                       Wen_Stock_Comp_Avg)) %>%                            # the annual average of the RRH:RI and TUM:RI ratios is used where both exist       
-  mutate(Ok_Stock_Comp_Best = 1 - Wen_Stock_Comp_Best) %>%                                # and the best Ok stock comp is 100 - Best_Wen%.
+  mutate(Ok_Stock_Comp_Best = 1 - Wen_Stock_Comp_Best) %>%                                # and the best Ok stock comp is 100-Best_Wen%.
   mutate(Stock_Comp_Total = Wen_Stock_Comp_Best + Ok_Stock_Comp_Best) %>%                 # This is all a bit arbitrary, as it is not clear without dam count error data,
   dplyr::select(Return_Year, RockI_Sockeye_adj, RRH_Sockeye_adj, Tum_Sockeye_adj,         # fall-back (and over-shoot) estimates, and spatially-resolved harvest data, to
                 Wen_Stock_Comp_1, Ok_Stock_Comp_1, Wen_Stock_Comp_2,                      # know which of the three dams is contributing what to the noise.
@@ -347,9 +347,4 @@ ggplot(Columbia_Sockeye_Dam_Counts_Adj_long,
 filename <- paste("./figures/Columbia_Sockeye_Dam_Counts_Adj_", 
                   timestamp, ".png", sep = "")                                  # figure output filename
 ggsave(file = filename, width = 8, height = 6, units = "in")                    # saves the plot
-
-  
-  
-  
-  
   
