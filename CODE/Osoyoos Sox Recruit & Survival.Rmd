@@ -21,11 +21,15 @@
 # update: TO DO  - incorporate RY2022 and 2023 data to extend mar-surv time-series to SY2021 - DONE
 # update: 240701 - dam counts now retrieved from CBR-DART web data portal - requires execution of "Download Sockeye Dam Counts from CBR-DATA.R"
 #
-
 timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
 
 knitr::opts_chunk$set(echo = TRUE)
 
+if (!require(SiREfunctions)) {
+  install.packages("devtools")
+  install.packages("remotes")
+  remotes::install_github("SiRE-P/SiREfunctions")
+}
 library(ggplot2)
 library(ggpubr)       # for adding text boxes with regression coefficients to plots
 library(ggrepel)
@@ -40,13 +44,6 @@ library(SiREfunctions)
 library(splines)
 library(stringi)
 library(tidyverse)
-
-if (!require(SiREfunctions)) {
-  install.packages("devtools")
-  install.packages("remotes")
-  remotes::install_github("SiRE-P/SiREfunctions")
-}
-library(SiREfunctions)
 
 last_year <- 2023     # current last year of returns data handled or available 
 ```
@@ -206,18 +203,19 @@ deadpitch_shingle <- shingle_deadpitch %>%                          # process Sh
   mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
   mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))       # H-O fry released into both Osoyoos and Skaha lakes in 2013
 
-deadpitch_2022_2023 <- data.frame(                              ### append summary values for 2022 and 2023 till raw data obtained [24.07.04]
-  year = c(2022, 2023, 2022, 2022),                             # 
-  section = c("Lower Ok River", "Lower Ok River",                           # Lower Ok River
-              "Penticton Channel", "Shingle Creek"),                        # Skaha River and Shingle Creek section
-  n_natural = c(388, 311, 360, 35),                                         # natural origin count from AO
-  n = c(392, 322, 368, 57)) %>%                                             # total deadpitch from AO 
+deadpitch_2022_2023 <- data.frame(                                ### append summary values for 2022 and 2023 till raw data obtained [24.07.04]
+  year = c(2022, 2023, 2022, 2022),                               
+  section = c("Lower Ok River", "Lower Ok River",                   # Lower Ok River
+              "Penticton Channel", "Shingle Creek"),                # Skaha River and Shingle Creek section
+  n_natural = c(388, 311, 360, 35),                               ### natural origin count from AO
+  n = c(392, 322, 368, 57)) %>%                                   ### total deadpitch from AO 
   mutate(p_nat = n_natural / n) %>%
   mutate(osoyoos_stocked = FALSE)
   
-deadpitch <- bind_rows(deadpitch_low_mid, deadpitch_pen, deadpitch_shingle, # combine deadpitch data
-                       deadpitch_2022_2023) %>% 
-  dplyr::filter(section != "Shingle Creek") %>%
+deadpitch <- bind_rows(deadpitch_low_mid, deadpitch_pen,            # combine deadpitch data
+                       deadpitch_shingle, 
+                       deadpitch_2022_2023) %>%                   ### hard-wired data
+  dplyr::filter(section != "Shingle Creek") %>%                     # drop Shingle Creek from this analysis
   arrange (section, year)   
 
 #run cross validation to determine df of year spline
@@ -524,6 +522,21 @@ columbia_okanagan_recruits <- annual_returns %>% ungroup() %>%
 
 filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")                 # filename for recruitment output 
 write.csv(columbia_okanagan_recruits, filename)                                                       # saves the data to filename
+
+report_table1 <- columbia_okanagan_recruits %>%
+# mutate("Total Proportions" = prop_oso_origin_nat + prop_ska_origin_nat + prop_hatch_origin) %>%
+  dplyr::select(Year=return_year, 
+                "Bon 24-hr Counts (estimated)" = bon_sox,
+                "Harvest Zones 1-5" = total_harvest_below_bonn,
+                "Snake Sockeye Estimates" = snake_recruits,
+                "Mid-Columbia Sockeye Abundance" = mid_columbia_recruits,
+                "Okanagan Stock Proportion (%)" = ok_stock_comp,
+                "Okanagan Sockeye" = oka_recruits,
+                "Osoyoos N-O Proportion (%)" = prop_oso_origin_nat,
+                "Skaha N-O Proportion(%)" = prop_ska_origin_nat,
+                "Hatchery Origin (H-O) Proportion (%)" = prop_hatch_origin,
+#               "Total Proportions",
+                "Osoyoos N-O Recruits" = oso_total_recruits)
 
 # columbia_okanagan_recruits %>%                                                                      # replaced with multi-line plot for all variables or
 #   dplyr::select(return_year, columbia_recruits, oka_recruits, oso_nat_recruits, ska_nat_recruits,   # stacked 100% barchart for Okanagan sub-stocks, below
@@ -883,9 +896,9 @@ write.csv(oso_marine_survival_by_source,filename)                               
 
 mar_surv_table <- oso_marine_survival_by_source %>%                             # "Best" Marine Survival selected for output for report table 
   dplyr::select(Smolt_Year = smolt_year, 
-                Presmolts = oso_juv_presmolt, 
-                Adults = oso_sox_best,
-                Survival = oso_sox_survival)
+                Presmolt_Estimates = oso_juv_presmolt, 
+                Adult_Recruitment = oso_sox_best,
+                Presmolt_to_Adult_Survival = oso_sox_survival)
 
 filename <- paste("../output/OSO_Marine_Surv_for_Report_", 
                   timestamp, ".csv", sep = "")                                  # filename for SELECT survival time-series output 
