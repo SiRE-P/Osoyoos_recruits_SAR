@@ -14,6 +14,7 @@
 library(ggplot2)
 library(ggpubr)       # for adding text boxes with regression coefficients to plots
 library(ggrepel)
+library(here)
 library(rvest)
 library(MASS)
 library(mgcv)
@@ -26,11 +27,10 @@ library(splines)
 library(stringi)
 library(tidyverse)
 
-work <- "C:\\Users\\StiffH\\Documents\\Rcode\\Osoyoos_recruits_SAR"             # working directory
-
 timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
+last_year <- 2023
 
-filename <- paste(work, "\\DATA\\ok_riv_deadpitch_xlsx_240524.csv", sep = "")
+filename  <- here("DATA", "ok_riv_deadpitch_xlsx_240524.csv")
 ok_riv_deadpitch <- read.csv2(filename, sep=",") 
 
 age_sample_lower <- ok_riv_deadpitch %>%                            # get lower Ok River Sockeye biosample data (SiRE/ONA) for age composition estimate...
@@ -127,11 +127,13 @@ age_comp_ONA_long <- age_composition_ONA_wide %>%                               
 
 # age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.06.13.xlsx",
 # age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.06.19.xlsx",
-#           sheet = "CRITFC Age Comp", na="")                                   # read CRITFC age comp from workbook in OneDrive      ### fix folder spec
-filename <- paste(work, "\\DATA\\age_comp_critfc_240619.csv", sep = "")         # CSV filename for CRITFC age composition proportions ### fix folder spec
-# write.csv(age_comp_critfc, filename)                                          # saves the data to filename
+  age_comp_critfc <- read_xlsx("C:\\DFO-MPO\\OneDrive\\OneDrive - DFO-MPO\\Sockeye Index Stocks\\Okanagan\\Harvest\\OKA Returns at Age from JF 24.08.26.xlsx",
+            sheet = "CRITFC Age Comp", na="")                                   # read CRITFC age comp from workbook in OneDrive      ### fix folder spec
 
+filename <- here("DATA", "age_comp_critfc_240826.csv")
+write.csv(age_comp_critfc, filename)                                            # saves the data to filename
 age_comp_critfc <- read.csv2(filename, sep=",")                                 # input saved CRITFC annual age composition  
+
 age_comp_critfc_wide <- age_comp_critfc %>%    
   rename(return_year = Year) %>%
   dplyr::select(-Other,-Confirmed,-Source,-Notes,-X,-Sample_Size) %>%           # remove meta-data columns
@@ -152,7 +154,7 @@ age_comp_ONA_CRITFC <- merge(age_comp_CRITFC_long, age_comp_ONA_long,           
                        by = c("return_year", "age_class"), all = TRUE) %>%
   filter(age_class != "prop_age_1.4")                                           ### this filters out a record in 2007 where age 1.4 < 0.3%... 
 
-filename <- paste(work, "\\DATA\\age_comp_ona_critfc.csv", sep = "")            # CSV filename for ONA & CRITFC age composition proportions ### fix folder spec
+filename <- here("DATA", "age_comp_ona_critfc.csv")                             # CSV filename for ONA & CRITFC age composition proportions
 write.csv(age_comp_ONA_CRITFC, filename)                                        # saves the data to filename FOR USE IN OSOYOOS SOX RECRUITS & SURVIVAL.RMD
 
 ## -----------------------------------------------------------------------------
@@ -162,7 +164,9 @@ write.csv(age_comp_ONA_CRITFC, filename)                                        
 ## That leaves 2001 as the only "ONA" 'best source' in recent years, which might as well be assigned to CRITFC since the two sources have nearly identical age comps for the major ages.
 ## However, it would be worth reviewing 2002-2003, which were years where CRITFC showed a potentially problematic number of older ages (3.x, 4.x), which JF has suggested may be misread scales.
 
-age_data <- read.csv("./DATA/age_composition_data.csv")  %>%                    # read csv & build on previous "best source" assignments to construct new source option...
+filename = here("DATA", "age_composition_data.csv")
+
+age_data <- read.csv(filename)  %>%                                             # read csv & build on previous "best source" assignments to construct new source option...
   mutate(best_source_old = best_source) %>%                                     # first, copy prev "best source" to best_source_old variable to preserve old assignments
   mutate(best_source_new = ifelse(return_year %in% c(1985,1987:2001,2004:2022), # next, create best_source_new assignment variable by setting all years specified here to CRITFC...
                                   "CRITFC", best_source_old)) %>%
@@ -177,10 +181,10 @@ best_age_comp_source_past$best_source <- gsub("SiRE", "ONA",
 best_age_comp_source_past <- best_age_comp_source_past %>%
   dplyr::select(return_year, best_source)
 
-filename <- paste(work, "\\DATA\\best_age_comp_source_past_240527.csv",       ### fix folder spec...
-                    sep = "")                                                   # CSV filename for CRITFC age composition proportions
-write.csv(best_age_comp_source_past, filename)                                  # saves the data to filename
+filename <- here("DATA", "best_age_comp_source_past_240527.csv")                # CSV filename for ONA & CRITFC age composition proportions
+write.csv(best_age_comp_source_past, filename, sep="")                          # saves the data to filename
 best_age_comp_source_past <- read.csv(filename)                                 # read CSV file; this stmt needs filename stmt above to be uncommented
+
 best_age_comp_source_past <- best_age_comp_source_past %>%
   dplyr::select(return_year, best_source_PAST = best_source)
 
@@ -191,8 +195,8 @@ best_age_comp_source_CRITFC$best_source =
   ifelse(best_age_comp_source_CRITFC$return_year >= 2006, "CRITFC",             # assign CRITFC as 'best source' for all years >=2006, for which CRITFC
          best_age_comp_source_CRITFC$best_source)                               # age comp was derived from Bonneville PIT-tag based stock comp & aging
 best_age_comp_source_CRITFC$best_source =
-  ifelse(best_age_comp_source_CRITFC$return_year == 2023, "ONA",                # that leaves only 2001 in the time-series as ONA-source; but ONA==CRITFC age comp
-         best_age_comp_source_CRITFC$best_source)                               # for that year for major ages, plus has some 2.x that did not show up on SG, so assign 2001<-CRITFC
+  ifelse(best_age_comp_source_CRITFC$return_year == 2023, "CRITFC",             # until 240826, CRITFC age comp for 2023 was unavailable, and was assigned to ONA
+         best_age_comp_source_CRITFC$best_source)                               
 best_age_comp_source_CRITFC$best_source =
   ifelse(best_age_comp_source_CRITFC$return_year == 2001, "CRITFC",             # that leaves only 2001 in the time-series as ONA-source; but ONA==CRITFC age comp
          best_age_comp_source_CRITFC$best_source)                               # for that year for major ages, plus has some 2.x that did not show up on SG, so assign 2001<-CRITFC
@@ -203,10 +207,10 @@ best_age_comp_source_CRITFC$best_source =
 best_age_comp_source_CRITFC <- best_age_comp_source_CRITFC %>%
   dplyr::select(return_year, best_source)
 
-filename <- paste(work, "\\DATA\\best_age_comp_source_CRITFC_240527.csv",       ### fix folder spec... 
-                  sep = "")                                                     # CSV filename for CRITFC age composition proportions
-write.csv(best_age_comp_source_CRITFC, filename)                                # saves the data to filename
+filename <- here("DATA", "best_age_comp_source_CRITFC_240527.csv")
+write.csv(best_age_comp_source_CRITFC, filename, sep="")                        # saves the data to filename
 best_age_comp_source_CRITFC <- read.csv(filename)                               # this stmt needs filename stmt above to be uncommented
+
 best_age_comp_source_CRITFC <- best_age_comp_source_CRITFC %>%
   dplyr::select(return_year, best_source_CRITFC = best_source)
 
@@ -217,10 +221,10 @@ best_age_comp_source_ONA$best_source =
   ifelse(best_age_comp_source_ONA$return_year >= 2000, "ONA",                   # assign ONA as 'best source' for all years >=2000, i.e. use Spawn Grd data
          best_age_comp_source_ONA$best_source)                                  # where available...
 
-filename <- paste(work, "\\DATA\\best_age_comp_source_ONA_240527.csv",          ### fix folder spec... 
-                  sep = "")                                                     # CSV filename for CRITFC age composition proportions
+filename = here("DATA", "best_age_comp_source_ONA_240527.csv")
 write.csv(best_age_comp_source_ONA, filename)                                   # saves the data to filename
 best_age_comp_source_ONA <- read.csv(filename)                                  # this stmt needs filename stmt above to be uncommented
+
 best_age_comp_source_ONA <- best_age_comp_source_ONA %>%
   dplyr::select(return_year, best_source_ONA = best_source)
 
@@ -312,7 +316,7 @@ past_plot <- ggplot(ocean_age_comp_past, aes(x = return_year, y = best_age_comp)
     xlab(NULL)+
     theme_pt()+
     ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))            # theme_pt centers main title but not subtitle
-  
+# past_plot
 #-------
 
 age_comp_from_CRITFC_best_source <- age_comp_source_all %>%                     # Assign age comp proportions to year based on CRITFC over ONA age comp assignments                                       
@@ -373,8 +377,7 @@ CRITFC_plot <- ggplot(CRITFC_ocean_age_filtered,
   theme_pt()+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
-# CRITFC_plot
-  
+CRITFC_plot
 #-------
   
 age_comp_from_ONA_best_source <- age_comp_source_all %>%                        # Assign age comp proportions to year based on ONA over CRITFC age comp assignments                                
@@ -435,15 +438,16 @@ ONA_plot <- ggplot(ONA_ocean_age_filtered, aes(x = return_year, y = best_age_com
   theme_pt()+
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
-# past_plot + CRITFC_plot + ONA_plot +                                          # collate three age comp plots for comparison
-CRITFC_plot + ONA_plot +                                                        # collate CRITFC & ONA age comp plots for comparison
-  plot_annotation(tag_levels = 'A')+                                            # put A B on Figure
-  plot_layout(nrow = 2)                                                         # stack figures
+ONA_plot
 
-filename <- paste(work, "\\FIGURES\\Age_Comp_Compare_100_", timestamp, ".png", sep = "") # figure output filename
-ggsave(file = filename, width = 8, height = 8, units = "in")                    # saves the plot
-
-#-----------------------  
+#-------------------------------------------                                    # stacked plot does not seem to work anymore "only defined for equally-sized data frames"...  
+# # past_plot + CRITFC_plot + ONA_plot +                                          # collate three age comp plots for comparison
+# CRITFC_plot + ONA_plot +                                                        # collate only CRITFC & ONA age comp plots for comparison
+#   plot_annotation(tag_levels = 'A')+                                            # put A B on Figure
+#   plot_layout(nrow = 2)                                                         # stack figures
+# 
+# filename <- paste(here("FIGURES", "Age_Comp_Compare_100_"), timestamp, ".png", sep = "") # figure output filename
+# ggsave(file = filename, width = 8, height = 8, units = "in")                    # saves the plot
 
 setup_ONA_OA_comp <- ocean_age_comp_ONA %>% ungroup() %>%
   mutate(ONA_age_comp = best_age_comp) %>%
@@ -458,7 +462,7 @@ setup_CRITFC_OA_comp <- ocean_age_comp_CRITFC %>% ungroup() %>%
 compare_OA_comp <-
   merge(setup_ONA_OA_comp, setup_CRITFC_OA_comp) %>%
   mutate(diff_OA_comp = abs(ONA_age_comp - CRITFC_age_comp)) %>%
-  dplyr::filter(return_year >= 1990)                                            # no differences prior to 2000, actually
+  dplyr::filter(return_year >= 2000)                                            # no differences prior to 2000, actually
 
 ocean_age_1 <- compare_OA_comp %>%
   filter(ocean_age == 1)
@@ -472,38 +476,38 @@ ggplot(ocean_age_1, aes(x = return_year, y = diff_OA_comp)) +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 1 Composition") + 
-  scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 0.4)+
-  scale_x_continuous(breaks = c(seq(from = 1990, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
+  scale_y_continuous(labels = scales::percent, expand = c(0,0), limits = c(0, 0.4), breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ 
+  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
   theme_pt(major_grid = TRUE)+
-  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) +                 # theme_pt centers main title but not subtitle
+  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) #+                # theme_pt centers main title but not subtitle
   
 ggplot(ocean_age_2, aes(x = return_year, y = diff_OA_comp)) +
   geom_bar(stat = "identity") +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 2 Composition") + 
-  scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 0.4)+
-  scale_x_continuous(breaks = c(seq(from = 1990, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
+  scale_y_continuous(labels = scales::percent, expand = c(0,0), limits = c(0, 0.4), breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ 
+  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
   theme_pt(major_grid = TRUE)+
-  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) +                 # theme_pt centers main title but not subtitle
+  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) #+                 # theme_pt centers main title but not subtitle
   
 ggplot(ocean_age_3, aes(x = return_year, y = diff_OA_comp)) +
   geom_bar(stat = "identity") +
   xlab(NULL) +
   ylab("Difference in Proportion") +
   ggtitle("Difference in Ocean Age 3 Composition") +   
-  scale_y_continuous(breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ ylim(0, 0.4)+
-  scale_x_continuous(breaks = c(seq(from = 1990, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
+  scale_y_continuous(labels = scales::percent, expand = c(0,0), limits = c(0, 0.4), breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ 
+  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
   theme_pt(major_grid = TRUE)+
-  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) +                 # theme_pt centers main title but not subtitle
+  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) # +                 # theme_pt centers main title but not subtitle
 
-  plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure
-  plot_layout(nrow = 3)                                                         # stack figures
-
-filename <- paste(work, "\\FIGURES\\Age_Comp_CompareDiff_", 
-                  timestamp, ".png", sep = "")                                  # figure output filename
-ggsave(file = filename, width = 8, height = 8, units = "in")                    # saves the plot
-
+#   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure - NO LONGER WORKS 240826
+#   plot_layout(nrow = 3)                                                         # stack figures
+# 
+# filename <- paste(work, "\\FIGURES\\Age_Comp_CompareDiff_", 
+#                   timestamp, ".png", sep = "")                                  # figure output filename
+# ggsave(file = filename, width = 8, height = 8, units = "in")                    # saves the plot
+# 
 #---- 
 # Side-by-side bar chart comparison of CRITFC vs ONA proportions by ocean age classes 1 and 2
 
