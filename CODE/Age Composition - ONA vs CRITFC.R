@@ -11,16 +11,17 @@
 ## Issues:  see statements where triple hash marks (###) exist.
 ## ---------------------------------------------------------------------------------------------------------------------------
 
+library(beepr)
 library(ggplot2)
 library(ggpubr)       # for adding text boxes with regression coefficients to plots
 library(ggrepel)
 library(here)
-library(rvest)
 library(MASS)
 library(mgcv)
 library(patchwork)
 library(psych)
 library(readxl)
+library(rvest)
 library(scales)
 library(SiREfunctions)
 library(splines)
@@ -29,6 +30,13 @@ library(tidyverse)
 
 timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
 last_year <- 2023
+
+# Functions 
+make_a_sound <- function(noise, pause) {                                        # generates a computer sound
+  beep(sound = noise)
+  Sys.sleep(pause)
+  beep(sound = noise)
+}
 
 filename  <- here("DATA", "ok_riv_deadpitch_xlsx_240524.csv")
 ok_riv_deadpitch <- read.csv2(filename, sep=",") 
@@ -58,8 +66,8 @@ missing_ages_2006 <- data.frame(year = 2006, age_1.1=1,             ### use summ
 missing_ages_2022 <- data.frame(year = 2022, age_1.1=19,            ### use summary % at age data from ONA (from AO 240322) for missing age comp in 2022
                                 age_1.2=861, age_1.3=120,           ### will need to incorporate 2022 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
                                 thermal_mark="Natural")            
-missing_ages_2023 <- data.frame(year = 2023, age_1.1=89,            ### use summary % at age data from ONA (from AO 240322) for missing age comp in 2023
-                                age_1.2=812, age_1.3=96, age_2.2=3, ### will need to incorporate 2023 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
+missing_ages_2023 <- data.frame(year = 2023, age_1.1=74,            ### use summary % at age data from ONA (from AO 240829) for missing age comp in 2023
+                                age_1.2=752, age_1.3=171, age_2.1=3,### will need to incorporate 2023 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
                                 thermal_mark="Natural")    
 
 missing_ages_1980 <- data.frame(year = 1980, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
@@ -107,7 +115,10 @@ age_composition_setup <- age_composition %>%
 age_composition_ONA_wide <- age_composition_setup %>% 
   mutate(across(everything(), ~ . / total, .names = "prop_{.col}")) %>%         # Calculate the annual proportions for each age column
   mutate(source = ifelse(return_year >= 2006, 
-                         "ONA Deadpitch", "ONA UNK (Broodstock?)"))
+                         "ONA Deadpitch", "ONA/SiRE (Broodstock?)"))
+
+filename <- here("OUTPUT", paste("age_composition_ONA_wide_", timestamp, ".csv", sep="")) # CSV filename for ONA age composition proportions
+write.csv(age_composition_ONA_wide, filename)                                             # saves the data inclusion in SAR report appendix
 
 age_comp_ONA_long <- age_composition_ONA_wide %>%                               # Pivot to list age composition by return year and age class
   pivot_longer(cols = c("prop_age_1.1", "prop_age_1.2", "prop_age_1.3",         ### caution: explicit selection of age classes may leave rare age classes 
@@ -182,7 +193,7 @@ best_age_comp_source_past <- best_age_comp_source_past %>%
   dplyr::select(return_year, best_source)
 
 filename <- here("DATA", "best_age_comp_source_past_240527.csv")                # CSV filename for ONA & CRITFC age composition proportions
-write.csv(best_age_comp_source_past, filename, sep="")                          # saves the data to filename
+write.csv(best_age_comp_source_past, filename)                                  # saves the data to filename
 best_age_comp_source_past <- read.csv(filename)                                 # read CSV file; this stmt needs filename stmt above to be uncommented
 
 best_age_comp_source_past <- best_age_comp_source_past %>%
@@ -208,7 +219,7 @@ best_age_comp_source_CRITFC <- best_age_comp_source_CRITFC %>%
   dplyr::select(return_year, best_source)
 
 filename <- here("DATA", "best_age_comp_source_CRITFC_240527.csv")
-write.csv(best_age_comp_source_CRITFC, filename, sep="")                        # saves the data to filename
+write.csv(best_age_comp_source_CRITFC, filename)                                # saves the data to filename
 best_age_comp_source_CRITFC <- read.csv(filename)                               # this stmt needs filename stmt above to be uncommented
 
 best_age_comp_source_CRITFC <- best_age_comp_source_CRITFC %>%
@@ -378,6 +389,10 @@ CRITFC_plot <- ggplot(CRITFC_ocean_age_filtered,
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
 CRITFC_plot
+
+filename <- here("FIGURES", paste("Ocean_Age_Prop_CRITFC_", timestamp, ".png", sep=""))
+ggsave(file = filename, width = 8, height = 8, units = "in")                    # save for report
+
 #-------
   
 age_comp_from_ONA_best_source <- age_comp_source_all %>%                        # Assign age comp proportions to year based on ONA over CRITFC age comp assignments                                
@@ -440,6 +455,9 @@ ONA_plot <- ggplot(ONA_ocean_age_filtered, aes(x = return_year, y = best_age_com
 
 ONA_plot
 
+filename <- here("FIGURES", paste("Ocean_Age_Prop_ONA_", timestamp, ".png", sep=""))
+ggsave(file = filename, width = 8, height = 8, units = "in")                    # save for report
+
 #-------------------------------------------                                    # stacked plot does not seem to work anymore "only defined for equally-sized data frames"...  
 # # past_plot + CRITFC_plot + ONA_plot +                                          # collate three age comp plots for comparison
 # CRITFC_plot + ONA_plot +                                                        # collate only CRITFC & ONA age comp plots for comparison
@@ -489,7 +507,7 @@ ggplot(ocean_age_2, aes(x = return_year, y = diff_OA_comp)) +
   scale_y_continuous(labels = scales::percent, expand = c(0,0), limits = c(0, 0.4), breaks = c(seq(from = 0, to = 0.5, by = 0.1)))+ 
   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
   theme_pt(major_grid = TRUE)+
-  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) #+                 # theme_pt centers main title but not subtitle
+  ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) #+                # theme_pt centers main title but not subtitle
   
 ggplot(ocean_age_3, aes(x = return_year, y = diff_OA_comp)) +
   geom_bar(stat = "identity") +
@@ -500,6 +518,8 @@ ggplot(ocean_age_3, aes(x = return_year, y = diff_OA_comp)) +
   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 2))) +    # omit 1980-1999 as only CRITFC or M-Yr ONA
   theme_pt(major_grid = TRUE)+
   ggplot2::theme(plot.title = ggplot2::element_text(hjust=0)) # +                 # theme_pt centers main title but not subtitle
+
+make_a_sound("coin", 0.4)
 
 #   plot_annotation(tag_levels = 'A')+                                            # put A B C on Figure - NO LONGER WORKS 240826
 #   plot_layout(nrow = 3)                                                         # stack figures
