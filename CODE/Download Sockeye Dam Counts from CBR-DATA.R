@@ -188,35 +188,35 @@ tot16_seq <- data.frame(tot_16 = seq(min(bonn_16_v_24$tot_16), max(bonn_16_v_24$
 bonn_pred_seq <- data.frame(tot_16 = tot16_seq, 
                             diff = predict(bonn_model, newdata = tot16_seq, type = "response"))                # type = "response" reverts to the scale of original data
 
-ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+                      ### Now getting ERROR in stacked plot creation...
-  geom_point()+                                                                 ###   Error in Ops.data.frame(guide_loc, panel_loc) : 
-  # geom_smooth(method = "glm.nb", color="gray", se=TRUE) +                     ###   ‘==’ only defined for equally-sized data frames 
-  geom_line(data = bonn_pred_seq, color="red", linewidth=1, linetype=1) +       ### ......................................[hs 240812]
-  geom_point(colour="black", size=2.5)+
-  # geom_jitter(height=1) +
-  geom_label_repel(aes(label = ret_year), fill = "white", colour = "black", size = 3)+ #, nudge_y = 5, nudge_x = -80)+
-  geom_text(x=0, y=36, label=stats_txt, hjust="inward", size=4) +
-  labs(title="Bonneville Dam Sockeye Counts (1000s)", subtitle = "1995-2002, 2013-2022")+
-  ylab("24 hr - 16 hr Count Difference")+
-  xlab("16 hr Count")+
-  theme_pt(major_grid=TRUE)+
-  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))+             # theme_pt centers main title but not subtitle
-  
-  ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
-  geom_line(data = bonn_pred_seq, color = "red", linewidth = 1.0)+                        # PT's predictive regression line
-  # geom_smooth(method = "lm", se=TRUE, alpha = 0.5, color = "white", linewidth = 0.01)+  # alternative line option
-  geom_point(colour="black", size=2.5)+
-  geom_label_repel(aes(label = ret_year), fill = "white", color = "black", size = 3, nudge_y = 50, nudge_x = -80)+
-  # labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+                   
-  ylab("24 hr Count")+
-  xlab("16 hr Count")+
-  theme_pt(major_grid=TRUE)+
-  
-  plot_annotation(tag_levels = 'A')+                                            # put A and B on Figure
-  plot_layout(nrow = 2)                                                         # stack figures
-
-filename <- paste("./figures/Bon_Dam_Counts_", timestamp, ".png", sep = "")     # figure output filename
-ggsave(file = filename, width = 6, height = 6, units = "in")                    # saves the plot
+# ggplot(bonn_16_v_24, aes(y = diff/1000, x = tot_16/1000))+                      ### Now getting ERROR in stacked plot creation...
+#   geom_point()+                                                                 ###   Error in Ops.data.frame(guide_loc, panel_loc) : 
+#   # geom_smooth(method = "glm.nb", color="gray", se=TRUE) +                     ###   ‘==’ only defined for equally-sized data frames 
+#   geom_line(data = bonn_pred_seq, color="red", linewidth=1, linetype=1) +       ### ......................................[hs 240812]
+#   geom_point(colour="black", size=2.5)+
+#   # geom_jitter(height=1) +
+#   geom_label_repel(aes(label = ret_year), fill = "white", colour = "black", size = 3)+ #, nudge_y = 5, nudge_x = -80)+
+#   geom_text(x=0, y=36, label=stats_txt, hjust="inward", size=4) +
+#   labs(title="Bonneville Dam Sockeye Counts (1000s)", subtitle = "1995-2002, 2013-2022")+
+#   ylab("24 hr - 16 hr Count Difference")+
+#   xlab("16 hr Count")+
+#   theme_pt(major_grid=TRUE)+
+#   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))+             # theme_pt centers main title but not subtitle
+#   
+# ggplot(bonn_16_v_24, aes(y = (diff + tot_16)/1000, x = tot_16/1000))+
+#   geom_line(data = bonn_pred_seq, color = "red", linewidth = 1.0)+                        # PT's predictive regression line
+#   # geom_smooth(method = "lm", se=TRUE, alpha = 0.5, color = "white", linewidth = 0.01)+  # alternative line option
+#   geom_point(colour="black", size=2.5)+
+#   geom_label_repel(aes(label = ret_year), fill = "white", color = "black", size = 3, nudge_y = 50, nudge_x = -80)+
+#   # labs(title="Bonneville Dam Sockeye Counts", subtitle = "1995-2002, 2013-2022")+                   
+#   ylab("24 hr Count")+
+#   xlab("16 hr Count")+
+#   theme_pt(major_grid=TRUE)+
+#   
+#   plot_annotation(tag_levels = 'A')+                                            # put A and B on Figure
+#   plot_layout(nrow = 2)                                                         # stack figures
+# 
+# filename <- paste("./figures/Bon_Dam_Counts_", timestamp, ".png", sep = "")     # figure output filename
+# ggsave(file = filename, width = 6, height = 6, units = "in")                    # saves the plot
 
 #-------------------------------------------------------------------------------
 
@@ -240,8 +240,8 @@ Columbia_Sockeye_Dam_Counts_24hr <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>% 
   full_join(bon_16_to_24, by = "Return_Year") %>%                                         # Bon 24-hr counts drawn from bon_16_to_24 data step
   mutate(RRH_Sockeye_24hr   = ifelse(Return_Year < 1994,                                
                                      round(RRH_Sockeye   * 1.120, 0), RRH_Sockeye  )) %>% # Using 16-to-24-hr adj factor (1.12) up to 1993 based on multi-year avg 2004-2011 at RRH (from CW WDFW)
-  mutate(Wells_Sockeye_24hr = ifelse(Return_Year < 1998, 
-                                     round(Wells_Sockeye * 1.132, 0), Wells_Sockeye)) %>% # Estimated from 16-hr counts (pre-1998) + average annual difference 13.2% between 16- and 24-hour counts (1998-2022; Tom Kahler pers. comm.), i.e. 16-hr count x 1.132 [hs 2022-10-17]
+  mutate(Wells_Sockeye_24hr = ifelse(Return_Year > 1984 & Return_Year < 1998,             # Tom K reports (email 240904) that 1967-1984 – complete counts (achieved by 16-hour/day live counts with ladder closures during the 8 nighttime hours).  
+                                     round(Wells_Sockeye * 1.132, 0), Wells_Sockeye)) %>% # Estimated from 16-hr counts (1985-1998) + average annual difference 13.2% between 16- and 24-hour counts (1998-2022; Tom Kahler pers. comm.), i.e. 16-hr count x 1.132 [hs 2022-10-17]
   mutate(RockI_Sockeye_24hr = RockI_Sockeye) %>%                                          # RockI dam counts are already 24hr based
   mutate(Tum_Sockeye_24hr   = Tum_Sockeye) %>%                                            # Tumwater dam counts are already 24hr based
   dplyr::select(Return_Year, Bonn_Sockeye_24hr, RockI_Sockeye_24hr, RRH_Sockeye_24hr,     # Keep just the variables based on 24-hr counts.
@@ -270,48 +270,68 @@ Columbia_Sockeye_Dam_Counts_24hr <- Columbia_Sockeye_Dam_Counts_by_Year_Raw %>% 
 Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_24hr %>%                   # Compare u/s dam totals to d/s dam totals ####
   mutate(RockI_gt_Bonn_diff = ifelse(RockI_Sockeye_24hr > Bonn_Sockeye_24hr,              # Compare u/s Rocky Reach (RRH) to d/s Bonneville
                                      RockI_Sockeye_24hr - Bonn_Sockeye_24hr, NA)) %>%     # and flag any records with the difference.
-  mutate(RockI_Sockeye_adj  = pmin(Bonn_Sockeye_24hr, RockI_Sockeye_24hr)) %>%            # Set d/s dam to min of the two dams.
+  mutate(RockI_Sockeye_adj  = pmin(Bonn_Sockeye_24hr, RockI_Sockeye_24hr)) %>%            # Set u/s dam to min of the two dams.
   mutate(RRH_gt_RockI_diff  = ifelse(RRH_Sockeye_24hr > RockI_Sockeye_adj,                # Compare u/s Rocky Reach (RRH) to d/s Rock Island
                                      RRH_Sockeye_24hr - RockI_Sockeye_adj, NA)) %>%       # and flag any records with the difference.
-  mutate(RRH_Sockeye_adj    = pmin(RockI_Sockeye_adj, RRH_Sockeye_24hr)) %>%              # Set d/s dam to max of the two dams.
+  mutate(RRH_Sockeye_adj    = pmin(RockI_Sockeye_adj, RRH_Sockeye_24hr)) %>%              # Set d/s dam to min of the two dams.
   mutate(Well_gt_RRH_diff   = ifelse(Wells_Sockeye_24hr > RRH_Sockeye_adj,                # and calculate dam count difference if u/s > d/s
                                      Wells_Sockeye_24hr - RRH_Sockeye_adj, NA)) %>%       # and flag the record by displaying the difference.
-  mutate(Wells_Sockeye_adj  = pmin(Wells_Sockeye_24hr, RRH_Sockeye_adj)) %>%              # Set d/s dam to max of the two dams.
+  mutate(Well_gt_RRH_pct    = Well_gt_RRH_diff / RRH_Sockeye_adj * 100) %>%
+  mutate(RRH_Sockeye_adj    = pmax(Wells_Sockeye_24hr, RRH_Sockeye_adj)) %>%              # Set d/s dam to max of the two dams as PIT data show Wells to be better tracker of abundance in years where Wells > RRH (see Columbia_Sockeye_Dam_Counts_Adj_240904_w_RegPlot.xlsx)
+  mutate(Wells_Sockeye_adj  = Wells_Sockeye_24hr) %>%                                     # No adjustments for Wells Dam.
+  mutate(RRH_to_Wells_Loss  = (RRH_Sockeye_adj - Wells_Sockeye_adj/RRH_Sockeye_adj)) %>%  # Mortality rate between RRH and Wells?
   mutate(Bonn_Sockeye_adj   = Bonn_Sockeye_24hr) %>%                                      # No further adjustments for Bonn.
   mutate(Tum_Sockeye_adj    = Tum_Sockeye_24hr) %>%                                       # or Tumwater.
-  dplyr::select(Return_Year,  Bonn_Sockeye_24hr, Bonn_Sockeye_adj, RockI_gt_Bonn_diff, 
-                              RockI_Sockeye_24hr, RockI_Sockeye_adj, RRH_gt_RockI_diff, 
-                              RRH_Sockeye_24hr, RRH_Sockeye_adj, Well_gt_RRH_diff, 
-                              Wells_Sockeye_24hr, Wells_Sockeye_adj, 
-                              Tum_Sockeye_24hr, Tum_Sockeye_adj) 
+  mutate(RIS_vs_RRH_TUM     = RockI_Sockeye_adj-(RRH_Sockeye_adj + Tum_Sockeye_adj)) %>%  # Now check if RRH + TUM > RIS...
+  dplyr::select(Return_Year,  Bonn_Sockeye_24hr, Bonn_Sockeye_adj, RockI_Sockeye_24hr, 
+                              RockI_gt_Bonn_diff, RockI_Sockeye_adj, RRH_Sockeye_24hr, 
+                              Wells_Sockeye_24hr, Well_gt_RRH_diff, Well_gt_RRH_pct,
+                              RRH_Sockeye_adj, Wells_Sockeye_adj, RRH_to_Wells_Loss,
+                              Tum_Sockeye_24hr, Tum_Sockeye_adj, RIS_vs_RRH_TUM) 
 
 filename <- paste("./data/Columbia_Sockeye_Dam_Counts_Adj_", timestamp, 
                   ".csv", sep = "")                                                       # filename for relevant adjusted dam counts output 
 write.csv(Columbia_Sockeye_Dam_Counts_Adj, filename)                                      # saves the adj dam count data (1977-2023) to filename
 
+# Fit a linear model to Wells as f(RRH) and plot the difference as f(RRH) to review years where Wells > RRH
+fit <- lm(Wells_Sockeye_24hr ~ RRH_Sockeye_24hr,                                    
+          data = Columbia_Sockeye_Dam_Counts_Adj %>% filter(Return_Year < 2008))
+
+ggplot(Columbia_Sockeye_Dam_Counts_Adj  %>% filter(Return_Year < 2008), # < 2010), # including 2009 and 2010 (tho Wells>RRH) compresses datapoints on x-axis
+  # aes(x = RRH_Sockeye_24hr / 1000, y = Wells_Sockeye_24hr / 1000 )) +
+  # labs(title = "Wells Totals as a function of RRH Totals") +
+  aes(x = RRH_Sockeye_24hr / 1000, y = RRH_to_Wells_Loss)) +
+  labs(title = "Dam Total Differences as a function of RRH Totals") + 
+# geom_hline(yintercept = 0, linetype = "dashed", color = "black", size=1) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, level = .999, color = "red", fill = "pink") +
+  geom_text_repel(aes(label = Return_Year)) +
+# geom_text(aes(label = Return_Year), hjust = 1.5, vjust = 1.5) +
+  theme_minimal() 
+
 #-------------------------------------------------------------------------------
 
-Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%                        # Get best mid-Columbia stock composition proportions ####
-  mutate(Ok_Stock_Comp_1  = round(RRH_Sockeye_adj / RockI_Sockeye_adj,2)) %>%             # Ok-bound stock is typically calc'd from ratio of RRH:RockI dam counts.
-  mutate(Wen_Stock_Comp_1 = round(1 - (RRH_Sockeye_adj / RockI_Sockeye_adj),2)) %>%       # Wen stock is usually calc'd by subtracting the Ok proportion from 1...
-  mutate(Wen_Stock_Comp_2 = ifelse(is.na(Tum_Sockeye_24hr), 0,                            # but if counts at Tumwater (since 2000) are large enough to indicate a higher proportion
-                                   round(Tum_Sockeye_24hr / RockI_Sockeye_adj, 2))) %>%   # of Wen fish than the RRH:RockI ratio, that then adds more information &
+Columbia_Sockeye_Stock_Comp <- Columbia_Sockeye_Dam_Counts_Adj %>%                       # Get best mid-Columbia stock composition proportions ####
+  mutate(Ok_Stock_Comp_1  = round(RRH_Sockeye_adj / RockI_Sockeye_adj, 2)) %>%           # Ok-bound stock is typically calc'd from ratio of RRH:RockI dam counts.
+  mutate(Wen_Stock_Comp_1 = round(1 - (RRH_Sockeye_adj / RockI_Sockeye_adj), 2)) %>%     # Wen stock is usually calc'd by subtracting the Ok proportion from 1...
+  mutate(Wen_Stock_Comp_2 = ifelse(is.na(Tum_Sockeye_24hr), 0,                           # but if counts at Tumwater (since 2000) are large enough to indicate a higher proportion
+                                   round(Tum_Sockeye_24hr / RockI_Sockeye_adj,2))) %>%   # of Wen fish than the RRH:RockI ratio, that then adds more information &
   mutate(Wen_Stock_Comp_Avg = (Wen_Stock_Comp_1 + Wen_Stock_Comp_2) / 2) %>%
-  mutate(Wen_Stock_Comp_Best = ifelse(Return_Year < 2000,                                 # then, depending on year (Tumwater counts available as of 2000)
-                                      pmax(Wen_Stock_Comp_1, Wen_Stock_Comp_2),           # the regular RRH:RI ratio is used up to 1999 and
-                                      Wen_Stock_Comp_Avg)) %>%                            # the annual average of the RRH:RI and TUM:RI ratios is used where both exist       
-  mutate(Ok_Stock_Comp_Best = 1 - Wen_Stock_Comp_Best) %>%                                # and the best Ok stock comp is 100-Best_Wen%.
-  mutate(Stock_Comp_Total = Wen_Stock_Comp_Best + Ok_Stock_Comp_Best) %>%                 # This is all a bit arbitrary, as it is not clear without dam count error data,
-  dplyr::select(Return_Year, RockI_Sockeye_adj, RRH_Sockeye_adj, Tum_Sockeye_adj,         # fall-back (and over-shoot) estimates, and spatially-resolved harvest data, to
-                Wen_Stock_Comp_1, Ok_Stock_Comp_1, Wen_Stock_Comp_2,                      # know which of the three dams is contributing what to the noise.
-                Wen_Stock_Comp_Best, Ok_Stock_Comp_Best, Stock_Comp_Total)                # Note also that the workbook contains somewhat different counts in the Tumwater column (starting in 
-                                                                                          # 1989 not 1999) provided by C.Willard (Chelan PUD; Tum Dam mgmt), who apparently supplies the dam 
-filename <- paste("./data/Columbia_Sockeye_Stock_Comp_", timestamp,                       # count data to CBR-DART; but her data may include rec harvest or spawning ground AUC estimates to 
-                  ".csv", sep = "")                                                       # better approximate 'total Wen returns'. This prog uses published CBR-DART data for Tumwater only, 
-write.csv(Columbia_Sockeye_Stock_Comp, filename)                                          # which means there will be some generally small diffs in stock comp from analyses based on workbook data.
+  mutate(Wen_Stock_Comp_Best = ifelse(Return_Year < 2000,                                # then, depending on year (Tumwater counts available as of 2000)
+                                      pmax(Wen_Stock_Comp_1, Wen_Stock_Comp_2),          # the regular RRH:RI ratio is used up to 1999 and
+                                      Wen_Stock_Comp_Avg)) %>%                           # the annual average of the RRH:RI and TUM:RI ratios is used where both exist       
+  mutate(Ok_Stock_Comp_Best = 1 - Wen_Stock_Comp_Best) %>%                               # and the best Ok stock comp is 100-Best_Wen%.
+  mutate(Stock_Comp_Total = Wen_Stock_Comp_Best + Ok_Stock_Comp_Best) %>%                # This is all a bit arbitrary, as it is not clear without dam count error data,
+  dplyr::select(Return_Year, RockI_Sockeye_adj, RRH_Sockeye_adj, Tum_Sockeye_adj,        # fall-back (and over-shoot) estimates, and spatially-resolved harvest data, to
+                Wen_Stock_Comp_1, Ok_Stock_Comp_1, Wen_Stock_Comp_2,                     # know which of the three dams is contributing what to the noise.
+                Wen_Stock_Comp_Best, Ok_Stock_Comp_Best, Stock_Comp_Total)               # Note also that the workbook contains somewhat different counts in the Tumwater column (starting in 
+                                                                                         # 1989 not 1999) provided by C.Willard (Chelan PUD; Tum Dam mgmt), who apparently supplies the dam 
+filename <- paste("./data/Columbia_Sockeye_Stock_Comp_", timestamp,                      # count data to CBR-DART; but her data may include rec harvest or spawning ground AUC estimates to 
+                  ".csv", sep = "")                                                      # better approximate 'total Wen returns'. This prog uses published CBR-DART data for Tumwater only, 
+write.csv(Columbia_Sockeye_Stock_Comp, filename)                                         # which means there will be some generally small diffs in stock comp from analyses based on workbook data.
 #-------------------------------------------------------------------------------
 
-Columbia_Sockeye_Dam_Counts_24hr_long <- Columbia_Sockeye_Dam_Counts_24hr %>%             # convert datasets to long to enable ggplot outputs
+Columbia_Sockeye_Dam_Counts_24hr_long <- Columbia_Sockeye_Dam_Counts_24hr %>%            # convert datasets to long to enable ggplot outputs
   pivot_longer(cols = c(Bonn_Sockeye_24hr, RockI_Sockeye_24hr, RRH_Sockeye_24hr, 
                         Wells_Sockeye_24hr), 
                names_to = "Mainstem_Dam", values_to = "Sockeye_Estimates") %>%
