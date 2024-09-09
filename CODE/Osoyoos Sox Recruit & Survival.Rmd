@@ -523,21 +523,39 @@ columbia_okanagan_recruits <- annual_returns %>% ungroup() %>%
 filename <- paste("../output/Columbia_Sockeye_Returns_", timestamp, ".csv", sep = "")                 # filename for recruitment output 
 write.csv(columbia_okanagan_recruits, filename)                                                       # saves the data to filename
 
-report_table1 <- columbia_okanagan_recruits %>%
-# mutate("Total Proportions" = prop_oso_origin_nat + prop_ska_origin_nat + prop_hatch_origin) %>%
+columbia_stock_recruitment <- columbia_okanagan_recruits %>%                                          # summary output for SAR report Table 1 (RESULTS)
   dplyr::select(Year=return_year, 
                 "Bon 24-hr Counts (estimated)" = bon_sox,
                 "Harvest Zones 1-5" = total_harvest_below_bonn,
                 "Snake Sockeye Estimates" = snake_recruits,
                 "Mid-Columbia Sockeye Abundance" = mid_columbia_recruits,
                 "Okanagan Stock Proportion (%)" = ok_stock_comp,
+#               "Wenatchee Sockeye" = wen_recruits,                                                   # Wenatchee recruitment not needed for Table 1
                 "Okanagan Sockeye" = oka_recruits,
-                "Osoyoos N-O Proportion (%)" = prop_oso_origin_nat,
-                "Skaha N-O Proportion(%)" = prop_ska_origin_nat,
-                "Hatchery Origin (H-O) Proportion (%)" = prop_hatch_origin,
-#               "Total Proportions",
-                "Osoyoos N-O Recruits" = oso_total_recruits)
+                "Osoyoos Natural Proportion (%)" = prop_oso_origin_nat,
+                "Osoyoos Natural Recruits" = oso_nat_recruits,
+                "Osoyoos Total Recruits" = oso_total_recruits)
 
+filename <- paste("../output/Osoyoos_Sockeye_Recruits_Table1_", timestamp, ".csv", sep = "")          # filename for recruitment output 
+write.csv(columbia_stock_recruitment, filename)                                                       # saves the data to filename
+
+okanagan_substock_recruitment <- columbia_okanagan_recruits %>%
+  mutate("Total Proportions" = prop_oso_origin_nat + prop_ska_origin_nat + prop_hatch_origin) %>%
+  dplyr::select(Year = return_year, 
+                "Okanagan-Bound Sockeye" = oka_recruits, 
+                "Hatchery Origin Proportion (%)" = prop_hatch_origin,
+                "Osoyoos Natural Proportion (%)" = prop_oso_origin_nat,
+                "Skaha Natural Proportion (%)" = prop_ska_origin_nat,
+#               "Total Proportions",
+                "Hatchery-Origin" = hatchery_recruits,
+                "Osoyoos Natural-Origin" = oso_nat_recruits,
+                "Osoyoos Natural + Hatchery-Origin" = oso_total_recruits,
+                "Skaha Natural-Origin" = ska_nat_recruits,
+                "Skaha Natural + Hatchery-Origin" = ska_total_recruits)
+
+filename <- paste("../output/OSO_SKA_Recruitment_", timestamp, ".csv", sep = "")                      # filename for OSO and SKA recruits
+write.csv(okanagan_substock_recruitment, filename)                                                    # possible APPENDIX table
+                
 # columbia_okanagan_recruits %>%                                                                      # replaced with multi-line plot for all variables or
 #   dplyr::select(return_year, columbia_recruits, oka_recruits, oso_nat_recruits, ska_nat_recruits,   # stacked 100% barchart for Okanagan sub-stocks, below
 #                 hatchery_recruits) %>% 
@@ -660,14 +678,14 @@ age_proportions_ONA_CRITFC <- age_comp_ONA_CRITFC %>%
                                    "ONA", best_source_old)) %>%
     mutate(best_source_old = ifelse(return_year %in% c(1980:1984,1986),           # ... multi-year averages (1980-1984, 1986)
                                    "Average", best_source_old)) %>%
-    mutate(best_source_new = ifelse(return_year %in% c(1985,1987:2001,2004:2022), # next, create best_source_new assignment variable by setting all years specified here to CRITFC...
+    mutate(best_source_new = ifelse(return_year %in% c(1985,1987:2001,2004:2023), # next, create best_source_new assignment variable by setting all years specified here to CRITFC...
                                    "CRITFC", "UNKNOWN")) %>%
-    mutate(best_source_new = ifelse(return_year %in% c(2002:2003, 2007, 2023),    # ...and all years specified here to ONA...  
+    mutate(best_source_new = ifelse(return_year %in% c(2002:2003, 2007),          # ...and all years specified here to ONA...  
                                    "ONA", best_source_new)) %>%
     mutate(best_source_new = ifelse(return_year %in% c(1980:1984,1986),           # ... multi-year averages (1980-1984, 1986)
                                    "Average", best_source_new)) %>%
     mutate(CRITFC_prop_at_age = as.numeric(CRITFC_prop_at_age)) %>%
-    mutate(ONA_prop_at_age = as.numeric(ONA_prop_at_age))
+    mutate(ONA_prop_at_age    = as.numeric(ONA_prop_at_age))
                 
 age_data_old <- age_proportions_ONA_CRITFC %>%
   mutate(best_source     = best_source_old)                                     ### select OLD annual assignments to use in analysis below, OR...
