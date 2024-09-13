@@ -37,10 +37,10 @@ library(tidyverse)
 
 timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
 
-current_date <- Sys.Date()                  # Get the current date
-current_month <- as.numeric(format(current_date, "%m")) # Extract the current month
-current_year <- as.numeric(format(current_date, "%Y"))  # Extract the current year
-latest_year_of_sockeye_data <- ifelse(current_month > 8, current_year, current_year - 1)
+current_date <- Sys.Date()                                                      # Get the current date, month, year
+current_month <- as.numeric(format(current_date, "%m"))                         # to determine if analysis should include
+current_year <- as.numeric(format(current_date, "%Y"))                          # Sockeye data from the current year... 
+latest_year_of_sockeye_data <- ifelse(current_month > 8, current_year, current_year - 1) # ..since run is not complete till after August
 
 #-------------------------------------------------------------------------------
 # Bonneville Dam Counts ####
@@ -302,45 +302,50 @@ calc_pct_diff_RIS_to_RRH <-Columbia_Sockeye_Dam_Counts_Adjust %>%               
   filter(RockI_to_RRH_pct > 0) %>%                                                        # ...filter for years where RockI > RRH (i.e., all years, since RockI >> RRH).
   select(Return_Year, RockI_Sockeye_adj, RRH_Sockeye_adj, RockI_to_RRH_pct) 
   
-mean_pct_diff_RIS_to_RRH <- mean(calc_pct_diff_RIS_to_RRH$RockI_to_RRH_pct)               # calculate multi-year mean pct difference = 31.2% drop between RIS and RRH
+mean_pct_diff_RIS_to_RRH    <- mean(calc_pct_diff_RIS_to_RRH$RockI_to_RRH_pct)            # calculate multi-year mean pct difference = 31.2% drop between RIS and RRH
+wt_mean_pct_diff_RIS_to_RRH <- weighted.mean(calc_pct_diff_RIS_to_RRH$RockI_to_RRH_pct,   # calculate multi-year mean pct difference = 22.5% drop between RIS and RRH (weighted by abund)
+                                             calc_pct_diff_RIS_to_RRH$RockI_Sockeye_adj) 
 
 calc_pct_diff_RRH_to_Wells <-Columbia_Sockeye_Dam_Counts_Adjust %>%                       # to calculate multi-year mean percent difference between RRH & Wells... 
   filter(RRH_to_Well_Pct > 0) %>%                                                         # ...filter for years where RRH > Wells (i.e., omit years where Wells > RRH).
   select(Return_Year, RRH_Sockeye_24hr, Wells_Sockeye_24hr, RRH_to_Well_Pct)
 
-mean_pct_diff_RRH_to_Wells <- mean(calc_pct_diff_RRH_to_Wells$RRH_to_Well_Pct)            # calculate multi-year mean pct difference =  8.9%
+mean_pct_diff_RRH_to_Wells <- mean(calc_pct_diff_RRH_to_Wells$RRH_to_Well_Pct)            # calculate multi-year mean pct difference = 8.9%
+wt_mean_pct_diff_RRH_to_Wells <- weighted.mean(calc_pct_diff_RRH_to_Wells$RRH_to_Well_Pct,# calculate multi-year mean pct difference = 7.9% (weighted by abund)
+                                               calc_pct_diff_RRH_to_Wells$RRH_Sockeye_24hr)                          
 
 Columbia_Sockeye_Dam_Counts_Adj <- Columbia_Sockeye_Dam_Counts_Adjust %>%                 # calculate adjusted RRH Sockeye count estimate
   mutate(RRH_Sockeye_adj = ifelse(RRH_to_Well_Pct > 0, RRH_Sockeye_adj,                   # for years where RRH > Wells, use RRH_Sockeye_adj from above, i.e., pmax(RRH24, Well24) 
                                   round(RRH_Sockeye_adj +                                 # otherwise where RRH < Wells,... 
-                                        RRH_Sockeye_adj * mean_pct_diff_RRH_to_Wells)))%>%# ...boost adjusted RRH from above by mean pct difference (8.82%)
+                                        RRH_Sockeye_adj * wt_mean_pct_diff_RRH_to_Wells)))%>%# ...boost adjusted RRH from above by weighted mean pct difference (7.9%)
   mutate(RRH_RIS_chk = ifelse(RRH_Sockeye_adj > RockI_Sockeye_adj,                        # check that the boosted RRH estimates are not greater than RIS downstream
-                              RRH_Sockeye_adj - RockI_Sockeye_adj, NA))
-         
+                              RRH_Sockeye_adj - RockI_Sockeye_adj, NA)) %>%
+  mutate(RRH_to_Well_new_diff = (RRH_Sockeye_adj - Wells_Sockeye_24hr)) # / RRH_Sockeye_adj) 
+  
 filename <- paste("./data/Columbia_Sockeye_Dam_Counts_Adj_", timestamp, 
                   ".csv", sep = "")                                                       # filename for relevant adjusted dam counts output 
 write.csv(Columbia_Sockeye_Dam_Counts_Adj, filename)                                      # saves the adj dam count data (1977-2023) to filename
 
 ggplot(Columbia_Sockeye_Dam_Counts_Adj  %>% 
-  filter(Return_Year < latest_year_of_sockeye_data), # < 2010),                 # including 2009 and 2010 (tho Wells>RRH) compresses datapoints on x-axis
+  filter(Return_Year <= latest_year_of_sockeye_data),                                     # plot annual percent difference between RRH and WELLS
   aes(x = Return_Year, y = RRH_to_Well_Pct)) +
   labs(title    = "Rocky Reach (RRH) vs Wells Dam - Annual Total Sockeye Count Differences",
-       subtitle = "Points below Zero-Line indicate Total Wells > Total RRH") +
+       subtitle = "Points below Zero-Line indicate: Total Wells > Total RRH") +
   theme(plot.subtitle = element_text(color = "red")) +
   ylab("Percent Difference") + xlab("") +
   scale_y_continuous(labels = scales::percent, expand = c(0,0), n.breaks = 7) +    
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black", size=1) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth=1) +
   geom_line() +
   geom_point(aes(color = ifelse(RRH_to_Well_Pct > 0, 'Above Zero', 'Below Zero')), size = 2) +
   scale_color_manual(values = c('Above Zero' = 'blue', 'Below Zero' = 'red')) +
-  guides(color=FALSE) + # removes legend
+  guides(color=FALSE) +                                                         # removes legend
   # geom_text(aes(label=Return_Year), nudge_y = ifelse(Columbia_Sockeye_Dam_Counts_Adj$RRH_to_Well_Pct < 0, -0.25, NA))+
   geom_text_repel(aes(label = Return_Year),
                   nudge_y = ifelse(Columbia_Sockeye_Dam_Counts_Adj$RRH_to_Well_Pct < 0, -0.25, +0.25), # Nudge labels downward if y < 0, otherwise remove
-                  direction = "y",    # specifies the direction in which overlapping text labels should be repelled away from each other
-  hjust = 0.5,        # adjusts the horizontal justification of the text
-  # vjust = 0,          # adjusts the vertical justification of the text
-  segment.size = 0.5, # controls the size of the line segments drawn between the point and the text
+                  direction = "y",                                              # specifies direction in which overlapping text labels should be repelled away from each other
+  hjust = 0.5,                                                                  # adjusts horizontal justification of the text
+  # vjust = 0,                                                                  # adjusts vertical justification of the text
+  segment.size = 0.5,                                                           # controls size of the line segments drawn between the point and the text
   segment.color = "grey50",
   segment.linetype = "dashed") +
   theme_minimal() +
@@ -350,9 +355,9 @@ ggplot(Columbia_Sockeye_Dam_Counts_Adj  %>%
   theme(plot.title    = element_text(color = "blue", hjust=0.5)) +
   theme(plot.subtitle = element_text(color = "red", hjust=0.5)) 
 
-filename <- paste("./figures/Total_Wells_gt_Total_RRH_Pct_",                        # Unadjusted 24hr totals
-                  timestamp, ".png", sep = "")                                  # figure output filename
-ggsave(file = filename, width = 8, height = 6, units = "in")                    # saves the plot
+filename <- paste("./figures/Total_Wells_gt_Total_RRH_Pct_",                    # Unadjusted 24hr totals
+                  timestamp, ".png", sep = "")                                  
+ggsave(file = filename, width = 8, height = 6, units = "in")                    
 
 #-------------------------------------------------------------------------------
 
@@ -396,6 +401,8 @@ ggplot(Columbia_Sockeye_Dam_Counts_24hr_long,
 Columbia_Sockeye_Dam_Counts_Adj_long <- Columbia_Sockeye_Dam_Counts_Adj %>% 
   pivot_longer(cols = c(Bonn_Sockeye_adj, RockI_Sockeye_adj, RRH_Sockeye_adj, Wells_Sockeye_adj), 
                names_to = "Mainstem_Dam", values_to = "Sockeye_Estimates") %>%
+  # filter(Mainstem_Dam >= "R") %>%                                             ### restricts plot below to RIS, RRH & Wells only!
+  # filter(Return_Year <= 2010) %>%                                             ### restricts plot to early years
   dplyr::select(Return_Year, Mainstem_Dam, Sockeye_Estimates)
 
 ggplot(Columbia_Sockeye_Dam_Counts_Adj_long, 
