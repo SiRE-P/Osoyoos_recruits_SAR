@@ -391,7 +391,7 @@ CRITFC_plot <- ggplot(CRITFC_ocean_age_filtered,
 CRITFC_plot
 
 filename <- here("FIGURES", paste("Ocean_Age_Prop_CRITFC_", timestamp, ".png", sep=""))
-ggsave(file = filename, width = 8, height = 8, units = "in")                    # save for report
+ggsave(file = filename, width = 8, height = 4, units = "in")                    # save for report
 
 #-------
   
@@ -456,7 +456,7 @@ ONA_plot <- ggplot(ONA_ocean_age_filtered, aes(x = return_year, y = best_age_com
 ONA_plot
 
 filename <- here("FIGURES", paste("Ocean_Age_Prop_ONA_", timestamp, ".png", sep=""))
-ggsave(file = filename, width = 8, height = 8, units = "in")                    # save for report
+ggsave(file = filename, width = 8, height = 4, units = "in")                    # save for report
 
 #-------------------------------------------                                    # stacked plot does not seem to work anymore "only defined for equally-sized data frames"...  
 # # past_plot + CRITFC_plot + ONA_plot +                                          # collate three age comp plots for comparison
