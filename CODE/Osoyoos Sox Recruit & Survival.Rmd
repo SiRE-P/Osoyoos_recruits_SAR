@@ -30,6 +30,7 @@ if (!require(SiREfunctions)) {
   install.packages("remotes")
   remotes::install_github("SiRE-P/SiREfunctions")
 }
+library(beepr)        # for making sounds
 library(ggplot2)
 library(ggpubr)       # for adding text boxes with regression coefficients to plots
 library(ggrepel)
@@ -46,6 +47,7 @@ library(stringi)
 library(tidyverse)
 
 last_year <- 2023     # current last year of returns data handled or available 
+
 ```
 
 ```{r functions}
@@ -80,6 +82,12 @@ cv_gam_loo <- function(data, formula, seed = 123) {
   
   # Return the average errors
   return(mean_mse)
+}
+
+make_a_sound <- function(noise, pause) {
+  beep(sound = noise)
+  Sys.sleep(pause)
+  beep(sound = noise)
 }
 ```
 
@@ -122,7 +130,8 @@ snake_sockeye_estimates <- read_xlsx(filename, sheet=worksheet) %>%
 ```{r calculate oka-bound sockeye abundance}
 
 Columbia_Sockeye_Dam_Counts_Adj <-                                              #   Import expanded & adjusted mainstem dam counts
-  read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240718.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
+# read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240718.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
+  read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240908.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
   janitor::clean_names()                                                        ###     unless version 240718 exists in DATA subdirectory already
 
 dam_counts <- Columbia_Sockeye_Dam_Counts_Adj %>%                               
@@ -131,8 +140,10 @@ dam_counts <- Columbia_Sockeye_Dam_Counts_Adj %>%
                 tum_sox = tum_sockeye_adj,    wel_sox = wells_sockeye_adj)
 
 Columbia_Sockeye_Stock_Comp <- 
-  read.csv("../data/Columbia_Sockeye_Stock_Comp_240718.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
-  janitor::clean_names()                                                        ###     unless version 240718 exists in DATA subdirectory already
+# read.csv("../data/Columbia_Sockeye_Stock_Comp_240718.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
+# read.csv("../data/Columbia_Sockeye_Stock_Comp_240908.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
+  read.csv("../data/Columbia_Sockeye_Stock_Comp_240913.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
+  janitor::clean_names()                                                        ###     unless version 240913 exists in DATA subdirectory already
 
 stock_comp <- Columbia_Sockeye_Stock_Comp %>% 
   dplyr::select(return_year, ok_stock_comp = ok_stock_comp_best)                # select best annual Okanagan Sockeye stock comp estimate
@@ -763,6 +774,9 @@ age_data.df <- age_data_new %>%
   mutate(best_age_prop = ifelse(best_source == "CRITFC", CRITFC_prop_at_age, ONA_prop_at_age)) %>%
   filter(return_year > 1984)
 
+filename <- paste("../output/Ocean_Age_Comp_", timestamp, ".csv", sep = "")     # output data for report
+write.csv(age_data.df, filename)                                                # saves the data to filename
+
 age_prop_chk <- age_data.df %>%                                                 # shows if any annual total age proportions don't add up to 1.0
   group_by(return_year) %>%                                                     # sorted by total_best proportion
   summarise(total_best = sum(best_age_prop), 
@@ -982,5 +996,5 @@ ggplot(radat2_final, aes(x = smolt_year, y = survival, colour = source))+
 filename <- paste("../figures/OSO_SAR_Survival_(FINAL)_", timestamp, ".png", sep = "")   # filename for figure output 
 ggsave(file = filename, width = 6, height = 4, units = "in")                             # saves the plot to filename
 
-
+make_a_sound("coin", 0.1)   # signal end of execution
 ```
