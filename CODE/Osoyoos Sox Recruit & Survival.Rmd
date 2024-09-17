@@ -131,8 +131,9 @@ snake_sockeye_estimates <- read_xlsx(filename, sheet=worksheet) %>%
 
 Columbia_Sockeye_Dam_Counts_Adj <-                                              #   Import expanded & adjusted mainstem dam counts
 # read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240718.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
-  read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240908.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
-  janitor::clean_names()                                                        ###     unless version 240718 exists in DATA subdirectory already
+# read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240908.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
+  read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240913.csv") %>%            ### <-- no changes since 240908.csv but 240913 is a benchmark for latest draft report
+  janitor::clean_names()                                                        ###     unless version 240913 exists in DATA subdirectory already
 
 dam_counts <- Columbia_Sockeye_Dam_Counts_Adj %>%                               
   dplyr::select(return_year,                  bon_sox = bonn_sockeye_adj,       # obtain ADJusted Sockeye estimates from mainstem dams
@@ -142,7 +143,7 @@ dam_counts <- Columbia_Sockeye_Dam_Counts_Adj %>%
 Columbia_Sockeye_Stock_Comp <- 
 # read.csv("../data/Columbia_Sockeye_Stock_Comp_240718.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
 # read.csv("../data/Columbia_Sockeye_Stock_Comp_240908.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
-  read.csv("../data/Columbia_Sockeye_Stock_Comp_240913.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
+  read.csv("../data/Columbia_Sockeye_Stock_Comp_240913.csv") %>%                ### <-- no changes since 240908.csv but 240913 is a benchmark for latest draft report
   janitor::clean_names()                                                        ###     unless version 240913 exists in DATA subdirectory already
 
 stock_comp <- Columbia_Sockeye_Stock_Comp %>% 
