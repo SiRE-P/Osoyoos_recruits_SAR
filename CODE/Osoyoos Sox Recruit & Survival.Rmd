@@ -279,7 +279,7 @@ prop_natural <- bind_rows(deadpitch %>% mutate(type = "Sampled"),
 ggplot(prop_natural, aes(x = year, y = p_nat))+
   geom_line()+
   geom_point(aes(color = type))+
-#  dplyr::filter(section != "Shingle Creek") +
+# dplyr::filter(section != "Shingle Creek") +
   facet_wrap(~section, ncol=1)+
   scale_x_continuous(breaks = c(seq(from = 2007, to = last_year, by = 2)))+
   labs(title="Proportion Natural Origin")+
@@ -346,7 +346,7 @@ prop_oso_strays <- prop_oso_strays_by_year %>%
 
 #  H-O fish in lower-OkR from 2018-2021 likely SKA or OKA strays, from which we can calc annual -- and weighted Multi-Yr avg -- "SKA stray rate" relative to total H-O on all SGs 
 
-#  PLT - calculate proportion of all HO in lower river in each year
+#  PLT - calculate proportion of all HO in lower river in each year of available data
 prop_ska_strays_by_year <- prop_natural %>% 
   filter(year >=2018, year <= 2020) %>%                                                    # based on 2018 and 2020 only (2019 insufficient data)
   mutate(rearing_lake = ifelse(section == "Lower Ok River", "Osoyoos", "Skaha")) %>% 
@@ -381,7 +381,8 @@ spawning_table <- spawning_location %>%                                         
   mutate(natural_sockeye = total_sockeye * p_nat) %>%                                      # calculate N-O abund based on proportion N-O  
   group_by(rearing_lake, year) %>% 
   summarise(total_sockeye = sum(total_sockeye), natural_sockeye = sum(natural_sockeye))    # aggregate by rearing lake
-  
+# mutate(p_nat = natural_sockeye / total_sockeye)                                          # re-estimates proportion natural by sub-stock & year
+
 stray_correct <- function(obs_focal, obs_other, stray_focal, stray_other){                 # function to adjust for strays in both directions
   max(0,((stray_other - 1) * obs_focal + stray_other * obs_other)/(stray_focal + stray_other - 1))}
 
@@ -465,7 +466,9 @@ spawning_totals_fix2011 <- spawning_totals %>%
   mutate(prop_ska_origin_nat =  ifelse(year == 2011, ska_nat_origin/(oso_total + ska_total), prop_ska_origin_nat)) %>%
   arrange(year)
 
-spawning_totals <- spawning_totals_fix2011
+spawning_totals <- spawning_totals_fix2011 %>%
+  mutate(p_nat_oso = oso_nat / oso_total) %>%                                   # added recalc of (lost) initial sub-stock proportion natural for OSO [240915]
+  mutate(p_nat_ska = ifelse(ska_total == 0, 0, ska_nat / ska_total))            # added recalc of (lost) initial sub-stock proportion natural for SKA [240915]
 
 spawning_totals %>% 
   ggplot(aes(x = year, y = prop_oso_origin_nat, color = prop_natural_origin_type))+
@@ -497,8 +500,26 @@ spawning_totals %>%                                                             
 
 ### add stacked 100% plot for OSO/SKA proportions?
 
-filename <- paste("../output/Spawning_Totals_", timestamp, ".csv", sep = "")    # filename for recruitment output 
-write.csv(spawning_totals, filename)                                            # saves the data to filename
+# filename <- paste("../output/Spawning_Totals_", timestamp, ".csv", sep = "")    
+# write.csv(spawning_totals, filename)                                            
+
+spawn_table_for_appendix <- spawning_totals %>%
+  mutate(OsoProportionNatural = oso_nat / oso_total) %>%
+  mutate(SkaProportionNatural = ska_nat / ska_total) %>%
+  mutate(HatcheryProportion = 1 - (prop_oso_origin_nat + prop_ska_origin_nat)) %>%
+  select(Year=year, 
+         OsoSoxSpawners = oso_total, OsoProportionNatural, OsoNaturalSpawners = oso_nat, 
+         SkaSoxSpawners = ska_total, SkaProportionNatural, SkaNaturalSpawners = ska_nat,
+         OsoStrayProp = prop_oso_strays, OsoStrays = oso_strays, 
+         SkaStrayProp = prop_ska_strays, SkaStrays = ska_strays,
+         OsoNaturalOrigin = oso_nat_origin, SkaNaturalOrigin = ska_nat_origin,
+         OsoBestPropNaturalOrigin = prop_oso_origin_nat, SkaBestPropNaturalOrigin = prop_ska_origin_nat,
+         HatcheryProportion)
+
+filename <- paste("../output/Spawning_Totals_", timestamp, ".csv", sep = "")    # filename for Spawning Grounds calculation 
+write.csv(spawn_table_for_appendix, filename)                                   # for Appendix Table 
+
+  
 ```  
 
 ```{r columbia/okanagan recruitment}  
