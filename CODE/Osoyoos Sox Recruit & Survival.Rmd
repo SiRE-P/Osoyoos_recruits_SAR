@@ -147,7 +147,7 @@ Columbia_Sockeye_Stock_Comp <-
   janitor::clean_names()                                                        ###     unless version 240913 exists in DATA subdirectory already
 
 stock_comp <- Columbia_Sockeye_Stock_Comp %>% 
-  dplyr::select(return_year, ok_stock_comp = ok_stock_comp_best)                # select best annual Okanagan Sockeye stock comp estimate
+  dplyr::select(return_year, ok_stock_comp = ok_stock_comp_best)                # select best annual Okanagan Sockeye stock comp estimates
 
 annual_returns <- dam_counts %>%                                                # get annual Okanagan-bound Sockeye recruitment estimates 
   full_join(columbia_sockeye_harvest_below_bonn, by = "return_year") %>%
@@ -447,27 +447,28 @@ spawning_totals <- bind_rows(spawning_totals_no2011 %>% mutate(prop_natural_orig
                                          year = 2011, prop_natural_origin_type = "imputed")) %>% 
     arrange(year)
 
-spawning_totals_fix2011 <- spawning_totals %>%
-  group_by(year) %>%
-  mutate(oso_total = ifelse(year == 2011, 35900, round(oso_total,0))) %>%                               ### hardwire OSO spawner numbers for 2011
-  mutate(ska_total = ifelse(year == 2011,  9426, round(ska_total,0))) %>%                               ### hardwire OSO spawner numbers for 2011
-  mutate(oso_nat = round(ifelse(year == 2011, oso_total * prop_oso_origin_nat, oso_nat),0)) %>%         ### update   OSO N-O     numbers for 2011
-  mutate(ska_nat = round(ifelse(year == 2011, ska_total * prop_ska_origin_nat, ska_nat),0)) %>%         ### update   OSO N-O     numbers for 2011
-  mutate(prop_oso_strays = ifelse(year == 2011, prop_oso_strays_mean, prop_oso_strays)) %>%             ### update   OSO stray proport'n for 2011
-  mutate(prop_ska_strays = ifelse(year == 2011, wmean_ska_stray_prop, prop_ska_strays)) %>%             ### update   SKA stray proport'n for 2011
-  mutate(oso_nat_origin = round(ifelse(year == 2011,                                                    
-                                       stray_correct(oso_nat,ska_nat,prop_oso_strays,prop_ska_strays),  # estimate OSO N-O taking into account OSO->SKA and SKA->OSO stray rates  
-                                       oso_nat_origin),0)) %>%                                                     
-  mutate(ska_nat_origin = round(ifelse(year == 2011, 
-                                       stray_correct(ska_nat,oso_nat,prop_ska_strays,prop_oso_strays),  # estimate SKA N-O taking into account OSO->SKA and SKA->OSO stray rates 
-                                       ska_nat_origin),0)) %>%   
-  mutate(oso_strays     = round(ifelse(year == 2011, oso_nat_origin * prop_oso_strays, oso_strays),0)) %>%                                      
-  mutate(ska_strays     = round(ifelse(year == 2011, ska_nat_origin * prop_ska_strays, ska_strays),0)) %>%
-  mutate(prop_oso_origin_nat =  ifelse(year == 2011, oso_nat_origin/(oso_total + ska_total), prop_oso_origin_nat)) %>%
-  mutate(prop_ska_origin_nat =  ifelse(year == 2011, ska_nat_origin/(oso_total + ska_total), prop_ska_origin_nat)) %>%
-  arrange(year)
+# spawning_totals_fix2011 <- spawning_totals %>%
+#   group_by(year) %>%
+#   mutate(oso_total = ifelse(year == 2011, 35900, round(oso_total,0))) %>%                               ### hardwire OSO spawner numbers for 2011
+#   mutate(ska_total = ifelse(year == 2011,  9426, round(ska_total,0))) %>%                               ### hardwire OSO spawner numbers for 2011
+#   mutate(oso_nat = round(ifelse(year == 2011, oso_total * prop_oso_origin_nat, oso_nat),0)) %>%         ### update   OSO N-O     numbers for 2011
+#   mutate(ska_nat = round(ifelse(year == 2011, ska_total * prop_ska_origin_nat, ska_nat),0)) %>%         ### update   OSO N-O     numbers for 2011
+#   mutate(prop_oso_strays = ifelse(year == 2011, prop_oso_strays_mean, prop_oso_strays)) %>%             ### update   OSO stray proport'n for 2011
+#   mutate(prop_ska_strays = ifelse(year == 2011, wmean_ska_stray_prop, prop_ska_strays)) %>%             ### update   SKA stray proport'n for 2011
+#   mutate(oso_nat_origin = round(ifelse(year == 2011,                                                    
+#                                        stray_correct(oso_nat,ska_nat,prop_oso_strays,prop_ska_strays),  # estimate OSO N-O taking into account OSO->SKA and SKA->OSO stray rates  
+#                                        oso_nat_origin),0)) %>%                                                     
+#   mutate(ska_nat_origin = round(ifelse(year == 2011, 
+#                                        stray_correct(ska_nat,oso_nat,prop_ska_strays,prop_oso_strays),  # estimate SKA N-O taking into account OSO->SKA and SKA->OSO stray rates 
+#                                        ska_nat_origin),0)) %>%   
+#   mutate(oso_strays     = round(ifelse(year == 2011, oso_nat_origin * prop_oso_strays, oso_strays),0)) %>%                                      
+#   mutate(ska_strays     = round(ifelse(year == 2011, ska_nat_origin * prop_ska_strays, ska_strays),0)) %>%
+#   mutate(prop_oso_origin_nat =  ifelse(year == 2011, oso_nat_origin/(oso_total + ska_total), prop_oso_origin_nat)) %>%
+#   mutate(prop_ska_origin_nat =  ifelse(year == 2011, ska_nat_origin/(oso_total + ska_total), prop_ska_origin_nat)) %>%
+#   arrange(year)
 
-spawning_totals <- spawning_totals_fix2011 %>%
+# spawning_totals <- spawning_totals_fix2011 %>%
+spawning_totals <- spawning_totals %>%
   mutate(p_nat_oso = oso_nat / oso_total) %>%                                   # added recalc of (lost) initial sub-stock proportion natural for OSO [240915]
   mutate(p_nat_ska = ifelse(ska_total == 0, 0, ska_nat / ska_total))            # added recalc of (lost) initial sub-stock proportion natural for SKA [240915]
 
