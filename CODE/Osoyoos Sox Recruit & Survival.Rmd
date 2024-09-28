@@ -220,14 +220,14 @@ deadpitch_2022_2023 <- data.frame(                                ### append sum
   section = c("Lower Ok River", "Lower Ok River",                   # Lower Ok River
               "Penticton Channel", "Shingle Creek"),                # Skaha River and Shingle Creek section
   n_natural = c(388, 311, 360, 35),                               ### natural origin count from AO
-  n = c(392, 322, 368, 57)) %>%                                   ### total deadpitch from AO 
+          n = c(392, 322, 368, 57)) %>%                           ### total deadpitch from AO 
   mutate(p_nat = n_natural / n) %>%
   mutate(osoyoos_stocked = FALSE)
   
 deadpitch <- bind_rows(deadpitch_low_mid, deadpitch_pen,            # combine deadpitch data
                        deadpitch_shingle, 
                        deadpitch_2022_2023) %>%                   ### hard-wired data
-  dplyr::filter(section != "Shingle Creek") %>%                     # drop Shingle Creek from this analysis
+# dplyr::filter(section != "Shingle Creek") %>%                   ### drop Shingle Creek from this analysis - insufficient data # commented out 240927 for testing
   arrange (section, year)   
 
 #run cross validation to determine df of year spline
@@ -250,9 +250,9 @@ cv_gam_loo(data = deadpitch %>% filter(section == "Penticton Channel") %>% filte
 #lowest Pen Channel MSE is for model with 4 df on spline [HS 24.07.24]
 
 # fit gam to impute missing values
-pnat_low_m <- gam(p_nat ~ bs(year, 3), data = deadpitch %>% filter(section == "Lower Ok River")  %>% filter(year!=2013), family = binomial(link = "logit"))
-pnat_mid_m <- gam(p_nat ~ bs(year, 5), data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), family = binomial(link = "logit"))
-pnat_pen_m <- gam(p_nat ~ bs(year, 4), data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011),family = binomial(link = "logit"))
+pnat_low_m <- gam(p_nat ~ bs(year, 3), data = deadpitch %>% filter(section == "Lower Ok River")    %>% filter(year!=2013), family = binomial(link = "logit"))
+pnat_mid_m <- gam(p_nat ~ bs(year, 5), data = deadpitch %>% filter(section == "Middle Ok River")   %>% filter(year!=2013), family = binomial(link = "logit"))
+pnat_pen_m <- gam(p_nat ~ bs(year, 4), data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year >2011), family = binomial(link = "logit"))
 ### NOTE: to be clear, Osoyoos was stocked with H-O fish in 2012 and 2013 also, returning primarily in 2015 and 2016 (in addition to 2013)...
 
 ggplot(deadpitch, aes(x = year, y = p_nat))+
