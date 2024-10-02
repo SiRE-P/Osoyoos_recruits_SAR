@@ -324,12 +324,13 @@ spawning_location <- AUC_data %>%
 
 prop_oso_strays_by_year <- spawning_location %>%          # calculate OSO stray rate based on years where no SKA N-O returns exist (2009-2012)
   filter(year > 2008, year < 2013) %>%                    # N-O fish in mid-OkR from 2009-2012 MUST be OSO strays, since McIntyre dam prevented N-O SKA to spawn <2009, ie N-O Skaha only >= 2013
-# filter(spawning_location != "Penticton Channel") %>%    # omit Pen Chan data from calculation of proportion OSO strays   ### <-- [Why? can't recall why we omit PEN - see new SUMMARISE stmt below]
+# filter(spawning_location != "Penticton Channel") %>%    # Pen Chan data now not omitted from calculation of proportion OSO strays - see new SUMMARISE stmt below]
   left_join(prop_natural %>% dplyr::select(year, spawning_location = section, p_nat)) %>% 
   mutate(natural_sockeye = total_sockeye * p_nat) %>% 
   group_by(year) %>%                                      # for true stray rate, include OSO strays in the denominator [PT 240411]
 # summarise(strays = natural_sockeye[spawning_location == "Middle Ok River"],lower_river = natural_sockeye[spawning_location == "Lower Ok River"], prop_oso_strays = strays/(lower_river + strays)) %>% 
-  summarise(strays = sum(natural_sockeye[spawning_location == "Middle Ok River"], natural_sockeye[spawning_location == "Penticton Channel"]),  # this stmt includes 2012 N-O fish in Pen Chn
+  summarise(strays = sum(natural_sockeye[spawning_location == "Middle Ok River"], 
+                         natural_sockeye[spawning_location == "Penticton Channel"]),  # this stmt includes 2012 N-O fish in Pen Chn
                      lower_river = natural_sockeye[spawning_location == "Lower Ok River"], 
                      prop_oso_strays = strays/(lower_river + strays)) %>% 
   mutate(spawning_location = "Lower Ok River")
