@@ -169,85 +169,141 @@ annual_returns <- dam_counts %>%                                                
 ```{r proportion hatch and natch}  
 # estimates of hatchery numbers      ### NOTE: initial ok_riv_deadpitch import from XLSX should be commented out for final GitHub version. ###
 
-#   ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 24.05.24.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
-#     janitor::clean_names()                                                                       # detection of thermal marks (was 24.05.24)                # comment out for GitHub
-# write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                         # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
-ok_riv_deadpitch <- read.csv("../data/ok_riv_deadpitch_xlsx_240524.csv")                         # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
+# ok_riv_deadpitch <- readxl::read_xlsx("../data/OSO_SOX_deadpitch_data_tidy 24.05.24.xlsx") %>% # deadpitch for Osoyoos and middle channel fish with        # comment out for GitHub
+#   janitor::clean_names()                                                                       # detection of thermal marks (was 24.05.24)                # comment out for GitHub
+# write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                       # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
+# ok_riv_deadpitch_old <- read.csv("../data/ok_riv_deadpitch_xlsx_240524.csv")                   # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
 
-#pen_channel_deadpitch <-read.csv("../data/skaha_deadpitch_tidy_240208.csv") %>%                 # deadpitch for Pen channel fish with thermal mark data 
-pen_channel_deadpitch <- read.csv("../data/skaha_deadpitch_tidy_240227.csv") %>%                 # deadpitch version with 26 obs in Section "Skaha Beach" chngd to Pen channel  
-  janitor::clean_names() %>%                                                                     #           (i.e., 26 SK records in 2016: 25N-O, 1H-O)
-  filter(location == "penticton channel") %>%                                                
-  mutate(location  = "Penticton Channel")
+filename <- ("C:/DFO-MPO/OneDrive/OneDrive - DFO-MPO/okanagan_data/deadpitch/combined_and_cleaned/okanagan_deadpitch.csv") # revised by AO and PT 2410xx
 
-shingle_deadpitch <- read.csv("../data/shingle_deadpitch.csv") %>%                               # deadpitch for Shingle Ck fish with thermal marks 
-  janitor::clean_names()
+ok_riv_deadpitch <- read.csv2(filename, sep=",")                    # read cleaned up DP data 
 
-deadpitch_low_mid <- ok_riv_deadpitch %>%                           # process lower and middle Ok River data...
-  filter(fish == "sockeye") %>%        
-  filter(section != "Penticton Channel") %>%                        # remove redundant Pen channel data 2017-18 as that is dup in Penticton dataset
-  filter(thermal_mark != "NA") %>%                                
-  filter(thermal_mark != "Unknown") %>%                             # removing all rows where thermal mark is NA or Unknown
-  dplyr::select(year, thermal_mark, section) %>% 
-  mutate(section = ifelse(section == "Lower Okanagan", "Lower Ok River", "Middle Ok River")) %>% 
-  group_by(year, section) %>% 
-  summarize(n_natural = sum(thermal_mark == "Natural"), n = n()) %>% 
-  mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
-  mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))%>%    # year where BOTH Osoyoos and Skaha were stocked, approx evenly
-  arrange(section, year)                                            # NOTE: all H-O fish released in 2012 & 2013 were into Osoyoos; <-- not sure if that is handled (or needs to be?) in this procedure!!?
+# filename <- paste("../data/ok_riv_deadpitch_", timestamp, ".csv", sep = "")   # make a copy in the OSO recruits DATA folder...   
+# write.csv(ok_riv_deadpitch, filename)                             # if *NEW* OSO SOX deadpitch data imported, re-write to CSV       ### comment out for GitHub
+# ok_riv_deadpitch <- read.csv(filename)                            # replaces import data from OSO SOX deadpitch                     #   keep for GitHub [240510]
+
+deadpitch_prop_natural <- ok_riv_deadpitch %>%                      # get proportion natural by spawning ground section and year
+  filter(species_from_age == "sockeye") %>%                         # from revised DP data (PT, AO, 240825)
+  filter(hatchery != "unknown") %>%                                 # omit unknown thermal mark class
+  mutate(origin = hatchery) %>%                                     # define variable origin based on hatchery = "natural" or "hatchery"
+  dplyr::select(section, year, origin, ona_number) %>% 
+  group_by(section, year) %>% 
+  summarize(n_natural = sum(origin == "natural"), n = n()) %>%      # get count of natural origin fish by section and year
+  mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O (natural)
+  mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))%>%    # BOTH Osoyoos and Skaha were stocked, approx evenly, in 2010 (from BY2009), mainly returning in 2013
+  mutate(osoyoos_stocked = ifelse(section == "lower_ok_river",      # osoyoos_stocked variable does not apply to mid- or upper river spawners,
+                                  osoyoos_stocked, NA))%>%          # so set variable to NA for those sections
+  arrange(section, year)                                          ### NOTE ALSO: all H-O fish released in 2012 & 2013 were into Osoyoos; returning mainly in 2015 and 2016 as 1.2s but also 2014 as 1.1s and 2017 as 1.3s <-- not sure if that is handled (or needs to be?) in this procedure!!?
+
+
+# deadpitch_lower_ok_river <- ok_riv_deadpitch %>%                    # re-analysis [241025] based on cleaned up DP data; by spawning ground Section...
+#   filter(section == "lower_ok_river") %>%                           # process lower Ok River data...
+#   filter(species_from_age == "sockeye") %>%     
+#   filter(hatchery != "unknown") %>%
+#   mutate(origin = hatchery) %>%
+#   dplyr::select(section, year, origin, ona_number) %>% 
+#   group_by(section, year) %>% 
+#   summarize(n_natural = sum(origin == "natural"), n = n()) %>% 
+#   mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O (natural)
+#   mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))%>%    # BOTH Osoyoos and Skaha were stocked, approx evenly, in 2010 (from BY2009), mainly returning in 2013
+#   arrange(section, year)                                          ### NOTE ALSO: all H-O fish released in 2012 & 2013 were into Osoyoos; returning mainly in 2015 and 2016 as 1.2s but also 2014 as 1.1s and 2017 as 1.3s <-- not sure if that is handled (or needs to be?) in this procedure!!?
+# 
+# deadpitch_middle_ok_river <- ok_riv_deadpitch %>%                   # process middle Ok River data...
+#   filter(section == "middle_ok_river") %>%
+#   filter(species_from_age == "sockeye") %>%     
+#   filter(hatchery != "unknown") %>%
+#   mutate(origin = hatchery) %>%
+#   dplyr::select(section, year, origin, ona_number) %>% 
+#   group_by(section, year) %>% 
+#   summarize(n_natural = sum(origin == "natural"), n = n()) %>% 
+#   mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O (natural)
+#   arrange(section, year)                                         
+# 
+# deadpitch_upper_ok_river <- ok_riv_deadpitch %>%                    # process upper Ok River data...
+#   filter(section == "upper_ok_river") %>%
+#   filter(species_from_age == "sockeye") %>%     
+#   filter(hatchery != "unknown") %>%
+#   mutate(origin = hatchery) %>%
+#   dplyr::select(section, year, origin, ona_number) %>% 
+#   group_by(section, year) %>% 
+#   summarize(n_natural = sum(origin == "natural"), n = n()) %>% 
+#   mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O (natural)
+#   arrange(section, year) 
+# 
+# deadpitch_shingle_creek <- ok_riv_deadpitch %>%                     # process Shingle Creek trib to upper Ok River data...
+#   filter(section == "shingle creek") %>%
+#   mutate(section = "shingle_creek") %>%
+#   filter(species_from_age == "sockeye") %>%     
+#   filter(hatchery != "unknown") %>%
+#   mutate(origin = hatchery) %>%
+#   dplyr::select(section, year, origin, ona_number) %>% 
+#   group_by(section, year) %>% 
+#   summarize(n_natural = sum(origin == "natural"), n = n()) %>% 
+#   mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O (natural)
+#   arrange(section, year) 
+
+# deadpitch_upper_ok_river <-ok_riv_deadpitch %>%                     # original analysis by Section
+#   filter(section == "upper_ok_river") %>%                                               
+# # deadpitch_pen <- upper_ok_river_deadpitch %>%                     # process upper Ok River (Pen Channel) deadpitch data...
+#   filter(species_from_age == "sockeye") %>%                         # Check whether this captures "Sockeye" too [not necessary, all lower case]
+#   filter(thermal != "NA") %>% 
+#   filter(thermal != "unknown") %>%                                  # remove all rows where thermal mark is unknown
+#   dplyr::select(year, thermal, section = location) %>% 
+#   group_by(year, section) %>% 
+#   summarize(n_natural = sum(thermal == "natural"), n = n()) %>% 
+#   mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
+#   mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))       # H-O fry released into both Osoyoos and Skaha lakes in 2013
+# 
+# deadpitch_shingle <- shingle_deadpitch %>%                          # process Shingle Creek (upper Ok River trib) data...
+#   filter(fish == "Sockeye") %>%                                     # Check whether this captures "sockeye" too [not necessary, all title case]
+#   filter(hatchery != "NA") %>% 
+#   filter(hatchery  != "unknown") %>%                                # removing all rows where thermal mark is NA or unknown
+#   dplyr::select(year, hatchery, section = okr_section) %>% 
+#   group_by(year, section) %>% 
+#   summarize(n_natural = sum(hatchery == "natural"), n = n()) %>% 
+#   mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
+#   mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))       # H-O fry released into both Osoyoos and Skaha lakes in 2013
+# 
+# deadpitch_2022_2023 <- data.frame(                                ### append summary values for 2022 and 2023 till raw data obtained [24.07.04]
+#   year = c(2022, 2023, 2022, 2022),                               
+#   section = c("Lower Ok River", "Lower Ok River",                   # Lower Ok River
+#               "Penticton Channel", "Shingle Creek"),                # Skaha River and Shingle Creek section
+#   n_natural = c(388, 311, 360, 35),                               ### natural origin count from AO
+#           n = c(392, 322, 368, 57)) %>%                           ### total deadpitch from AO 
+#   mutate(p_nat = n_natural / n) %>%
+#   mutate(osoyoos_stocked = FALSE)
   
-deadpitch_pen <- pen_channel_deadpitch %>%                          # process upper Ok River (Pen Channel) deadpitch data...
-  filter(fish == "sockeye") %>%                                     # Check whether this captures "Sockeye" too [not necessary, all lower case]
-  filter(thermal != "NA") %>% 
-  filter(thermal != "unknown") %>%                                  # remove all rows where thermal mark is unknown
-  dplyr::select(year, thermal, section = location) %>% 
-  group_by(year, section) %>% 
-  summarize(n_natural = sum(thermal == "natural"), n = n()) %>% 
-  mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
-  mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))       # H-O fry released into both Osoyoos and Skaha lakes in 2013
+# deadpitch <- bind_rows(deadpitch_low_mid, deadpitch_pen,            # combine deadpitch data
+#                        deadpitch_shingle, 
+#                        deadpitch_2022_2023) %>%                   ### hard-wired data
+# # dplyr::filter(section != "Shingle Creek") %>%                   ### drop Shingle Creek from this analysis - insufficient data # commented out 240927 for testing
+#   arrange (section, year)   
 
-deadpitch_shingle <- shingle_deadpitch %>%                          # process Shingle Creek (upper Ok River trib) data...
-  filter(fish == "Sockeye") %>%                                     # Check whether this captures "sockeye" too [not necessary, all title case]
-  filter(hatchery != "NA") %>% 
-  filter(hatchery  != "unknown") %>%                                # removing all rows where thermal mark is NA or unknown
-  dplyr::select(year, hatchery, section = okr_section) %>% 
-  group_by(year, section) %>% 
-  summarize(n_natural = sum(hatchery == "natural"), n = n()) %>% 
-  mutate(p_nat = n_natural / n) %>%                                 # calculate proportion N-O
-  mutate(osoyoos_stocked = ifelse(year == 2013, TRUE, FALSE))       # H-O fry released into both Osoyoos and Skaha lakes in 2013
+# deadpitch <- bind_rows(deadpitch_lower_ok_river, 
+#                        deadpitch_middle_ok_river, 
+#                        deadpitch_upper_ok_river, 
+#                        deadpitch_shingle_creek) %>%
+#   arrange(section, year)
 
-deadpitch_2022_2023 <- data.frame(                                ### append summary values for 2022 and 2023 till raw data obtained [24.07.04]
-  year = c(2022, 2023, 2022, 2022),                               
-  section = c("Lower Ok River", "Lower Ok River",                   # Lower Ok River
-              "Penticton Channel", "Shingle Creek"),                # Skaha River and Shingle Creek section
-  n_natural = c(388, 311, 360, 35),                               ### natural origin count from AO
-          n = c(392, 322, 368, 57)) %>%                           ### total deadpitch from AO 
-  mutate(p_nat = n_natural / n) %>%
-  mutate(osoyoos_stocked = FALSE)
-  
-deadpitch <- bind_rows(deadpitch_low_mid, deadpitch_pen,            # combine deadpitch data
-                       deadpitch_shingle, 
-                       deadpitch_2022_2023) %>%                   ### hard-wired data
-# dplyr::filter(section != "Shingle Creek") %>%                   ### drop Shingle Creek from this analysis - insufficient data # commented out 240927 for testing
-  arrange (section, year)   
-
+### still no 2023 data for mid/upper/shingle?
+### should these gams omit 2015 and 2016 too?  since they would be
 #run cross validation to determine df of year spline
-cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 3))
-cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 4))
-cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 5))
-cv_gam_loo(data = deadpitch %>% filter(section == "Lower Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 6))
+cv_gam_loo(data = deadpitch %>% filter(section == "lower_ok_river") %>% filter(year!=2013), formula = p_nat ~ bs(year, 3))
+cv_gam_loo(data = deadpitch %>% filter(section == "lower_ok_river") %>% filter(year!=2013), formula = p_nat ~ bs(year, 4))
+cv_gam_loo(data = deadpitch %>% filter(section == "lower_ok_river") %>% filter(year!=2013), formula = p_nat ~ bs(year, 5))
+cv_gam_loo(data = deadpitch %>% filter(section == "lower_ok_river") %>% filter(year!=2013), formula = p_nat ~ bs(year, 6))
 #lowest MSE is for model with 3 df on spline (was 4 df before 2022 & 2023 estimates added [HS 24.07.04]) 
 
-cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 3))
-cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 4))
-cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 5))
-cv_gam_loo(data = deadpitch %>% filter(section == "Middle Ok River") %>% filter(year!=2013), formula = p_nat ~ bs(year, 6))
+cv_gam_loo(data = deadpitch %>% filter(section == "middle_ok_river") %>% filter(year!=2013), formula = p_nat ~ bs(year, 3))
+cv_gam_loo(data = deadpitch %>% filter(section == "middle_ok_river") %>% filter(year!=2013), formula = p_nat ~ bs(year, 4))
+cv_gam_loo(data = deadpitch %>% filter(section == "middle_ok_river") %>% filter(year!=2013), formula = p_nat ~ bs(year, 5))
+cv_gam_loo(data = deadpitch %>% filter(section == "middle_ok_river") %>% filter(year!=2013), formula = p_nat ~ bs(year, 6))
 #lowest MSE is for model with 5 df on spline (same after 2022 & 2023 estimates added [HS 24.07.24])
 
-cv_gam_loo(data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011), formula = p_nat ~ bs(year, 3))
-cv_gam_loo(data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011), formula = p_nat ~ bs(year, 4))
-cv_gam_loo(data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011), formula = p_nat ~ bs(year, 5))
-cv_gam_loo(data = deadpitch %>% filter(section == "Penticton Channel") %>% filter(year>2011), formula = p_nat ~ bs(year, 6))
+cv_gam_loo(data = deadpitch %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_nat ~ bs(year, 3))
+cv_gam_loo(data = deadpitch %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_nat ~ bs(year, 4))
+cv_gam_loo(data = deadpitch %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_nat ~ bs(year, 5))
+cv_gam_loo(data = deadpitch %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_nat ~ bs(year, 6))
 #lowest Pen Channel MSE is for model with 4 df on spline [HS 24.07.24]
 
 # fit gam to impute missing values
