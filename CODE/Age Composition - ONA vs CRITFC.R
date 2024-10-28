@@ -38,70 +38,80 @@ make_a_sound <- function(noise, pause) {                                        
   beep(sound = noise)
 }
 
-filename  <- here("DATA", "ok_riv_deadpitch_xlsx_240524.csv")
+#ilename <- here("DATA", "ok_riv_deadpitch_xlsx_240524.csv")                    # original compilation by Braden/Colin
+filename <- ("C:/DFO-MPO/OneDrive/OneDrive - DFO-MPO/okanagan_data/deadpitch/combined_and_cleaned/okanagan_deadpitch.csv") # revised by AO and PT 2410xx
+
 ok_riv_deadpitch <- read.csv2(filename, sep=",") 
 
-age_sample_lower <- ok_riv_deadpitch %>%                            # get lower Ok River Sockeye biosample data (SiRE/ONA) for age composition estimate...
-  filter(fish == "sockeye") %>%        
-  filter(section != "Skaha") %>%                                    # remove mid-OkRiver (Skaha) samples
-  filter(section != "Penticton Channel") %>%                        # remove redundant Pen channel data 2017-18 as that is dup in Penticton dataset
-  filter(age != "Unknown") %>%                                      # removing all rows where age is Unknown  (2000-2021)
-  filter(!(age %in% c(1, 2, 3, 4, 5))) %>%                          # removing all rows where age is FW age only  (2000-2021)
-  mutate(age = substr(age,1,3)) %>%                                 # cleanup age data (e.g. change 1.10000001 to 1.1)
-  dplyr::select(year, thermal_mark, age, section, fish) %>% 
-  mutate(section = ifelse(section == "Lower Okanagan", "Lower Ok River", "Middle Ok River")) %>% 
+age_sample_lower <- ok_riv_deadpitch %>%                              # get lower Ok River Sockeye biosample data (SiRE/ONA) for age composition estimate...
+# filter(fish == "sockeye") %>%        
+  filter(species_from_age == "sockeye") %>%
+# filter(section != "Skaha") %>%                                      # remove mid-OkRiver (Skaha) samples
+# filter(section != "Penticton Channel") %>%                          # remove redundant Pen channel data 2017-18 as that is dup in Penticton dataset
+  mutate(hatchery = ifelse(year < 2007, "natural", hatchery)) %>%     # assign all pre-2007 lower OkR fish to 'natural'
+  mutate(hatchery = ifelse(year == 2019, "natural+hatchery", hatchery)) %>%     # no thermal-mark data in 2019
+  filter(section == "lower_ok_river") %>%
+  filter(hatchery != "hatchery") %>%
+  filter(hatchery != "unknown") %>%
+# filter(age != "Unknown") %>%                                        # removing all rows where age is Unknown  (2000-2021)  
+  filter(!(age %in% c(1, 2, 3, 4, 5))) %>%                            # removing all rows where age is FW age only (2000-2021)
+# mutate(age = substr(age,1,3)) %>%                                   # cleanup age data (e.g. change 1.10000001 to 1.1)
+  dplyr::select(year, thermal_mark = hatchery, age, section, fish = ona_number) %>% 
+# mutate(section = ifelse(section == "Lower Okanagan", "Lower Ok River", "Middle Ok River")) %>% 
   arrange(section, year, age)
   
 age_composition_natural <- age_sample_lower %>%                     # get age composition of N-O fish in lower river
   group_by(year, age, thermal_mark) %>%                             # by year and age group
   summarize(n = n()) %>%                                            # for all data where thermal_mark is NA (2000-2006) or Natural (2007-end)
-  mutate(thermal_mark = ifelse(year == 2019, "Natural",             # no thermal marking in 2019 data (all Unknown),  
-                               thermal_mark)) %>%                   # so reassign t_m in 2019 to "Natural" since most fish in lower river are N-O
-  filter(thermal_mark %in% c(NA, "Natural")) %>%                    # removing all rows where thermal mark is Unknown or Hatchery (2007-2021)
-  pivot_wider(names_from=age, names_prefix="age_", values_from=n)   # tabulate by year and age group
+# mutate(thermal_mark = ifelse(year == 2019, "Natural",             # no thermal marking in 2019 data (all Unknown),  
+#                              thermal_mark)) %>%                   # so reassign t_m in 2019 to "Natural" since most fish in lower river are N-O
+# filter(thermal_mark %in% c(NA, "Natural")) %>%                    # removing all rows where thermal mark is Unknown or Hatchery (2007-2021)
+  pivot_wider(names_from=age, names_prefix="age_", values_from=n)%>%# tabulate by year and age group
+  select(year, age_1.1, age_1.2, age_1.3, age_1.4, age_2.1, age_2.2, thermal_mark)
 
-missing_ages_2006 <- data.frame(year = 2006, age_1.1=1,             ### use summary # at age data from ONA (thanks Sam P 240527) for missing age comp in 2006
-                                age_1.2=371, age_1.3=46, age_2.2=2, ### will need to incorporate 2006 raw data into source data later...
-                                thermal_mark="Natural") 
-missing_ages_2022 <- data.frame(year = 2022, age_1.1=19,            ### use summary % at age data from ONA (from AO 240322) for missing age comp in 2022
-                                age_1.2=861, age_1.3=120,           ### will need to incorporate 2022 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
-                                thermal_mark="Natural")            
-missing_ages_2023 <- data.frame(year = 2023, age_1.1=74,            ### use summary % at age data from ONA (from AO 240829) for missing age comp in 2023
-                                age_1.2=752, age_1.3=171, age_2.1=3,### will need to incorporate 2023 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
-                                thermal_mark="Natural")    
+# missing_ages_2006 <- data.frame(year = 2006, age_1.1=1,             ### use summary # at age data from ONA (thanks Sam P 240527) for missing age comp in 2006
+#                                 age_1.2=371, age_1.3=46, age_2.2=2, ### will need to incorporate 2006 raw data into source data later...
+#                                 thermal_mark="Natural") 
+# missing_ages_2022 <- data.frame(year = 2022, age_1.1=19,            ### use summary % at age data from ONA (from AO 240322) for missing age comp in 2022
+#                                 age_1.2=861, age_1.3=120,           ### will need to incorporate 2022 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
+#                                 thermal_mark="Natural")            
+# missing_ages_2023 <- data.frame(year = 2023, age_1.1=74,            ### use summary % at age data from ONA (from AO 240829) for missing age comp in 2023
+#                                 age_1.2=752, age_1.3=171, age_2.1=3,### will need to incorporate 2023 raw data into source data later...THESE ARE PERCENTx10, NOT SAMPLE SIZES
+#                                 thermal_mark="Natural")    
+# 
+# missing_ages_1980 <- data.frame(year = 1980, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
+#                                 age_1.2=825, age_1.3=83, 
+#                                 age_2.1=23,  age_2.2=16,            ### need to find out what is the source of this multi-year average age comp used for 980-1984... ###  
+#                                 thermal_mark=NA)    
+# missing_ages_1981 <- data.frame(year = 1981, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
+#                                 age_1.2=825, age_1.3=83, 
+#                                 age_2.1=23,  age_2.2=16,             
+#                                 thermal_mark=NA)    
+# missing_ages_1982 <- data.frame(year = 1982, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
+#                                 age_1.2=825, age_1.3=83, 
+#                                 age_2.1=23,  age_2.2=16,             
+#                                 thermal_mark=NA)    
+# missing_ages_1983 <- data.frame(year = 1983, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
+#                                 age_1.2=825, age_1.3=83, 
+#                                 age_2.1=23,  age_2.2=16,             
+#                                 thermal_mark=NA)    
+# missing_ages_1984 <- data.frame(year = 1984, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
+#                                 age_1.2=825, age_1.3=83, 
+#                                 age_2.1=23,  age_2.2=16,             
+#                                 thermal_mark=NA)    
+# missing_ages_1986 <- data.frame(year = 1986, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1986, THESE ARE NOT SAMPLE SIZES 
+#                                 age_1.2=825, age_1.3=83, 
+#                                 age_2.1=23,  age_2.2=16,             
+#                                 thermal_mark=NA)    
+# 
+# age_composition <- bind_rows(age_composition_natural, 
+#                              missing_ages_1980, missing_ages_1981, 
+#                              missing_ages_1982, missing_ages_1983, 
+#                              missing_ages_1984, missing_ages_1986,  # 1980-1984 assigned multi-year avg
+#                              missing_ages_2006, missing_ages_2022,
+#                              missing_ages_2023) %>% arrange(year)   ### concatenate annual age comp data with provided numbers at age for 2006
 
-missing_ages_1980 <- data.frame(year = 1980, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
-                                age_1.2=825, age_1.3=83, 
-                                age_2.1=23,  age_2.2=16,            ### need to find out what is the source of this multi-year average age comp used for 980-1984... ###  
-                                thermal_mark=NA)    
-missing_ages_1981 <- data.frame(year = 1981, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
-                                age_1.2=825, age_1.3=83, 
-                                age_2.1=23,  age_2.2=16,             
-                                thermal_mark=NA)    
-missing_ages_1982 <- data.frame(year = 1982, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
-                                age_1.2=825, age_1.3=83, 
-                                age_2.1=23,  age_2.2=16,             
-                                thermal_mark=NA)    
-missing_ages_1983 <- data.frame(year = 1983, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
-                                age_1.2=825, age_1.3=83, 
-                                age_2.1=23,  age_2.2=16,             
-                                thermal_mark=NA)    
-missing_ages_1984 <- data.frame(year = 1984, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1980-1984, THESE ARE NOT SAMPLE SIZES 
-                                age_1.2=825, age_1.3=83, 
-                                age_2.1=23,  age_2.2=16,             
-                                thermal_mark=NA)    
-missing_ages_1986 <- data.frame(year = 1986, age_1.1=52,            ### use multi-year average PERCENTx10 for missing age comp in 1986, THESE ARE NOT SAMPLE SIZES 
-                                age_1.2=825, age_1.3=83, 
-                                age_2.1=23,  age_2.2=16,             
-                                thermal_mark=NA)    
-
-age_composition <- bind_rows(age_composition_natural, 
-                             missing_ages_1980, missing_ages_1981, 
-                             missing_ages_1982, missing_ages_1983, 
-                             missing_ages_1984, missing_ages_1986,  # 1980-1984 assigned multi-year avg
-                             missing_ages_2006, missing_ages_2022,
-                             missing_ages_2023) %>%                 ### concatenate annual age comp data with provided numbers at age for 2006
-  arrange(year)
+age_composition <- age_composition_natural  
 
 age_composition$thermal_mark <- NULL                                # drop thermal_mark variable (which were all NA or Natural)
 age_composition[is.na(age_composition)] <- 0                        # set NAs to 0 in pivot table
@@ -114,8 +124,9 @@ age_composition_setup <- age_composition %>%
 
 age_composition_ONA_wide <- age_composition_setup %>% 
   mutate(across(everything(), ~ . / total, .names = "prop_{.col}")) %>%         # Calculate the annual proportions for each age column
-  mutate(source = ifelse(return_year >= 2006, 
-                         "ONA Deadpitch", "ONA/SiRE (Broodstock?)"))
+  mutate(source = "ONA Deadpitch")
+  # mutate(source = ifelse(return_year >= 2006, 
+  #                        "ONA Deadpitch", "ONA/SiRE (Broodstock?)"))
 
 filename <- here("OUTPUT", paste("age_composition_ONA_wide_", timestamp, ".csv", sep="")) # CSV filename for ONA age composition proportions
 write.csv(age_composition_ONA_wide, filename)                                             # saves the data inclusion in SAR report appendix
