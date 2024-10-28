@@ -20,7 +20,8 @@
 # update: 240524 + see GitHub
 # update: TO DO  - incorporate RY2022 and 2023 data to extend mar-surv time-series to SY2021 - DONE
 # update: 240701 - dam counts now retrieved from CBR-DART web data portal - requires execution of "Download Sockeye Dam Counts from CBR-DATA.R"
-#
+# update: 240825 - uses CRITFC age comp for all years available, and no ONA age comp from spawning grounds.
+
 timestamp <- substr(format(Sys.time(), "%Y%m%d"), 3, 8)                         # Get the current date and time and format as string to timestamp output files
 
 knitr::opts_chunk$set(echo = TRUE)
@@ -715,10 +716,13 @@ age_proportions_ONA_CRITFC <- age_comp_ONA_CRITFC %>%
                                    "ONA", best_source_old)) %>%
     mutate(best_source_old = ifelse(return_year %in% c(1980:1984,1986),           # ... multi-year averages (1980-1984, 1986)
                                    "Average", best_source_old)) %>%
-    mutate(best_source_new = ifelse(return_year %in% c(1985,1987:2001,2004:2023), # next, create best_source_new assignment variable by setting all years specified here to CRITFC...
+  # mutate(best_source_new = ifelse(return_year %in% c(1985,1987:2001,2004:2023), # OBSOLETE as this assigned 2002-2003 to ONA [240825]; create best_source_new assignment variable by setting all years specified here to CRITFC...
+  #                                "CRITFC", "UNKNOWN")) %>%
+    mutate(best_source_new = ifelse(return_year %in% c(1985,1987:last_year),      # next, create best_source_new assignment variable by setting all years specified here to CRITFC...
                                    "CRITFC", "UNKNOWN")) %>%
-    mutate(best_source_new = ifelse(return_year %in% c(2002:2003, 2007),          # ...and all years specified here to ONA...  
-                                   "ONA", best_source_new)) %>%
+  # mutate(best_source_new = ifelse(return_year %in% c(2002:2003, 2007),          # ...and all years specified here to ONA...  
+    # mutate(best_source_new = ifelse(return_year %in% c(2002:2003),              # ...and all years specified here to ONA...  
+    #                                "ONA", best_source_new)) %>%
     mutate(best_source_new = ifelse(return_year %in% c(1980:1984,1986),           # ... multi-year averages (1980-1984, 1986)
                                    "Average", best_source_new)) %>%
     mutate(CRITFC_prop_at_age = as.numeric(CRITFC_prop_at_age)) %>%
