@@ -256,16 +256,23 @@ prop_natural <- bind_rows(deadpitch_prop_natural_filtered %>% mutate(type = "Sam
                 data.frame(year = c(2019), section = "lower_ok_river",  type = "Imputed", 
                            p_nat = predict(pnat_low_m, data.frame(year = c(2019)), type = "response")),
                 data.frame(year = c(2016), section = "middle_ok_river", type = "Imputed", 
-                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response"))) %>%
-                # data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",
-                #            p_nat = predict(pnat_mid_m, data.frame(year = c(2023)), type = "response"))) %>%
-                arrange(section, year)
+                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%
+                data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",
+                           p_nat = predict(pnat_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
+  mutate(section_label = ifelse(section == "lower_ok_river",  "Lower Okanagan River", section)) %>%
+  mutate(section_label = ifelse(section == "middle_ok_river", "Middle Okanagan River", section_label)) %>%
+  mutate(section_label = ifelse(section == "upper_ok_river",  "Penticton Channel (Upper Okanagan River)", section_label)) %>%
+  mutate(section_label = ifelse(section == "shingle_creek",   "Shingle Creek", section_label)) %>%
+  mutate(spawning_location = ifelse(section == "shingle_creek",   "Shingle Creek", "Unknown")) %>%
+  mutate(spawning_location = ifelse(section == "lower_ok_river",  "Lower Ok River", spawning_location)) %>%
+  mutate(spawning_location = ifelse(section == "middle_ok_river", "Middle Ok River", spawning_location)) %>%
+  mutate(spawning_location = ifelse(section == "upper_ok_river",  "Penticton Channel", spawning_location)) %>%
+                arrange(section_label, year)
 
 ggplot(prop_natural, aes(x = year, y = p_nat))+
   geom_line()+
   geom_point(aes(color = type))+
-# dplyr::filter(section != "Shingle Creek") +
-  facet_wrap(~section, ncol=1)+
+  facet_wrap(~section_label, ncol=1)+
   scale_x_continuous(breaks = c(seq(from = 2007, to = last_year, by = 2)))+
   labs(title="Proportion Natural Origin")+
   ylab("Proportion")+
@@ -283,43 +290,105 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 #prop_natural_oso <- prop_natural %>%                                           # get just prop natural osoyoos
 #  filter(section == "Lower Ok River")
 ```  
+```{r SK vs KO}  
 
-```{r oso vs ska}  
+deadpitch_prop_sockeye <- ok_riv_deadpitch %>%                        # get proportion Sockeye vs Kokanee by spawning ground section and year
+  filter(species_from_age %in% c("sockeye", "kokanee")) %>%           # from revised DP data (PT, AO, 240825)
+  # filter(hatchery != "unknown") %>%                                 # omit unknown thermal mark class
+  mutate(species = species_from_age) %>%
+  mutate(origin = hatchery) %>%                                       # define variable origin based on hatchery = "natural" or "hatchery"
+  dplyr::select(section, year, species, origin, ona_number) %>%       # at this stage we can include Sockeye of any origin (H-O or N-O) since
+  group_by(section, year) %>%                                         # we're interested in simply accounting for (removing) the percent KO from AUC nerkids
+  summarize(n_sockeye = sum(species == "sockeye"), n = n()) %>%       # get count of Sockeye by section and year
+  mutate(p_sockeye = n_sockeye / n) %>%                               # calculate proportion Sockeye (H-O and N-O)
+  mutate(testalinden_spill = ifelse(year == 2013, TRUE, FALSE))%>%  # 2010 Testalinden dam failure might affect juvs in Osoyoos Lk mainly returning in 2013
+  mutate(testalinden_spill = ifelse(section == "lower_ok_river",
+                                    testalinden_spill, NA))%>%
+  arrange(section, year)   
+
 # osoyoos vs. skaha data     ### NOTE: initial AUC_data_Import import from XLSX should be commented out for final GitHub version. ###
 
 # AUC_data_Import <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                           
 #   janitor::clean_names()   # comment out for GitHub
 # write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240624.csv")        # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
+
 AUC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_240624.csv")          # replaces AUC data from SIS xlsx workbook (was 240516)          # keep for GitHub [240510]
 
 AUC_data <- AUC_data_Import %>% 
-  dplyr::select(rearing_lake, spawning_location, year, spawning_nerkids, percent_35cm_fl) %>% 
-  filter(year <= last_year) %>% 
-  filter(year != 2011)        # removing 2011 which was previously imputed, but using sub-optimal methods [240221]
-
-spawning_location <- AUC_data %>% 
-  mutate(prop_sock = 1 - percent_35cm_fl, total_sockeye = spawning_nerkids * prop_sock) %>% 
+  filter(year <= last_year) %>%                                                                        ### removing 2011 which was previously imputed, 
+# filter(year != 2011)                                                                                 ### but using sub-optimal methods [240221]
+  mutate(spawning_nerkids = ifelse(year == 2011, NA, spawning_nerkids)) %>%                            ### nerkids in 2011 set to NA
+  mutate(section = ifelse(spawning_location == "Lower Ok River",    "lower_ok_river", "Unknown"))%>%
+  mutate(section = ifelse(spawning_location == "Middle Ok River",   "middle_ok_river", section)) %>%   # changing mid-OkR SK rearing lake to Skaha based on direction from H. Stiff.
+  mutate(section = ifelse(spawning_location == "Penticton Channel", "upper_ok_river",  section)) %>%
+  mutate(section = ifelse(spawning_location == "Shingle Creek",     "shingle_creek",   section)) %>%
+  mutate(rearing_lake = ifelse(spawning_location == "Middle Ok River", "Skaha", rearing_lake)) %>%     # mutate(rearing_lake) assigns spawners in middle channel     
+  dplyr::select(section, year, spawning_location, rearing_lake, spawning_nerkids, percent_35cm_fl) %>% # to Skaha (assumed rearing lake of origin) for purposes of
+  arrange(section, year)                                                                               # calculating OSO vs SKA proportion [PT 240221]  
+                                                                                                       
+spawning_location_compare <- AUC_data %>% 
+  mutate(old_prop_sock = 1 - percent_35cm_fl, old_total_sockeye = spawning_nerkids * old_prop_sock) %>% 
+  left_join(., deadpitch_prop_sockeye, by = c("section", "year")) %>%
+  mutate(total_sockeye = spawning_nerkids * p_sockeye) %>%
   group_by(year, rearing_lake, spawning_location) %>% 
-  summarise(total_sockeye = sum(total_sockeye, na.rm = TRUE)) %>% 
-  mutate(rearing_lake = ifelse(spawning_location == "Middle Ok River", "Skaha", rearing_lake)) %>% # changing this to Skaha based on direction from H. Stiff. 
+  summarise(nerkids = round(sum(spawning_nerkids)),
+            p_sock_len35 = round(sum(old_prop_sock),2),
+            total_sockeye_old = round(sum(old_total_sockeye)),
+            p_sock_deadp = round(sum(p_sockeye),2),
+            total_sockeye     = round(sum(total_sockeye   ))) %>% 
   arrange (rearing_lake, spawning_location, year)
-  # mutate is "assigning the spawners in middle channel to rearing lake of origin for purposes of calculating OSO vs SKA proportion" [PT 240221]
-  # So mutate assignment is correct as specified [HS 240221]
+
+ggplot(spawning_location_compare, aes(x=year)) +
+  ggtitle("Total Sockeye") +
+  facet_wrap(~spawning_location, ncol=2, scales="free_y") +
+  geom_line(aes(y = total_sockeye), color = "blue") +
+  geom_line(aes(y = total_sockeye_old), color = "red") +
+  geom_point(aes(y = total_sockeye), color = "blue") +
+  geom_point(aes(y = total_sockeye_old), color = "red") +
+  labs(x=NULL, y="Total Sockeye") +
+  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))+
+  scale_color_manual(values = c("Total Sockeye" = "blue", "Old Total" = "red")) +
+  theme_minimal() +
+  theme_pt(major_grid=TRUE) +
+  theme(legend.position = "bottom", legend.title = element_text(size=9),
+        legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
+
+ggplot(spawning_location_compare, aes(x=year)) +
+  ggtitle("Percent Sockeye vs Kokanee") +
+  facet_wrap(~spawning_location, ncol=2) + # , scales="free_y") +
+  geom_line(aes(y = p_sock_deadp), color = "blue") +
+  geom_line(aes(y = p_sock_len35), color = "red") +
+  geom_point(aes(y = p_sock_deadp), color = "blue") +
+  geom_point(aes(y = p_sock_len35), color = "red") +
+  labs(x=NULL, y="Percent Sockeye") +
+  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))+
+  scale_color_manual(values = c("Sockeye %" = "blue", "Old Sockeye %" = "red")) +
+  theme_minimal() +
+  theme_pt(major_grid=TRUE) +
+  theme(legend.position = "bottom", legend.title = element_text(size=9),
+        legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
+
+spawning_location <- spawning_location_compare %>%
+  dplyr::select(rearing_lake, spawning_location, year, nerkids, p_sock_deadp, total_sockeye)
+
+``` 
+
+```{r oso vs ska}  
 
 prop_oso_strays_by_year <- spawning_location %>%          # calculate OSO stray rate based on years where no SKA N-O returns exist (2009-2012)
   filter(year > 2008, year < 2013) %>%                    # N-O fish in mid-OkR from 2009-2012 MUST be OSO strays, since McIntyre dam prevented N-O SKA to spawn <2009, ie N-O Skaha only >= 2013
-# filter(spawning_location != "Penticton Channel") %>%    # Pen Chan data now not omitted from calculation of proportion OSO strays - see new SUMMARISE stmt below]
-  left_join(prop_natural %>% dplyr::select(year, spawning_location = section, p_nat)) %>% 
-  mutate(natural_sockeye = total_sockeye * p_nat) %>% 
+  left_join(prop_natural %>% dplyr::select(year, spawning_location, p_nat)) %>% 
+  mutate(natural_sockeye = round(total_sockeye * p_nat)) %>% 
+  filter(year != 2011) %>%
   group_by(year) %>%                                      # for true stray rate, include OSO strays in the denominator [PT 240411]
-# summarise(strays = natural_sockeye[spawning_location == "Middle Ok River"],lower_river = natural_sockeye[spawning_location == "Lower Ok River"], prop_oso_strays = strays/(lower_river + strays)) %>% 
   summarise(strays = sum(natural_sockeye[spawning_location == "Middle Ok River"], 
                          natural_sockeye[spawning_location == "Penticton Channel"]),  # this stmt includes 2012 N-O fish in Pen Chn
                      lower_river = natural_sockeye[spawning_location == "Lower Ok River"], 
                      prop_oso_strays = strays/(lower_river + strays)) %>% 
+  filter(!(is.na(prop_oso_strays))) %>%
   mutate(spawning_location = "Lower Ok River")
 
-prop_oso_strays_mean <- sum(prop_oso_strays_by_year$strays)/sum(prop_oso_strays_by_year$lower_river)    # weighted mean stray rate (across available years) = ~6%
+prop_oso_strays_mean <- sum(prop_oso_strays_by_year$strays)/sum(prop_oso_strays_by_year$lower_river)    # weighted mean stray rate (available years 2010,2012) = 2.69%
 
 prop_oso_strays <- prop_oso_strays_by_year %>% 
   dplyr::select(-strays, -lower_river) %>% 
@@ -332,19 +401,19 @@ prop_oso_strays <- prop_oso_strays_by_year %>%
 
 ```{r ska strays} 
 
-#  H-O fish in lower-OkR from 2018-2021 likely SKA or OKA strays, from which we can calc annual -- and weighted Multi-Yr avg -- "SKA stray rate" relative to total H-O on all SGs 
+#  H-O fish in lower-OkR from 2018-2021 likely SKA or OKA strays, from which we can calc annual & weighted Multi-Yr avg "SKA stray rate" relative to total H-O on all SGs 
 
 #  PLT - calculate proportion of all HO in lower river in each year of available data
 prop_ska_strays_by_year <- prop_natural %>% 
   filter(year >=2018, year <= 2020) %>%                                                    # based on 2018 and 2020 only (2019 insufficient data)
-  mutate(rearing_lake = ifelse(section == "Lower Ok River", "Osoyoos", "Skaha")) %>% 
+  mutate(rearing_lake = ifelse(spawning_location == "Lower Ok River", "Osoyoos", "Skaha")) %>% 
   group_by(year, rearing_lake) %>% 
   summarise(lake_HO = sum(n-n_natural)) %>% 
   spread(key = rearing_lake, value = lake_HO) %>% 
   mutate(prop_ska_strays = Osoyoos/(Skaha + Osoyoos)) %>% 
   filter(!is.na(Osoyoos))
 
-wmean_ska_stray_prop <- sum(prop_ska_strays_by_year$Osoyoos)/(sum(prop_ska_strays_by_year$Skaha) + sum(prop_ska_strays_by_year$Osoyoos))  # ~4.1% 
+wmean_ska_stray_prop <- sum(prop_ska_strays_by_year$Osoyoos)/(sum(prop_ska_strays_by_year$Skaha) + sum(prop_ska_strays_by_year$Osoyoos))  # 5.78% (based on 2018, 2020) 
 
 prop_ska_strays <- prop_ska_strays_by_year %>%                                             # get year-specific SKA stray rates (for 2018 and 2020)
   dplyr::select(-Osoyoos, -Skaha) %>% 
@@ -353,7 +422,7 @@ prop_ska_strays <- prop_ska_strays_by_year %>%                                  
   arrange(year)
 
 ```
-
+########### CONTINUE REVISIONS HERE ###################
 ```{r prop_nat_origin after strays} 
 
 spawning_table <- spawning_location %>%                                                    # populate Spawning Table from AUC count of spawners in...   
