@@ -255,6 +255,8 @@ ggplot(deadpitch_prop_natural_filtered, aes(x = year, y = p_nat))+
 prop_natural <- bind_rows(deadpitch_prop_natural_filtered %>% mutate(type = "Sampled"), 
                 data.frame(year = c(2019), section = "lower_ok_river",  type = "Imputed", 
                            p_nat = predict(pnat_low_m, data.frame(year = c(2019)), type = "response")),
+                data.frame(year = c(2009), section = "middle_ok_river", type = "Imputed", 
+                           p_nat = predict(pnat_mid_m, data.frame(year = c(2009)), type = "response")), #) %>%
                 data.frame(year = c(2016), section = "middle_ok_river", type = "Imputed", 
                            p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%
                 data.frame(year = c(2019), section = "middle_ok_river", type = "Imputed", 
@@ -507,12 +509,12 @@ spawn_table_summary <- spawning_table %>%                                       
 stray_correct <- function(obs_focal, obs_other, stray_focal, stray_other){                 # function to adjust for strays in both directions
   max(0,((stray_other - 1) * obs_focal + stray_other * obs_other)/(stray_focal + stray_other - 1))}
 
-spawning_totals_no2011 <- spawning_table %>%                                               # tabulate spawning ground data 
+spawning_totals_no2011 <- spawn_table_summary %>%                                          # tabulate spawning ground data 
   group_by(rearing_lake, year) %>%                                                         # by year
   dplyr::select(-natural_sockeye) %>% 
   spread(key = rearing_lake, value = total_sockeye, fill = 0) %>% 
   rename(oso_total = Osoyoos, ska_total = Skaha) %>% 
-  left_join(spawning_table %>% 
+  left_join(spawn_table_summary %>% 
   dplyr::select(-total_sockeye) %>% 
   spread(key = rearing_lake, value = natural_sockeye, fill = 0) %>%
   rename(oso_nat = Osoyoos, ska_nat = Skaha)) %>%                                          # assign Osoyoos to oso_nat & Skaha to ska_nat vars 
@@ -524,8 +526,8 @@ spawning_totals_no2011 <- spawning_table %>%                                    
   mutate(ska_nat_origin = round(stray_correct(ska_nat, oso_nat, prop_ska_strays, prop_oso_strays))) %>%   # estimate SKA N-O taking into account OSO->SKA and SKA->OSO stray rates 
   mutate(oso_strays = round(oso_nat_origin * prop_oso_strays)) %>%                                      
   mutate(ska_strays = round(ska_nat_origin * prop_ska_strays)) %>%
-  mutate(prop_oso_origin_nat = oso_nat_origin/(oso_total + ska_total)) %>%
-  mutate(prop_ska_origin_nat = ska_nat_origin/(oso_total + ska_total)) %>%
+  mutate(prop_oso_origin_nat = round(oso_nat_origin/(oso_total + ska_total),3)) %>%
+  mutate(prop_ska_origin_nat = round(ska_nat_origin/(oso_total + ska_total),3)) %>%
   filter(year != 2011)
 
 #fit gam to impute missing 2011 N-O proportions by sub-stock
