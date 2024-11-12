@@ -41,6 +41,7 @@ library(mgcv)
 library(patchwork)
 library(psych)
 library(readxl)
+library(reshape2)
 library(scales)
 library(SiREfunctions)
 library(splines)
@@ -133,8 +134,9 @@ snake_sockeye_estimates <- read_xlsx(filename, sheet=worksheet) %>%
 Columbia_Sockeye_Dam_Counts_Adj <-                                              #   Import expanded & adjusted mainstem dam counts
 # read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240718.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
 # read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240908.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
-  read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240913.csv") %>%            ### <-- no changes since 240908.csv but 240913 is a benchmark for latest draft report
-  janitor::clean_names()                                                        ###     unless version 240913 exists in DATA subdirectory already
+# read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240913.csv") %>%            ### <-- no changes since 240908.csv but 240913 is a benchmark for latest draft report
+  read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_241111.csv") %>%            ### <-- no changes since 240913.csv but 241111 is a benchmark for latest draft report
+  janitor::clean_names()                                                        ###     
 
 dam_counts <- Columbia_Sockeye_Dam_Counts_Adj %>%                               
   dplyr::select(return_year,                  bon_sox = bonn_sockeye_adj,       # obtain ADJusted Sockeye estimates from mainstem dams
@@ -144,8 +146,9 @@ dam_counts <- Columbia_Sockeye_Dam_Counts_Adj %>%
 Columbia_Sockeye_Stock_Comp <- 
 # read.csv("../data/Columbia_Sockeye_Stock_Comp_240718.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
 # read.csv("../data/Columbia_Sockeye_Stock_Comp_240908.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
-  read.csv("../data/Columbia_Sockeye_Stock_Comp_240913.csv") %>%                ### <-- no changes since 240908.csv but 240913 is a benchmark for latest draft report
-  janitor::clean_names()                                                        ###     unless version 240913 exists in DATA subdirectory already
+# read.csv("../data/Columbia_Sockeye_Stock_Comp_240913.csv") %>%                ### <-- no changes since 240908.csv but 240913 is a benchmark for latest draft report
+  read.csv("../data/Columbia_Sockeye_Stock_Comp_241111.csv") %>%                ### <-- no changes since 240913.csv but 241111 is a benchmark for latest draft report
+  janitor::clean_names()                                                        ###     
 
 stock_comp <- Columbia_Sockeye_Stock_Comp %>% 
   dplyr::select(return_year, ok_stock_comp = ok_stock_comp_best)                # select best annual Okanagan Sockeye stock comp estimates
@@ -532,7 +535,7 @@ wmean_ska_stray_prop <- sum(prop_ska_strays_by_year$Osoyoos)/(sum(prop_ska_stray
 
 prop_ska_strays <- prop_ska_strays_by_year %>%                                             # get year-specific SKA stray rates (for 2018 and 2020)
   dplyr::select(-Osoyoos, -Skaha) %>% 
-  bind_rows(data.frame(year = c(2009:2010, 2011, 2012:2017,2019,2020:last_year),           # apply mean stray rate to other years (was 2012:2021)
+  bind_rows(data.frame(year = c(2009:2010, 2011, 2012:2017,2019,2021:last_year),           # apply mean stray rate to other years (was 2012:2021)
                        prop_ska_strays = wmean_ska_stray_prop)) %>%                        # included 2009-2010 and 2011 [241108]
   arrange(year)
 
@@ -754,7 +757,7 @@ columbia_stock_recruitment <- columbia_okanagan_recruits %>%                    
                 "Snake Sockeye Estimates" = snake_recruits,
                 "Mid-Columbia Sockeye Abundance" = mid_columbia_recruits,
                 "Okanagan Stock Proportion (%)" = ok_stock_comp,
-#               "Wenatchee Sockeye" = wen_recruits,                                                   # Wenatchee recruitment not needed for Table 1
+                "Wenatchee Sockeye" = wen_recruits,                                                   # Wenatchee recruitment not needed for Table 1
                 "Okanagan Sockeye" = oka_recruits,
                 "Osoyoos Natural Proportion (%)" = prop_oso_origin_nat,
                 "Osoyoos Natural Recruits" = oso_nat_recruits,
@@ -762,6 +765,22 @@ columbia_stock_recruitment <- columbia_okanagan_recruits %>%                    
 
 filename <- paste("../output/Osoyoos_Sockeye_Recruits_Table1_", timestamp, ".csv", sep = "")          # filename for recruitment output 
 write.csv(columbia_stock_recruitment, filename)                                                       # saves the data to filename
+
+# create a stacked 100% plot comparing "Okanagan Sockeye" and "Wenatchee Sockeye"
+long_data <- melt(columbia_stock_recruitment, id.vars = "Year", measure.vars = c("Okanagan Sockeye", "Wenatchee Sockeye"))
+ggplot(long_data, aes(x = Year, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Return Year", y = "Proportion", Group = "Stock", fill = "Group",
+       title = "Mid-Columbia Sockeye Stock Composition", subtitle = "By Return Year") +
+  scale_fill_discrete(labels = c("Okanagan", "Wenatchee")) +
+  theme_pt(major_grid=TRUE)+theme(legend.position="bottom") +
+  theme(legend.background = element_rect(fill = "white", color = "black"),
+        legend.text = element_text(size = 10)) +
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))    
+filename <- paste("../figures/Mid-Columbia_Stock_Comp_", timestamp, ".png", sep = "") # filename for figure output 
+ggsave(file = filename, width = 8, height = 4, units = "in")                          # saves the plot to filename
+
 
 okanagan_substock_recruitment <- columbia_okanagan_recruits %>%
   mutate("Total Proportions" = prop_oso_origin_nat + prop_ska_origin_nat + prop_hatch_origin) %>%
@@ -804,8 +823,10 @@ columbia_okanagan_long <- columbia_okanagan_recruits %>%                        
                 Hatchery_Origin=hatchery_recruits) %>% 
   pivot_longer(cols = -Year, names_to = "Group", values_to = "Recruits")
 
-ggplot(columbia_okanagan_long, aes(x=Year, y = Recruits/1000, color = Group))+  # multi-line plot of Columbia Sockeye recruits by sub-group
+ggplot(columbia_okanagan_long,
+       aes(x=Year, y = Recruits/1000, color = Group))+  # multi-line plot of Columbia Sockeye recruits by sub-group
   geom_line() +
+# geom_bar(stat = "identity", position = "dodge") +  
   scale_y_continuous(breaks       = c( 0, 100, 200, 300, 400, 500, 600, 700))+
   scale_x_continuous(breaks = c(seq(from = 1976, to = last_year+1, by = 4)))+
   labs(title="Columbia/Okanagan Sockeye Recruits", subtitle = "by Return Year", x="", y = "Abundance (1000s)")+
@@ -825,7 +846,21 @@ okanagan_recruits_long <- columbia_okanagan_long %>%                            
   mutate(Group = replace(Group, Group == "Hatchery_Origin", "3. Hatchery Origin")) %>%
   mutate(Proportion = Recruits / sum(Recruits))
 
-ggplot(okanagan_recruits_long,                                                  # stacked bar plot of Okanagan Sockeye recruits by sub-group
+ggplot(okanagan_recruits_long %>% filter(Year > 2003),                          # cluster bar plot of Okanagan Sockeye recruits by sub-group
+       aes(x = factor(Year), y = Recruits/1000, fill = Group)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(breaks       = c( 0, 100, 200, 300, 400, 500, 600, 700))+
+# scale_y_continuous(labels = scales::percent, expand = c(0,0)) +               # format props as % and get rid of white space between data and plot borders
+  labs(x = "", y = "Abundance (1000s)") +
+  scale_x_discrete(breaks = c(seq(from = 1976, to = last_year+1, by = 4))) +
+  labs(title="Okanagan Sockeye Recruitment", subtitle = "by Return Year")+
+  theme_minimal() +
+  scale_color_manual(values = c("white", "red", "gray"))+                       ### can't seem to change bars to these colours... 
+  theme(plot.title = element_text(hjust=0.5), legend.position = "bottom",
+        plot.subtitle = element_text(hjust=0.5), axis.ticks.x = element_line(color = "black"),
+        legend.title = element_blank(),    legend.text = element_text(size = 10))              
+
+ggplot(okanagan_recruits_long,                                                  # stacked bar plot of Okanagan Sockeye recruitment by sub-group
        aes(x = factor(Year), y = Proportion, fill = Group)) +
   geom_bar(stat = "identity") +
   scale_y_continuous(labels = scales::percent, expand = c(0,0)) +               # format props as % and get rid of white space between data and plot borders
