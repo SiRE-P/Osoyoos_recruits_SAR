@@ -442,11 +442,13 @@ spawning_location_compare <- AUC_data %>%
 
 ggplot(spawning_location_compare %>% filter(sockeye_est != "Unresolved"), aes(x=year)) +
   ggtitle("Total Sockeye") +
-  facet_wrap(~spawning_location, ncol=2) + #, scales="free_y") +
-  geom_line (aes(y = total_sockeye_old), color = "gray", size=1) +
-  geom_line (aes(y = total_sockeye), color = "blue", linetype=2, size=1) +
-  geom_point(aes(y = total_sockeye_old), color = "gray") +
+  facet_wrap(~spawning_location, ncol=1) + #, scales="free_y") +
+  geom_line (aes(y = total_sockeye), color = "blue", linetype=1, size=1) +
   geom_point(aes(y = total_sockeye, color = sockeye_est)) +
+# geom_line (aes(y = total_sockeye_old), color = "gray", size=1) +
+# geom_line (aes(y = total_sockeye), color = "blue", linetype=2, size=1) +
+# geom_point(aes(y = total_sockeye_old), color = "gray") +
+# geom_point(aes(y = total_sockeye, color = sockeye_est)) +
   labs(x=NULL, y="Total Sockeye") +
   labs(color = "Sockeye Estimate:") +  
   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))+
@@ -1028,60 +1030,55 @@ age_data.df <- age_data_new %>%
 filename <- paste("../output/Ocean_Age_Comp_", timestamp, ".csv", sep = "")     # output data for report
 write.csv(age_data.df, filename)                                                # saves the data to filename
 
-age_prop_chk <- age_data.df %>%                                                 # shows if any annual total age proportions don't add up to 1.0
-  group_by(return_year) %>%                                                     # sorted by total_best proportion
-  # summarise(total_best    = sum(best_age_prop), 
-  #           total_ONA     = sum(ONA_prop_at_age), 
-  #           total_CRITFC  = sum(CRITFC_prop_at_age)) %>% 
-  summarise(total_CRITFC  = sum(best_age_prop)) %>% 
-  arrange(return_year) # total_best)
+age_data.df <- age_data.df %>%
+  group_by(return_year) %>%
+  mutate(prop = best_age_prop / sum(best_age_prop))
 
-# Following plots check the age composition visually.  First one shows selected proportions by ocean age with annual assignment source
-ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   #stacked 100% bar plot of annual age composition
-  geom_point(data = age_data.df %>% ungroup() %>% 
-#              filter(return_year != 1986) %>%
-               dplyr::select(return_year, best_source) %>% 
-               unique(), aes(x = return_year, y = 0, 
-                             color = best_source), size = 3, pch = 15)+
-  geom_col(aes(fill = ocean_age))+
-  scale_fill_viridis_d("Ocean Age (Years)")+
-  scale_color_manual(values = c("black", "red", "dodgerblue", "green"), "Source")+
-  guides(colour = guide_legend(order = 2),
-           fill = guide_legend(order = 1))+
-# coord_cartesian(expand = FALSE)+
-# coord_cartesian(xlim = c(1986, last_year)) +
+ggplot(age_data.df, aes(x = return_year, y = prop, fill = as.factor(ocean_age))) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Return Year", y = "Percentage", fill = "Ocean Age") +
   scale_x_continuous(breaks = c(seq(from = 1985, to = last_year, by = 3))) +
+  scale_fill_viridis_d("Ocean Age (Years)")+
   labs(title = "Okanagan Sockeye Ocean Age Composition", subtitle = "By Return Year")+
-  ylab("Proportion at Age")+
+  ylab("Percent at Age")+
   xlab("")+
   theme_pt(major_grid=TRUE)+theme(legend.position="bottom") +
   theme(legend.background = element_rect(fill = "white", color = "black"),
         legend.text = element_text(size = 10)) +
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
 
-# Following plots check the age composition visually.  First one shows selected proportions by ocean age with annual assignment source
-ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   #stacked 100% bar plot of annual age composition
-# geom_point(data = age_data.df %>% ungroup()) + # %>% 
-#              filter(return_year != 1986) %>%
-               # dplyr::select(return_year, best_source) %>% 
-               # unique(), aes(x = return_year, y = -0.02, 
-               #               color = best_source), size = 3, pch = 15)+
-  geom_col(aes(fill = ocean_age))+
-  scale_fill_viridis_d("Ocean Age (Years)")+
-  ylim(0, 1) +
-  # scale_color_manual(values = c("black", "red", "dodgerblue", "green"), "Source")+
-  # guides(colour = guide_legend(order = 2),
-  #          fill = guide_legend(order = 1))+
-# coord_cartesian(expand = FALSE)+
-# coord_cartesian(xlim = c(1986, last_year)) +
-  scale_x_continuous(breaks = c(seq(from = 1985, to = last_year, by = 3))) +
-  labs(title = "Okanagan Sockeye Ocean Age Composition", subtitle = "By Return Year")+
-  ylab("Proportion at Age")+
-  xlab("")+
-  theme_pt(major_grid=TRUE)+theme(legend.position="bottom") +
-  theme(legend.background = element_rect(fill = "white", color = "black"),
-        legend.text = element_text(size = 10)) +
-  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+# age_prop_chk <- age_data.df %>%                                                 # shows if any annual total age proportions don't add up to 1.0
+#   group_by(return_year) %>%                                                     # sorted by total_best proportion
+#   # summarise(total_best    = sum(best_age_prop), 
+#   #           total_ONA     = sum(ONA_prop_at_age), 
+#   #           total_CRITFC  = sum(CRITFC_prop_at_age)) %>% 
+#   summarise(total_best      = sum(best_age_prop)) %>% 
+#   arrange(return_year) # total_best)
+# 
+# # Following plots check the age composition visually.  First one shows selected proportions by ocean age with annual assignment source
+# ggplot(age_data.df, aes(x = return_year, y = best_age_prop))+                   #stacked 100% bar plot of annual age composition
+#   geom_point(data = age_data.df %>% ungroup() %>% 
+# #              filter(return_year != 1986) %>%
+#                dplyr::select(return_year, best_source) %>% 
+#                unique(), aes(x = return_year, y = 0, 
+#                              color = best_source), size = 3, pch = 15)+
+#   geom_col(aes(fill = ocean_age))+
+#   scale_fill_viridis_d("Ocean Age (Years)")+
+#   scale_color_manual(values = c("black", "red", "dodgerblue", "green"), "Source")+
+#   guides(colour = guide_legend(order = 2),
+#            fill = guide_legend(order = 1))+
+# # coord_cartesian(expand = FALSE)+
+# # coord_cartesian(xlim = c(1986, last_year)) +
+#   scale_x_continuous(breaks = c(seq(from = 1985, to = last_year, by = 3))) +
+#   labs(title = "Okanagan Sockeye Ocean Age Composition", subtitle = "By Return Year")+
+#   ylab("Proportion at Age")+
+#   xlab("")+
+#   theme_pt(major_grid=TRUE)+theme(legend.position="bottom") +
+#   theme(legend.background = element_rect(fill = "white", color = "black"),
+#         legend.text = element_text(size = 10)) +
+#   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+
 
 filename <- paste("../figures/Age_Composition_(NEW)_", timestamp, ".png", sep = "")   # filename for figure output
 ggsave(file = filename, width = 8, height = 6, units = "in")                    # saves the plot to filename
