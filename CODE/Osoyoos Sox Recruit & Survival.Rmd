@@ -40,6 +40,7 @@ library(MASS)
 library(mgcv)
 library(patchwork)
 library(psych)
+library(RColorBrewer)
 library(readxl)
 library(reshape2)
 library(scales)
@@ -250,7 +251,7 @@ ggplot(deadpitch_prop_natural_filtered, aes(x = year, y = p_nat))+
                               p_nat = predict(pnat_mid_m, data.frame(year = 2009:2018),      type = "response")))+
   geom_line(data = data.frame(section = "upper_ok_river", year = 2011:last_year, 
                               p_nat = predict(pnat_pen_m, data.frame(year = 2011:last_year), type = "response")))+
-  facet_wrap(~section, ncol=1)+
+  facet_wrap(~section, ncol=2)+
   scale_x_continuous(breaks = c(seq(from = 2007, to = last_year, by = 2)))+
   theme_pt(major_grid=TRUE) +
   theme(legend.position = "bottom", legend.title = element_text(size=9),
@@ -296,7 +297,7 @@ prop_natural <- bind_rows(deadpitch_prop_natural_filtered %>% mutate(type = "Sam
 ggplot(prop_natural, aes(x = year, y = p_nat))+
   geom_line()+
   geom_point(aes(color = prop_nat_type))+
-  facet_wrap(~section_label, ncol=1)+
+  facet_wrap(~section_label, ncol=2)+
   scale_x_continuous(breaks = c(seq(from = 2007, to = last_year, by = 2)))+
   labs(title="Proportion Natural Origin")+
   ylab("Proportion")+
@@ -344,19 +345,19 @@ cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river")
 p_sock_pen_m   <- gam(p_sockeye ~ bs(year, 4), data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") , family = binomial(link = "logit"))
 
 deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type = "Observed"),                       ### apply imputed estimate for multiple years for mid-OkR
-                               data.frame(year = c(2009), section = "middle_ok_river", type = "Imputed", 
+                               data.frame(year = c(2009), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2009)), type = "response")),
-                               data.frame(year = c(2016), section = "middle_ok_river", type = "Imputed", 
+                               data.frame(year = c(2016), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2016)), type = "response")),
-                               data.frame(year = c(2019), section = "middle_ok_river", type = "Imputed", 
+                               data.frame(year = c(2019), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2019)), type = "response")),
-                               data.frame(year = c(2020), section = "middle_ok_river", type = "Imputed", 
+                               data.frame(year = c(2020), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2020)), type = "response")),
-                               data.frame(year = c(2021), section = "middle_ok_river", type = "Imputed", 
+                               data.frame(year = c(2021), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2021)), type = "response")),
-                               data.frame(year = c(2022), section = "middle_ok_river", type = "Imputed", 
+                               data.frame(year = c(2022), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2022)), type = "response")),
-                               data.frame(year = c(2023), section = "middle_ok_river", type = "Imputed", 
+                               data.frame(year = c(2023), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2023)), type = "response")),
                                
                                data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",             ### apply imputed estimate for Pen Ch in 2023
@@ -418,7 +419,7 @@ spawning_location_compare <- AUC_data %>%
             p_sock_deadp = round(sum(p_sockeye),2),
             total_sockeye = round(sum(total_sockeye   ))) %>% arrange (rearing_lake, spawning_location, year) %>%
   
-  mutate(prop_sock_type= ifelse(year == 2000, "Observed", prop_sock_type)) %>%                    # Nerkids observed, %sox=1 based on visual survey methods confidence [241128]
+  mutate(prop_sock_type= ifelse(year == 2000, "Assumed", prop_sock_type)) %>%                     # Nerkids observed, %sox=1 based on visual survey methods confidence [241128]
   mutate(prop_sock_type= ifelse(is.na(prop_sock_type), "Unresolved", prop_sock_type)) %>%                        
   mutate(sockeye_est   = ifelse(!is.na(total_sockeye), prop_sock_type, "Unresolved")) %>%         # Missing nerkid estimate
 
@@ -495,19 +496,26 @@ ggplot(spawning_location_compare, aes(x=year)) +
   theme(legend.position = "bottom", legend.title = element_text(size=9),
         legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
 
-ggplot(spawning_location_compare, aes(x=year)) +
+ggplot(data = filter(spawning_location_compare, prop_sock_type != "Unresolved"), aes(x=year)) +
   ggtitle("Proportion Sockeye vs Kokanee") +
   facet_wrap(~spawning_location, ncol=2) + #, scales="free_y") +
   geom_line (aes(y = p_sock_deadp), color = "black") + #, size=1) +
-  geom_point(aes(y = p_sock_deadp, color = prop_sock_type)) +
+  geom_point(aes(y = p_sock_deadp, color = prop_sock_type, shape = prop_sock_type), size=2) +
+  scale_shape_manual(values = c(0, 22, 19)) +  # Set shapes: 0 = square, 22 = filled square, 21 = filled circle with border
+  scale_color_manual(values = c("black", "blue", "black")) +  # Set colors
+#  guides(color = guide_legend(override.aes = list(fill = c("white", "blue", "white")))) +  # Set fill colors for legend
   labs(x=NULL, y="Percent Sockeye") +
   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))+
-  # scale_color_manual(values = c("Sockeye %" = "blue", "Old Sockeye %" = "gray")) +
   theme_minimal() +
+  scale_color_brewer(palette = "Set1") +
+  guides(color = guide_legend(override.aes = list(shape = c(0, 22, 19)))) +  # Merge legends
   labs(color = "Sockeye Proportion:") +  
   theme_pt(major_grid=TRUE) +
   theme(legend.position = "bottom", legend.title = element_text(size=9),
         legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
+
+filename <- paste("../figures/Prop_Sockeye_", timestamp, ".png", sep = "")   # filename for figure output 
+ggsave(file = filename, width = 6, height = 6, units = "in")                    # saves the plot to filename
 
 spawning_location <- spawning_location_compare %>%                                                 
   dplyr::select(rearing_lake, spawning_location, year, nerkids, p_sock_deadp, total_sockeye) # trim dataframe to revised estimates
@@ -872,17 +880,21 @@ okanagan_recruits_long <- columbia_okanagan_long %>%                            
 
 ggplot(okanagan_recruits_long %>% filter(Year > 2003),                          # cluster bar plot of Okanagan Sockeye recruits by sub-group
        aes(x = factor(Year), y = Recruits/1000, fill = Group)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar(stat = "identity", position = "dodge", color="black") +
   scale_y_continuous(breaks       = c( 0, 100, 200, 300, 400, 500, 600, 700))+
 # scale_y_continuous(labels = scales::percent, expand = c(0,0)) +               # format props as % and get rid of white space between data and plot borders
   labs(x = "", y = "Abundance (1000s)") +
-  scale_x_discrete(breaks = c(seq(from = 1976, to = last_year+1, by = 4))) +
+  scale_x_discrete(breaks = c(seq(from = 2004, to = last_year+1, by = 2))) +
   labs(title="Okanagan Sockeye Recruitment", subtitle = "by Return Year")+
   theme_minimal() +
-  scale_color_manual(values = c("white", "red", "gray"))+                       ### can't seem to change bars to these colours... 
+# scale_color_manual(values = c("white", "red", "gray"))+                       ### can't seem to change bars to these colours... 
+  scale_fill_brewer(palette = "Set2") +
   theme(plot.title = element_text(hjust=0.5), legend.position = "bottom",
         plot.subtitle = element_text(hjust=0.5), axis.ticks.x = element_line(color = "black"),
         legend.title = element_blank(),    legend.text = element_text(size = 10))              
+
+filename <- paste("../figures/Oka_Substock_Recruit_Cluster_", timestamp, ".png", sep = "") # filename for figure output 
+ggsave(file = filename, width = 8, height = 4, units = "in")                           # saves the plot to filename
 
 ggplot(okanagan_recruits_long,                                                  # stacked bar plot of Okanagan Sockeye recruitment by sub-group
        aes(x = factor(Year), y = Proportion, fill = Group)) +
@@ -892,7 +904,8 @@ ggplot(okanagan_recruits_long,                                                  
   scale_x_discrete(breaks = c(seq(from = 1976, to = last_year+1, by = 4))) +
   labs(title="Okanagan Sockeye Recruitment Proportions", subtitle = "by Return Year")+
   theme_minimal() +
-  scale_color_manual(values = c("white", "red", "gray"))+                       ### can't seem to change bars to these colours... 
+#  scale_color_manual(values = c("white", "red", "gray"))+                      ### can't seem to change bars to these colours... 
+  scale_fill_brewer(palette = "Set2") +
   theme(plot.title = element_text(hjust=0.5), legend.position = "bottom",
         plot.subtitle = element_text(hjust=0.5), axis.ticks.x = element_line(color = "black"),
         legend.title = element_blank(),    legend.text = element_text(size = 10))              
@@ -908,14 +921,14 @@ post_fwmt <- geometric.mean(columbia_okanagan_recruits[columbia_okanagan_recruit
 columbia_okanagan_recruits %>% ggplot(aes(x = return_year, y = oso_nat_recruits/1000))+
   geom_line(linewidth = 0.5)+
   geom_point(size = 2)+
-  geom_segment(aes(x = 1977,   xend = 2007.5, y = pre_fwmt,  yend = pre_fwmt),  colour = "red",       linewidth = 1, linetype = 2)+ # CB: this is for the option of adding the pre- and current freshwater management tools era 
-  geom_segment(aes(x = 2007.5, xend = 2023,   y = post_fwmt, yend = post_fwmt), colour = "darkgreen", linewidth = 1, linetype = 2)+ #     to compare median recruits between the two time periods
-  geom_hline(yintercept = geometric.mean(columbia_okanagan_recruits$oso_nat_recruits)/1000,colour= "blue", linewidth = 1, linetype = 2)+
+  geom_segment(aes(x = 1976,   xend = 2007.5, y = pre_fwmt,  yend = pre_fwmt),  colour = brewer.pal(8, "Set1")[1], linewidth = 1, linetype = "dashed")+ # CB: this is for the option of adding the pre- and current freshwater management tools era 
+  geom_segment(aes(x = 2007.5, xend = 2024,   y = post_fwmt, yend = post_fwmt), colour = brewer.pal(8, "Set1")[2], linewidth = 1, linetype = "dashed")+ #     to compare median recruits between the two time periods
+  geom_hline(yintercept = geometric.mean(columbia_okanagan_recruits$oso_nat_recruits)/1000, colour="black", linewidth = 1, linetype = "dotdash")+
   scale_y_continuous(breaks       = c( 0, 100, 200, 300, 400, 500, 600))+
   scale_x_continuous(breaks = c(seq(from = 1976, to = last_year+1, by = 4)))+
   labs(title="Osoyoos Sockeye Recruits", subtitle = "by Return Year", x="", y = "Sockeye Recruit Abundance (1000s)")+
   theme_pt(major_grid=TRUE)+
-  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5)) 
   
 filename <- paste("../figures/OSO_Recruits_", timestamp, ".png", sep = "")      # filename for figure output 
 ggsave(file = filename, width = 6, height = 4, units = "in")                    # saves the plot to filename
@@ -1251,6 +1264,7 @@ ggplot(radat2_new, aes(x = smolt_year, y = survival, colour = source))+
   geom_point(aes(size = source, alpha = source))+
   geom_line(aes(linewidth = source, alpha = source))+
   scale_colour_manual(values = c("black","#0072B2", "#D55E00"), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
+# scale_color_viridis(discrete = TRUE)  # Use a colorblind-friendly palette
   scale_linewidth_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
   scale_size_manual(values = c(1, 3, 3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
   scale_alpha_manual(values = c(1, 0.3, 0.3), name = "Source", labels = c("Best", "CRITFC", "ONA/SIRE"))+
