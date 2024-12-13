@@ -283,7 +283,7 @@ prop_natural <- bind_rows(deadpitch_prop_natural_filtered %>% mutate(type = "Sam
   
   mutate(section_label = ifelse(section == "lower_ok_river",  "Lower Okanagan River", section)) %>%
   mutate(section_label = ifelse(section == "middle_ok_river", "Middle Okanagan River", section_label)) %>%
-  mutate(section_label = ifelse(section == "upper_ok_river",  "Penticton Channel (Upper Okanagan River)", section_label)) %>%
+  mutate(section_label = ifelse(section == "upper_ok_river",  "Penticton Channel", section_label)) %>%
   mutate(section_label = ifelse(section == "shingle_creek",   "Shingle Creek", section_label)) %>%
   mutate(section_label = ifelse(section == "shingle creek",   "Shingle Creek", section_label)) %>%
   mutate(spawning_location = ifelse(section == "shingle_creek",   "Shingle Creek", "Unknown")) %>%
@@ -461,18 +461,34 @@ spawning_location_compare <- AUC_data %>%
   dplyr::select(rearing_lake, spawning_location, year, nerkids, p_sock_len35, total_sockeye_old, p_sock_deadp, prop_sock_type, total_sockeye, sockeye_est) %>%
   arrange (rearing_lake, spawning_location, year)
 
+# ggplot(spawning_location_compare, aes(x=year)) +                              # comparing length-based to species_from_age-based
+#   ggtitle("Proportion Sockeye vs Kokanee") +
+#   facet_wrap(~spawning_location, ncol=2) + #, scales="free_y") +
+#   geom_line (aes(y = p_sock_len35), color = "gray") +
+#   geom_line (aes(y = p_sock_deadp), color = "blue", linetype=2, size=1) +
+#   geom_point(aes(y = p_sock_len35), color = "gray") +
+#   geom_point(aes(y = p_sock_deadp, color = "blue")) +
+#   labs(x=NULL, y="Percent Sockeye") +
+#   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))+
+#   scale_color_manual(values = c("Sockeye %" = "blue", "Old Sockeye %" = "gray")) +
+#   theme_minimal() +
+#   theme_pt(major_grid=TRUE) +
+#   theme(legend.position = "bottom", legend.title = element_text(size=9),
+#         legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
+
 ggplot(spawning_location_compare %>% filter(sockeye_est != "Unresolved"), aes(x=year)) +
   ggtitle("Sockeye Spawner Abundance", subtitle = "by Return Year") + 
   facet_wrap(~spawning_location, ncol=2) + #, scales="free_y") +
-  geom_line (aes(y = total_sockeye), color = "blue", linetype=1, size=1) +
-  geom_point(aes(y = total_sockeye, color = sockeye_est), size=2) +
-  scale_color_manual(values = c("Assumed"="gray50", "Imputed"="red", "Observed"="black")) +
+  geom_line (aes(y = total_sockeye), color = "blue") + #, linetype=1, size=1) +
+  geom_point(aes(y = total_sockeye, shape = sockeye_est), size=2) +
+  scale_shape_manual(values = c("Assumed"=6, "Imputed"=0, "Observed"=1)) +
+# scale_color_manual(values = c("Assumed"="cyan", "Imputed"="red", "Observed"="black")) +
 # geom_line (aes(y = total_sockeye_old), color = "gray", size=1) +
 # geom_line (aes(y = total_sockeye), color = "blue", linetype=2, size=1) +
 # geom_point(aes(y = total_sockeye_old), color = "gray") +
 # geom_point(aes(y = total_sockeye, color = sockeye_est)) +
   labs(x=NULL, y="Total Sockeye") +
-  labs(color = "Sockeye Estimate:") +  
+  labs(shape = "Sockeye Estimate:") +  
   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))+
 # scale_color_manual(values = c("Total Sockeye" = "blue", "Old Total" = "gray")) +
   theme_minimal() +
@@ -481,36 +497,25 @@ ggplot(spawning_location_compare %>% filter(sockeye_est != "Unresolved"), aes(x=
   theme(legend.position = "bottom", legend.title = element_text(size=9),
         legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
 
-ggplot(spawning_location_compare, aes(x=year)) +
-  ggtitle("Proportion Sockeye vs Kokanee") +
-  facet_wrap(~spawning_location, ncol=2) + #, scales="free_y") +
-  geom_line (aes(y = p_sock_len35), color = "gray") +
-  geom_line (aes(y = p_sock_deadp), color = "blue", linetype=2, size=1) +
-  geom_point(aes(y = p_sock_len35), color = "gray") +
-  geom_point(aes(y = p_sock_deadp, color = "blue")) +
-  labs(x=NULL, y="Percent Sockeye") +
-  scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))+
-  scale_color_manual(values = c("Sockeye %" = "blue", "Old Sockeye %" = "gray")) +
-  theme_minimal() +
-  theme_pt(major_grid=TRUE) +
-  theme(legend.position = "bottom", legend.title = element_text(size=9),
-        legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
+filename <- paste("../figures/Sockeye_Spawners_", timestamp, ".png", sep = "")  # filename for figure output 
+ggsave(file = filename, width = 6, height = 6, units = "in")                    # saves the plot to filename
 
 ggplot(data = filter(spawning_location_compare, prop_sock_type != "Unresolved"), aes(x=year)) +
-  ggtitle("Proportion Sockeye vs Kokanee") +
+  ggtitle("Proportion Sockeye vs Kokanee", subtitle = "by Return Year") +
   facet_wrap(~spawning_location, ncol=2) + #, scales="free_y") +
-  geom_line (aes(y = p_sock_deadp), color = "black") + #, size=1) +
-  geom_point(aes(y = p_sock_deadp, color = prop_sock_type, shape = prop_sock_type), size=2) +
-  scale_shape_manual(values = c(0, 22, 19)) +  # Set shapes: 0 = square, 22 = filled square, 21 = filled circle with border
-  scale_color_manual(values = c("black", "blue", "black")) +  # Set colors
+  geom_line (aes(y = p_sock_deadp), color = "blue") + #, size=1) +
+  geom_point(aes(y = p_sock_deadp, shape = prop_sock_type), size=2) +
+  scale_shape_manual(values = c("Assumed"=6, "Imputed"=0, "Observed"=1)) +
+#  scale_color_manual(values = c("black", "blue", "black")) +  # Set colors
 #  guides(color = guide_legend(override.aes = list(fill = c("white", "blue", "white")))) +  # Set fill colors for legend
   labs(x=NULL, y="Percent Sockeye") +
   scale_x_continuous(breaks = c(seq(from = 2000, to = last_year, by = 4)))+
   theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  guides(color = guide_legend(override.aes = list(shape = c(0, 22, 19)))) +  # Merge legends
-  labs(color = "Sockeye Proportion:") +  
+#  scale_color_brewer(palette = "Set1") +
+#  guides(color = guide_legend(override.aes = list(shape = c(0, 22, 19)))) +  # Merge legends
+  labs(shape = "Sockeye Proportion:") +  
   theme_pt(major_grid=TRUE) +
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5)) +            # theme_pt centers main title but not subtitle
   theme(legend.position = "bottom", legend.title = element_text(size=9),
         legend.background = element_rect(fill="white", colour="grey80", linewidth = 0.5))
 
@@ -810,9 +815,9 @@ ggplot(long_data, aes(x = Year, y = value, fill = variable)) +
   theme(legend.background = element_rect(fill = "white", color = "black"),
         legend.text = element_text(size = 10)) +
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))    
-filename <- paste("../figures/Mid-Columbia_Stock_Comp_", timestamp, ".png", sep = "") # filename for figure output 
-ggsave(file = filename, width = 8, height = 4, units = "in")                          # saves the plot to filename
 
+filename <- paste("../figures/Mid-Columbia_Stock_Comp_", timestamp, ".png", sep = "") # filename for figure output 
+ggsave(file = filename, width = 8, height = 6, units = "in")                          # saves the plot to filename
 
 okanagan_substock_recruitment <- columbia_okanagan_recruits %>%
   mutate("Total Proportions" = prop_oso_origin_nat + prop_ska_origin_nat + prop_hatch_origin) %>%
@@ -868,7 +873,7 @@ ggplot(columbia_okanagan_long,
   ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust=0.5))              # theme_pt centers main title but not subtitle
   
 filename <- paste("../figures/Columbia_Okanagan_Recruits_", timestamp, ".png", sep = "") # filename for figure output 
-ggsave(file = filename, width = 8, height = 4, units = "in")                    # saves the plot to filename
+ggsave(file = filename, width = 8, height = 6, units = "in")                    # saves the plot to filename
 
 okanagan_recruits_long <- columbia_okanagan_long %>%                            # set up data for stacked bar plot 
   filter(Group %in% c("Osoyoos_Natural", "Skaha_Natural", "Hatchery_Origin"))%>%
