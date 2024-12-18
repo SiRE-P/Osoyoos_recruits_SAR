@@ -1,7 +1,8 @@
 # --------------------------------------------------------------------------
 # Program: Download Sockeye Dam Counts from CBR-DATA.R ####
 #
-# Title:   Download Sockeye Dam Counts from CBR-DART.R (mispelled in filename!)
+# Title:   Download Sockeye Dam Counts from CBR-DART.R (mispelled in filename!)  SEE BOTTOM OF CODE for FULL DESCRIPTION.
+#
 # Purpose: Obtain raw total annual dam counts at Columbia mainstem dams from online web portal and adjust for 16-24-hr expansions where 
 #          appropriate, as well as "negative mortality" issues at u/s dams vs d/s dams. Calculate annual mid-Columbia Sockeye stock composition
 #          for Wenatchee- and Okanagan-bound Sockeye stocks.
@@ -420,3 +421,32 @@ filename <- paste("./figures/Columbia_Sockeye_Dam_Counts_Adj_",
                   timestamp, ".png", sep = "")                                  # figure output filename
 ggsave(file = filename, width = 8, height = 6, units = "in")                    # saves the plot
   
+
+# 24.12.18
+# This R script is designed to download and process annual dam count data for
+# Sockeye salmon from the Columbia River mainstem dams. The data is obtained
+# from an online web portal and adjusted for various factors, such as 16-24 hour
+# expansions and "negative mortality" issues at upstream dams versus downstream
+# dams. The script also calculates annual mid-Columbia Sockeye stock composition
+# for Wenatchee- and Okanagan-bound Sockeye stocks.
+#
+# The script starts by loading necessary libraries and defining the current date
+# and year. It then downloads the annual dam count data for several dams from
+# the Columbia Basin Research's Data Access in Real Time (DART) website. The
+# data is cleaned and processed, including converting the data to numeric format
+# and selecting relevant columns.
+#
+# The script then joins all the downloaded datasets into a single dataset,
+# Columbia_Sockeye_Dam_Counts_by_Year_All, and writes this data to a CSV file.
+# It also performs a negative binomial regression analysis to adjust the
+# Bonneville dam counts from 16-hour counts to 24-hour counts.
+#
+# The script further adjusts the dam counts from 16-hour to 24-hour counts for
+# other dams, where applicable, and compares upstream dam totals to downstream
+# dam totals. It also calculates the best mid-Columbia stock composition
+# proportions and writes the adjusted dam count data to a CSV file.
+#
+# Finally, the script creates several plots to visualize the dam count data and
+# the adjusted dam count data, and saves these plots as PNG files. The plots
+# show the annual Sockeye counts at the Columbia mainstem dams and the adjusted
+# Sockeye estimates at these dams, respectively.
