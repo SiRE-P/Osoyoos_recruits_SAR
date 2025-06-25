@@ -364,9 +364,9 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
                                
                                # data.frame(year = c(2011), section = "upper_ok_river",  type = "Imputed",          ### apply imputed estimate for Pen Ch in 2011
                                # p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2011)), type = "response")), 
-                               # data.frame(year = c(2011), section = "upper_ok_river",  type = "Unresolved",          ### apply imputed estimate for Pen Ch in 2011
+                               # data.frame(year = c(2011), section = "upper_ok_river",  type = "Unresolved",       ### apply imputed estimate for Pen Ch in 2011
                                # p_sockeye = NA), 
-                               data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",             ### apply imputed estimate for Pen Ch in 2023
+                               data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",            ### apply imputed estimate for Pen Ch in 2023
                                p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
 
   filter(!(year == 2011 & section == "upper_ok_river")) %>%                                                         # Exclude the 2011 upper_ok_river record as too sketch
@@ -385,8 +385,8 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
 #UC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_241105_AO.csv")         # AO checking nerkid estimates and providing updates (241105)    # keep for GitHub [240510]
 
 #UC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_241105_AO.xlsx", sheet = "AUC_data_Import") %>% 
-
-AUC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_250623_AO.xlsx", sheet = "AUC_data_Import") %>%  # back to the original AUC estimates for 2011
+#UC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_250623_AO.xlsx", sheet = "AUC_data_Import") %>%  # back to the original AUC estimates for 2011
+AUC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_2025.06.25_AO.xlsx", sheet = "AUC_data_Import") %>%  # AO updated Pen 2023 and Shingle 2021-2023 %
                    janitor::clean_names() %>% 
                    mutate_at("auc", as.numeric) %>%
                    mutate_at("spawning_nerkids", as.numeric) %>%
@@ -412,7 +412,7 @@ AUC_data <- auc_data_import %>%
   mutate(section = ifelse(spawning_location == "Penticton Channel", "upper_ok_river",  section)) %>%
   mutate(section = ifelse(spawning_location == "Shingle Creek",     "shingle_creek",   section)) %>%
   mutate(rearing_lake = ifelse(spawning_location == "Middle Ok River", "Skaha", rearing_lake)) %>%     # assigns spawners in middle channel as Skaha-reared     
-  mutate(percent_35cm_fl = ifelse(year == 2023 & section == "upper_ok_river" & is.na(percent_35cm_fl), 0.80, percent_35cm_fl)) %>%   ### Pen Ch. fish not yet ecotyped via age, so substituting pivot estimate
+# mutate(percent_35cm_fl = ifelse(year == 2023 & section == "upper_ok_river" & is.na(percent_35cm_fl), 0.80, percent_35cm_fl)) %>%   ### Pen Ch. fish not yet ecotyped via age, but now IMPUTED, above
   dplyr::select(section, year, spawning_location, rearing_lake, spawning_nerkids, percent_35cm_fl, spawning_sockeye, spawning_nerkids_note, -X) %>% # to Skaha (assumed rearing lake of origin) for purposes of
   arrange(section, year)                                                                               # calculating OSO vs SKA proportion [PT 240221]  
                                                                                                        
@@ -536,6 +536,10 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 spawning_location <- spawning_location_compare %>%                                                 
   dplyr::select(rearing_lake, spawning_location, year, nerkids, p_sock_deadp, total_sockeye, sockeye_est) # trim dataframe to revised estimates
 
+filename <- paste("../output/Spawning_Basics_", timestamp, ".csv", sep = "")    # Total Nerkids, Sockeye, prop Sockeye on  Spawning Grounds  
+write.csv(spawning_location, filename)                                          # before stray rate calculations
+
+
 ``` 
 
 ```{r oso vs ska}  
@@ -618,6 +622,10 @@ spawning_table <- spawning_location %>%                                         
   mutate(section = ifelse(spawning_location == "Middle Ok River",   "middle_ok_river", section)) %>%
   mutate(section = ifelse(spawning_location == "Penticton Channel", "upper_ok_river",  section)) %>%
   filter(spawning_location != "Shingle Creek")                                             # omit Shingle Creek because of low numbers & data quality
+
+filename <- paste("../output/Spawner_Estimates_", timestamp, ".csv", sep = "")             # Total Nerkids, Sockeye, prop Sockeye on  Spawning Grounds  
+write.csv(spawning_table, filename)                                                        # after stray rate calculations
+
   
 spawn_table_summary <- spawning_table %>%                                                  # calculate N-O abund based on proportion N-O  
   group_by(rearing_lake, year) %>% 
