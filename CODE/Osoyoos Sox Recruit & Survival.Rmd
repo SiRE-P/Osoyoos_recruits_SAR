@@ -278,6 +278,8 @@ prop_natural <- bind_rows(deadpitch_prop_natural_filtered %>% mutate(type = "Sam
                 data.frame(year = c(2023), section = "middle_ok_river", type = "Imputed", 
                            p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%
                 
+                data.frame(year = c(2011), section = "upper_ok_river", type = "Imputed", 
+                           p_nat = predict(pnat_pen_m, data.frame(year = c(2011)), type = "response")), #) %>%
                 data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",
                            p_nat = predict(pnat_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
   
@@ -360,9 +362,14 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
                                data.frame(year = c(2023), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2023)), type = "response")),
                                
+                               # data.frame(year = c(2011), section = "upper_ok_river",  type = "Imputed",          ### apply imputed estimate for Pen Ch in 2011
+                               # p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2011)), type = "response")), 
+                               # data.frame(year = c(2011), section = "upper_ok_river",  type = "Unresolved",          ### apply imputed estimate for Pen Ch in 2011
+                               # p_sockeye = NA), 
                                data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",             ### apply imputed estimate for Pen Ch in 2023
                                p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
-  
+
+  filter(!(year == 2011 & section == "upper_ok_river")) %>%                                                         # Exclude the 2011 upper_ok_river record as too sketch
   mutate(prop_sock_type = type) %>%
   dplyr::select(-type) %>%
   arrange(section, year)
@@ -371,28 +378,32 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
 
 # AUC_data_Import <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                           
 #   janitor::clean_names()   # comment out for GitHub
-# write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240624.csv")        # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
+# write.csv(AUC_data_Import,  "../data/AUC_data_Import_xlsx_240624.csv")          # if AUC_data imported from SIS xlsx workbook, re-write to CSV   # comment out for GitHub
 
 #UC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_240624.csv")            # replaces AUC data from SIS xlsx workbook (was 240516)          # keep for GitHub [240510]
 #UC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_240624 - wkg (AO).csv") # AO checking nerkid estimates and providing updates (241101)    # keep for GitHub [240510]
 #UC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_241105_AO.csv")         # AO checking nerkid estimates and providing updates (241105)    # keep for GitHub [240510]
 
-AUC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_241105_AO.xlsx", sheet = "AUC_data_Import") %>% 
+#UC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_241105_AO.xlsx", sheet = "AUC_data_Import") %>% 
+
+AUC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_250623_AO.xlsx", sheet = "AUC_data_Import") %>%  # back to the original AUC estimates for 2011
                    janitor::clean_names() %>% 
                    mutate_at("auc", as.numeric) %>%
                    mutate_at("spawning_nerkids", as.numeric) %>%
                    mutate_at("percent_35cm_fl", as.numeric) %>%
-                   mutate(bad_estimate = ifelse(year == 2011, spawning_nerkids, NA)) %>%         # store 2011 value...
-                   mutate(spawning_nerkids = ifelse(year == 2011, NA, spawning_nerkids)) %>%     # nerkids in 2011 set to NA
+                 # mutate(bad_estimate = ifelse(year == 2011, spawning_nerkids, NA)) %>%         # store 2011 value...
+                 # mutate(spawning_nerkids = ifelse(year == 2011, NA, spawning_nerkids)) %>%     # nerkids in 2011 set to NA
+                   mutate(percent_35cm_fl  = ifelse(year == 2011 & spawning_location == "Penticton Channel", NA, percent_35cm_fl)) %>%
                    mutate(spawning_nerkids_note = ifelse(spawning_location %in%                  # flag issue spawning_nerkids=SK for L- and M-OkR but SK & KO for Upper [241128]
                                                   c("Lower Ok River", "Middle Ok River"), "Nerkids = Sockeye only", "Nerkids = Sockeye & Kokanee")) %>%
                    mutate(spawning_nerkids_note = ifelse(is.na(spawning_nerkids), "No estimate", spawning_nerkids_note)) %>%
-                   mutate(spawning_nerkids_note = ifelse(year == 2011, paste("Poor survey estimate (", bad_estimate, ") omitted"), spawning_nerkids_note)) %>%
+                 # mutate(spawning_nerkids_note = ifelse(year == 2011, paste("Poor survey estimate (", bad_estimate, ") omitted"), spawning_nerkids_note)) %>%
+                 # mutate(spawning_nerkids_note = ifelse(year == 2011, paste("Suspicious survey estimate (", bad_estimate, ")"), spawning_nerkids_note)) %>%
                    mutate(spawning_sockeye = ifelse(spawning_location %in% c("Lower Ok River", "Middle Ok River"), spawning_nerkids, NA)) %>%
                    dplyr::select(rearing_lake, spawning_location, year, auc, spawning_nerkids, spawning_nerkids_note, spawning_sockeye, percent_35cm_fl)
 
-write.csv(AUC_data_Import,  "../data/AUC_data_Import_241128.csv")        # if AUC_data imported from AO xlsx workbook, re-write to CSV   # comment out for GitHub
-auc_data_import <- read.csv("../data/AUC_data_Import_241128.csv")        # export and re-import (NOTE lower-case dataset name) --- keep for GitHub [241128]
+write.csv(AUC_data_Import,  "../data/AUC_data_Import_250623.csv")        # if AUC_data imported from AO xlsx workbook, re-write to CSV   # comment out for GitHub
+auc_data_import <- read.csv("../data/AUC_data_Import_250623.csv")        # export and re-import (NOTE lower-case dataset name) --- keep for GitHub [241128]
 
 AUC_data <- auc_data_import %>% 
   filter(year <= last_year) %>%                                                                        ### removing 2011 which was previously imputed, 
@@ -523,7 +534,7 @@ filename <- paste("../figures/Prop_Sockeye_", timestamp, ".png", sep = "")   # f
 ggsave(file = filename, width = 6, height = 6, units = "in")                    # saves the plot to filename
 
 spawning_location <- spawning_location_compare %>%                                                 
-  dplyr::select(rearing_lake, spawning_location, year, nerkids, p_sock_deadp, total_sockeye) # trim dataframe to revised estimates
+  dplyr::select(rearing_lake, spawning_location, year, nerkids, p_sock_deadp, total_sockeye, sockeye_est) # trim dataframe to revised estimates
 
 ``` 
 
@@ -533,7 +544,7 @@ prop_oso_strays_by_year <- spawning_location %>%          # calculate OSO stray 
   filter(year > 2008, year < 2013) %>%                    # N-O fish in mid-OkR from 2009-2012 MUST be OSO strays, since McIntyre dam prevented N-O SKA to spawn <2009, ie N-O Skaha only >= 2013
   left_join(prop_natural %>% dplyr::select(year, spawning_location, p_nat, prop_nat_type)) %>% 
   mutate(natural_sockeye = round(total_sockeye * p_nat)) %>% 
-  filter(year != 2011) %>%
+# filter(year != 2011) %>%
   group_by(year) %>%                                      # for true stray rate, include OSO strays in the denominator [PT 240411]
   summarise(strays = sum(natural_sockeye[spawning_location == "Middle Ok River"], 
                          natural_sockeye[spawning_location == "Penticton Channel"]),  # this stmt includes 2012 N-O fish in Pen Chn
@@ -634,8 +645,8 @@ spawning_totals_no2011 <- spawn_table_summary %>%                               
   mutate(oso_strays = round(oso_nat_origin * prop_oso_strays)) %>%                                      
   mutate(ska_strays = round(ska_nat_origin * prop_ska_strays)) %>%
   mutate(prop_oso_origin_nat = round(oso_nat_origin/(oso_total + ska_total),3)) %>%
-  mutate(prop_ska_origin_nat = round(ska_nat_origin/(oso_total + ska_total),3)) %>%
-  filter(year != 2011)
+  mutate(prop_ska_origin_nat = round(ska_nat_origin/(oso_total + ska_total),3))#%>%
+# filter(year != 2011)
 
 #fit gam to impute missing 2011 N-O proportions by sub-stock
 #perform cross validation to determine appropriate df on year spline
@@ -671,11 +682,13 @@ prop_oso_natural_m <- gam(prop_oso_origin_nat ~ bs(year, oso_df), data = spawnin
 prop_ska_natural_m <- gam(prop_ska_origin_nat ~ bs(year, ska_df), data = spawning_totals_no2011 %>% 
                             filter(year > 2010, year <= gam_endyear), family = binomial(link = "logit"))  # SKA imputation model for data up to 2023
 
-spawning_totals <- bind_rows(spawning_totals_no2011 %>% mutate(prop_natural_origin_type = "sampled"),   # incorporate 2011 estimates into spawn totals 
-                              data.frame(prop_oso_origin_nat = predict(prop_oso_natural_m, data.frame(year = 2011), type = "response"), 
-                                         prop_ska_origin_nat = predict(prop_ska_natural_m, data.frame(year = 2011), type = "response"),
-                                         year = 2011, prop_natural_origin_type = "imputed")) %>% 
-    arrange(year)
+# spawning_totals <- bind_rows(spawning_totals_no2011 %>% mutate(prop_natural_origin_type = "sampled"),   # incorporate 2011 estimates into spawn totals 
+#                               data.frame(prop_oso_origin_nat = predict(prop_oso_natural_m, data.frame(year = 2011), type = "response"), 
+#                                          prop_ska_origin_nat = predict(prop_ska_natural_m, data.frame(year = 2011), type = "response"),
+#                                          year = 2011, prop_natural_origin_type = "imputed")) %>% 
+spawning_totals <- spawning_totals_no2011 %>%
+  mutate(prop_natural_origin_type = "sampled") %>%
+  arrange(year)
 
 # spawning_totals_fix2011 <- spawning_totals %>%
 #   group_by(year) %>%
