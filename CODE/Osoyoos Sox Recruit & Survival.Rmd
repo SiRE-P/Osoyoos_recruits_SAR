@@ -200,7 +200,15 @@ deadpitch_prop_natural <- ok_riv_deadpitch %>%                      # get propor
   mutate(testalinden_spill = ifelse(section == "lower_ok_river",     
                                     testalinden_spill, NA))%>%    
   mutate(section = ifelse(section == "shingle creek", "shingle_creek", section)) %>%
-  arrange(section, year)                                          
+  arrange(section, year)        
+
+deadpitch_2023 <- data.frame(                                     ### append summary values for 2023 till raw data compiled [250625]
+  year = c(2023, 2023),
+  section = c("upper_ok_river", "shingle_creek"),                   # Penticton Channel and Shingle Creek sections
+  n_natural = c(405, 40),                                         ### natural origin count from Nerkid (Skaha) Deadpitch Adult.BioData_23.xlsx (250625)
+          n = c(420, 100)) %>%                                    ### total deadpitch from Nerkid (Skaha) Deadpitch Adult.BioData_23.xlsx
+  mutate(p_nat = n_natural / n) %>%                               
+  mutate(testalinden_spill = NA)
 
 # deadpitch_2022_2023 <- data.frame(                                ### append summary values for 2022 and 2023 till raw data obtained [24.07.04]
 #   year = c(2022, 2023, 2022, 2022),                               
@@ -236,7 +244,9 @@ pnat_mid_m <- gam(p_nat ~ bs(year, 5), data = deadpitch_prop_natural %>% filter(
 pnat_pen_m <- gam(p_nat ~ bs(year, 3), data = deadpitch_prop_natural %>% filter(section == "upper_ok_river") , family = binomial(link = "logit"))
 
 deadpitch_prop_natural_filtered <- deadpitch_prop_natural %>%
-  filter(section != "ok_lake_creeks")
+  bind_rows(deadpitch_2023) %>%
+  filter(section != "ok_lake_creeks") %>%
+  arrange(section, year)
 
 ggplot(deadpitch_prop_natural_filtered, aes(x = year, y = p_nat))+
   geom_point() +
@@ -267,21 +277,21 @@ prop_natural <- bind_rows(deadpitch_prop_natural_filtered %>% mutate(type = "Sam
                            p_nat = predict(pnat_mid_m, data.frame(year = c(2009)), type = "response")), #) %>%
                 data.frame(year = c(2016), section = "middle_ok_river", type = "Imputed", 
                            p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%
-                data.frame(year = c(2019), section = "middle_ok_river", type = "Imputed", 
-                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%
-                data.frame(year = c(2020), section = "middle_ok_river", type = "Imputed", 
-                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%
-                data.frame(year = c(2021), section = "middle_ok_river", type = "Imputed", 
-                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%
-                data.frame(year = c(2022), section = "middle_ok_river", type = "Imputed", 
-                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%
-                data.frame(year = c(2023), section = "middle_ok_river", type = "Imputed", 
-                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%
+                data.frame(year = c(2019), section = "middle_ok_river", type = "Imputed",
+                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%  ### imputes to zero unless year=c(2016) in this row
+                data.frame(year = c(2020), section = "middle_ok_river", type = "Imputed",
+                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%  ### imputes to zero unless year=c(2016) in this row
+                data.frame(year = c(2021), section = "middle_ok_river", type = "Imputed",
+                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%  ### imputes to zero unless year=c(2016) in this row
+                data.frame(year = c(2022), section = "middle_ok_river", type = "Imputed",
+                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%  ### imputes to zero unless year=c(2016) in this row
+                data.frame(year = c(2023), section = "middle_ok_river", type = "Imputed",
+                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%  ### imputes to zero unless year=c(2016) in this row
                 
                 data.frame(year = c(2011), section = "upper_ok_river", type = "Imputed", 
-                           p_nat = predict(pnat_pen_m, data.frame(year = c(2011)), type = "response")), #) %>%
-                data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",
-                           p_nat = predict(pnat_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
+                           p_nat = predict(pnat_pen_m, data.frame(year = c(2011)), type = "response"))) %>%
+                # data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",
+                #            p_nat = predict(pnat_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
   
   mutate(section_label = ifelse(section == "lower_ok_river",  "Lower Okanagan River", section)) %>%
   mutate(section_label = ifelse(section == "middle_ok_river", "Middle Okanagan River", section_label)) %>%
@@ -620,14 +630,14 @@ spawning_table <- spawning_location %>%                                         
   mutate(natural_sockeye = round(total_sockeye * p_nat)) %>%
   mutate(section = ifelse(spawning_location == "Lower Ok River",    "lower_ok_river", "upper_ok_river")) %>%  
   mutate(section = ifelse(spawning_location == "Middle Ok River",   "middle_ok_river", section)) %>%
-  mutate(section = ifelse(spawning_location == "Penticton Channel", "upper_ok_river",  section)) %>%
-  filter(spawning_location != "Shingle Creek")                                             # omit Shingle Creek because of low numbers & data quality
+  mutate(section = ifelse(spawning_location == "Penticton Channel", "upper_ok_river",  section)) 
+# filter(spawning_location != "Shingle Creek")                                             # Shingle Creek omitted in next step (spawn_table_summary) because of low numbers & data quality
 
 filename <- paste("../output/Spawner_Estimates_", timestamp, ".csv", sep = "")             # Total Nerkids, Sockeye, prop Sockeye on  Spawning Grounds  
-write.csv(spawning_table, filename)                                                        # after stray rate calculations
+write.csv(spawning_table %>% dplyr::select(-section), filename, row.names = FALSE)                                                        # after stray rate calculations
 
-  
 spawn_table_summary <- spawning_table %>%                                                  # calculate N-O abund based on proportion N-O  
+  filter(spawning_location != "Shingle Creek") %>%                                         # omit Shingle Creek because of low numbers & data quality
   group_by(rearing_lake, year) %>% 
   summarise(total_sockeye = sum(total_sockeye), natural_sockeye = sum(natural_sockeye))    # aggregate by rearing lake
 # mutate(p_nat = natural_sockeye / total_sockeye)                                          # re-estimates proportion natural by sub-stock & year
