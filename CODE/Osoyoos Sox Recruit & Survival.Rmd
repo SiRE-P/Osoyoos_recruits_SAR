@@ -189,7 +189,7 @@ ok_riv_deadpitch <- read.csv2(filename, sep=",")                    # read clean
 # ok_riv_deadpitch <- read.csv(filename)                            # replaces import data from OSO SOX deadpitch                     #   keep for GitHub [240510]
 
 deadpitch_prop_natural <- ok_riv_deadpitch %>%                      # get proportion natural by spawning ground section and year
-  filter(species_from_age == "sockeye") %>%                         # from revised DP data (PT, AO, 240825)
+  filter(species_from_age == "sockeye") %>%                         # for Sockeye only; from revised DP data (PT, AO, 240825)
   filter(hatchery != "unknown") %>%                                 # omit unknown thermal mark class
   mutate(origin = hatchery) %>%                                     # define variable origin based on hatchery = "natural" or "hatchery"
   dplyr::select(section, year, origin, ona_number) %>% 
@@ -202,13 +202,13 @@ deadpitch_prop_natural <- ok_riv_deadpitch %>%                      # get propor
   mutate(section = ifelse(section == "shingle creek", "shingle_creek", section)) %>%
   arrange(section, year)        
 
-deadpitch_2023 <- data.frame(                                     ### append summary values for 2023 till raw data compiled [250625]
-  year = c(2023, 2023),
-  section = c("upper_ok_river", "shingle_creek"),                   # Penticton Channel and Shingle Creek sections
-  n_natural = c(405, 40),                                         ### natural origin count from Nerkid (Skaha) Deadpitch Adult.BioData_23.xlsx (250625)
-          n = c(420, 100)) %>%                                    ### total deadpitch from Nerkid (Skaha) Deadpitch Adult.BioData_23.xlsx
-  mutate(p_nat = n_natural / n) %>%                               
-  mutate(testalinden_spill = NA)
+# deadpitch_2023 <- data.frame(                                     ### append summary values for 2023 till raw data compiled [250625]
+#   year = c(2023, 2023),
+#   section = c("upper_ok_river", "shingle_creek"),                   # Penticton Channel and Shingle Creek sections
+#   n_natural = c(405, 40),                                         ### natural origin count from Nerkid (Skaha) Deadpitch Adult.BioData_23.xlsx (250625)
+#           n = c(420, 100)) %>%                                    ### total deadpitch from Nerkid (Skaha) Deadpitch Adult.BioData_23.xlsx
+#   mutate(p_nat = n_natural / n) %>%                               
+#   mutate(testalinden_spill = NA)               
 
 # deadpitch_2022_2023 <- data.frame(                                ### append summary values for 2022 and 2023 till raw data obtained [24.07.04]
 #   year = c(2022, 2023, 2022, 2022),                               
@@ -236,7 +236,8 @@ cv_gam_loo(data = deadpitch_prop_natural %>% filter(section == "upper_ok_river")
 cv_gam_loo(data = deadpitch_prop_natural %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_nat ~ bs(year, 4))
 cv_gam_loo(data = deadpitch_prop_natural %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_nat ~ bs(year, 5))
 cv_gam_loo(data = deadpitch_prop_natural %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_nat ~ bs(year, 6))
-#lowest MSE is for model with 3 df on spline 
+#lowest MSE is for model with 5 df on spline, but using that to fit gam to missing Pen section value (2011) yields way high estimate; 
+#even applying 4 df works better than 5, but reset to 3 df below in pnat_pen_m statement, as it was before 2023 data was added;  250724
 
 # fit gam to impute missing values
 pnat_low_m <- gam(p_nat ~ bs(year, 3), data = deadpitch_prop_natural %>% filter(section == "lower_ok_river") , family = binomial(link = "logit"))
@@ -244,7 +245,7 @@ pnat_mid_m <- gam(p_nat ~ bs(year, 5), data = deadpitch_prop_natural %>% filter(
 pnat_pen_m <- gam(p_nat ~ bs(year, 3), data = deadpitch_prop_natural %>% filter(section == "upper_ok_river") , family = binomial(link = "logit"))
 
 deadpitch_prop_natural_filtered <- deadpitch_prop_natural %>%
-  bind_rows(deadpitch_2023) %>%
+# bind_rows(deadpitch_2023) %>%              # wired data no longer needed
   filter(section != "ok_lake_creeks") %>%
   arrange(section, year)
 
@@ -333,7 +334,7 @@ ggsave(file = filename, width = 6, height = 6, units = "in")                    
 deadpitch_prop_sockeye <- ok_riv_deadpitch %>%                        # get proportion Sockeye vs Kokanee by spawning ground section and year
   filter(species_from_age %in% c("sockeye", "kokanee")) %>%           # from revised DP data (PT, AO, 240825)
   # filter(hatchery != "unknown") %>%                                 # omit unknown thermal mark class
-  mutate(species = species_from_age) %>%
+  mutate(species = species_from_age) %>%                              # define species based on age data (not fork length)
   mutate(origin = hatchery) %>%                                       # define variable origin based on hatchery = "natural" or "hatchery"
   dplyr::select(section, year, species, origin, ona_number) %>%       # at this stage we can include Sockeye of any origin (H-O or N-O) since
   group_by(section, year) %>%                                         # we're interested in simply accounting for (removing) the percent KO from AUC nerkids
@@ -344,14 +345,14 @@ deadpitch_prop_sockeye <- ok_riv_deadpitch %>%                        # get prop
   arrange(section, year)   
                                                                     ### species_from_age data not available for mid-OkR for 2016, 2019-2023 [241108], so GAM it.. 
 cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "middle_ok_river") %>% filter(year>2008), formula = p_sockeye ~ bs(year, 3))
-cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "middle_ok_river") %>% filter(year>2008), formula = p_sockeye ~ bs(year, 4)) # 4DF best [241108]
+cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "middle_ok_river") %>% filter(year>2008), formula = p_sockeye ~ bs(year, 4)) # 4df best [241108, 250724]
 cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "middle_ok_river") %>% filter(year>2008), formula = p_sockeye ~ bs(year, 5))
 cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "middle_ok_river") %>% filter(year>2008), formula = p_sockeye ~ bs(year, 6))
 p_sock_mid_m   <- gam(p_sockeye ~ bs(year, 4), data = deadpitch_prop_sockeye %>% filter(section == "middle_ok_river") , family = binomial(link = "logit"))
 
                                                                     ### species_from_age data not yet available for 2023 Pen Chan [241108], so GAM it.. 
-cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_sockeye ~ bs(year, 3))
-cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_sockeye ~ bs(year, 4)) # 4DF best [241108]
+cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_sockeye ~ bs(year, 3)) # 3df best since 2023 data added [250724]
+cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_sockeye ~ bs(year, 4)) # 4df best [241108]
 cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_sockeye ~ bs(year, 5))
 cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_sockeye ~ bs(year, 6))
 p_sock_pen_m   <- gam(p_sockeye ~ bs(year, 4), data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") , family = binomial(link = "logit"))
@@ -370,16 +371,16 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
                                data.frame(year = c(2022), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2022)), type = "response")),
                                data.frame(year = c(2023), section = "middle_ok_river", type = "Assumed", 
-                               p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2023)), type = "response")),
+                               p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2023)), type = "response"))) %>%
                                
                                # data.frame(year = c(2011), section = "upper_ok_river",  type = "Imputed",          ### apply imputed estimate for Pen Ch in 2011
                                # p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2011)), type = "response")), 
                                # data.frame(year = c(2011), section = "upper_ok_river",  type = "Unresolved",       ### apply imputed estimate for Pen Ch in 2011
                                # p_sockeye = NA), 
-                               data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",            ### apply imputed estimate for Pen Ch in 2023
-                               p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
+                               # data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",          ### imputation no longer needed for Pen Ch in 2023 [250724]
+                               # p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
 
-  filter(!(year == 2011 & section == "upper_ok_river")) %>%                                                         # Exclude the 2011 upper_ok_river record as too sketch
+# filter(!(year == 2011 & section == "upper_ok_river")) %>%                                                         # Exclude the 2011 upper_ok_river record as too sketch
   mutate(prop_sock_type = type) %>%
   dplyr::select(-type) %>%
   arrange(section, year)
@@ -412,8 +413,8 @@ AUC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_2025.06.25_AO
                    mutate(spawning_sockeye = ifelse(spawning_location %in% c("Lower Ok River", "Middle Ok River"), spawning_nerkids, NA)) %>%
                    dplyr::select(rearing_lake, spawning_location, year, auc, spawning_nerkids, spawning_nerkids_note, spawning_sockeye, percent_35cm_fl)
 
-write.csv(AUC_data_Import,  "../data/AUC_data_Import_250623.csv")        # if AUC_data imported from AO xlsx workbook, re-write to CSV   # comment out for GitHub
-auc_data_import <- read.csv("../data/AUC_data_Import_250623.csv")        # export and re-import (NOTE lower-case dataset name) --- keep for GitHub [241128]
+write.csv(AUC_data_Import,  "../data/AUC_data_Import_250625.csv")        # if AUC_data imported from AO xlsx workbook, re-write to CSV   # comment out for GitHub
+auc_data_import <- read.csv("../data/AUC_data_Import_250625.csv")        # export and re-import (NOTE lower-case dataset name) --- keep for GitHub [241128]
 
 AUC_data <- auc_data_import %>% 
   filter(year <= last_year) %>%                                                                        ### removing 2011 which was previously imputed, 
