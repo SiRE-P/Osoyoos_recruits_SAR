@@ -1,0 +1,416 @@
+"","return_year","age_class","CRITFC_prop_at_age","CRITFC_method","ONA_prop_at_age","ONA_method"
+"1",1980,"prop_age_1.1",NA,NA,0.0520520520520521,"MultiYearAvg"
+"2",1980,"prop_age_1.2",NA,NA,0.825825825825826,"MultiYearAvg"
+"3",1980,"prop_age_1.3",NA,NA,0.0830830830830831,"MultiYearAvg"
+"4",1980,"prop_age_2.1",NA,NA,0.023023023023023,"MultiYearAvg"
+"5",1980,"prop_age_2.2",NA,NA,0.016016016016016,"MultiYearAvg"
+"6",1981,"prop_age_1.1",NA,NA,0.0520520520520521,"MultiYearAvg"
+"7",1981,"prop_age_1.2",NA,NA,0.825825825825826,"MultiYearAvg"
+"8",1981,"prop_age_1.3",NA,NA,0.0830830830830831,"MultiYearAvg"
+"9",1981,"prop_age_2.1",NA,NA,0.023023023023023,"MultiYearAvg"
+"10",1981,"prop_age_2.2",NA,NA,0.016016016016016,"MultiYearAvg"
+"11",1982,"prop_age_1.1",NA,NA,0.0520520520520521,"MultiYearAvg"
+"12",1982,"prop_age_1.2",NA,NA,0.825825825825826,"MultiYearAvg"
+"13",1982,"prop_age_1.3",NA,NA,0.0830830830830831,"MultiYearAvg"
+"14",1982,"prop_age_2.1",NA,NA,0.023023023023023,"MultiYearAvg"
+"15",1982,"prop_age_2.2",NA,NA,0.016016016016016,"MultiYearAvg"
+"16",1983,"prop_age_1.1",NA,NA,0.0520520520520521,"MultiYearAvg"
+"17",1983,"prop_age_1.2",NA,NA,0.825825825825826,"MultiYearAvg"
+"18",1983,"prop_age_1.3",NA,NA,0.0830830830830831,"MultiYearAvg"
+"19",1983,"prop_age_2.1",NA,NA,0.023023023023023,"MultiYearAvg"
+"20",1983,"prop_age_2.2",NA,NA,0.016016016016016,"MultiYearAvg"
+"21",1984,"prop_age_1.1",NA,NA,0.0520520520520521,"MultiYearAvg"
+"22",1984,"prop_age_1.2",NA,NA,0.825825825825826,"MultiYearAvg"
+"23",1984,"prop_age_1.3",NA,NA,0.0830830830830831,"MultiYearAvg"
+"24",1984,"prop_age_2.1",NA,NA,0.023023023023023,"MultiYearAvg"
+"25",1984,"prop_age_2.2",NA,NA,0.016016016016016,"MultiYearAvg"
+"26",1985,"prop_age_1.1","0.069","Deadpitch on SG",NA,NA
+"27",1985,"prop_age_1.2","0.88","Deadpitch on SG",NA,NA
+"28",1985,"prop_age_1.3","0.006","Deadpitch on SG",NA,NA
+"29",1985,"prop_age_2.1","0.011","Deadpitch on SG",NA,NA
+"30",1985,"prop_age_2.2","0.034","Deadpitch on SG",NA,NA
+"31",1985,"prop_age_2.3","0","Deadpitch on SG",NA,NA
+"32",1985,"prop_age_3.1",NA,"Deadpitch on SG",NA,NA
+"33",1985,"prop_age_3.2",NA,"Deadpitch on SG",NA,NA
+"34",1985,"prop_age_3.3",NA,"Deadpitch on SG",NA,NA
+"35",1985,"prop_age_4.1",NA,"Deadpitch on SG",NA,NA
+"36",1986,"prop_age_1.1",NA,"use multi-year average?",0.0520520520520521,"MultiYearAvg"
+"37",1986,"prop_age_1.2",NA,"use multi-year average?",0.825825825825826,"MultiYearAvg"
+"38",1986,"prop_age_1.3",NA,"use multi-year average?",0.0830830830830831,"MultiYearAvg"
+"39",1986,"prop_age_2.1",NA,"use multi-year average?",0.023023023023023,"MultiYearAvg"
+"40",1986,"prop_age_2.2",NA,"use multi-year average?",0.016016016016016,"MultiYearAvg"
+"41",1986,"prop_age_2.3",NA,"use multi-year average?",NA,NA
+"42",1986,"prop_age_3.1",NA,"use multi-year average?",NA,NA
+"43",1986,"prop_age_3.2",NA,"use multi-year average?",NA,NA
+"44",1986,"prop_age_3.3",NA,"use multi-year average?",NA,NA
+"45",1986,"prop_age_4.1",NA,"use multi-year average?",NA,NA
+"46",1987,"prop_age_1.1","0.492","SPA - Mixed Stock Adjusted?",NA,NA
+"47",1987,"prop_age_1.2","0.46","SPA - Mixed Stock Adjusted?",NA,NA
+"48",1987,"prop_age_1.3","0.028","SPA - Mixed Stock Adjusted?",NA,NA
+"49",1987,"prop_age_2.1","0.01","SPA - Mixed Stock Adjusted?",NA,NA
+"50",1987,"prop_age_2.2","0.01","SPA - Mixed Stock Adjusted?",NA,NA
+"51",1987,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"52",1987,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"53",1987,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"54",1987,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"55",1987,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"56",1988,"prop_age_1.1","0.00199","SPA - Mixed Stock Adjusted?",NA,NA
+"57",1988,"prop_age_1.2","0.96853","SPA - Mixed Stock Adjusted?",NA,NA
+"58",1988,"prop_age_1.3","0.01273","SPA - Mixed Stock Adjusted?",NA,NA
+"59",1988,"prop_age_2.1","0.01037","SPA - Mixed Stock Adjusted?",NA,NA
+"60",1988,"prop_age_2.2","0.00638","SPA - Mixed Stock Adjusted?",NA,NA
+"61",1988,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"62",1988,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"63",1988,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"64",1988,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"65",1988,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"66",1989,"prop_age_1.1","0.03019","SPA - Mixed Stock Adjusted?",NA,NA
+"67",1989,"prop_age_1.2","0.9312","SPA - Mixed Stock Adjusted?",NA,NA
+"68",1989,"prop_age_1.3","0.02738","SPA - Mixed Stock Adjusted?",NA,NA
+"69",1989,"prop_age_2.1","0.00597","SPA - Mixed Stock Adjusted?",NA,NA
+"70",1989,"prop_age_2.2","0.00526","SPA - Mixed Stock Adjusted?",NA,NA
+"71",1989,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"72",1989,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"73",1989,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"74",1989,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"75",1989,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"76",1990,"prop_age_1.1","0.45208","SPA - Mixed Stock Adjusted?",NA,NA
+"77",1990,"prop_age_1.2","0.26189","SPA - Mixed Stock Adjusted?",NA,NA
+"78",1990,"prop_age_1.3","0.22627","SPA - Mixed Stock Adjusted?",NA,NA
+"79",1990,"prop_age_2.1","0.01884","SPA - Mixed Stock Adjusted?",NA,NA
+"80",1990,"prop_age_2.2","0.03506","SPA - Mixed Stock Adjusted?",NA,NA
+"81",1990,"prop_age_2.3","0.00585","SPA - Mixed Stock Adjusted?",NA,NA
+"82",1990,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"83",1990,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"84",1990,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"85",1990,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"86",1991,"prop_age_1.1","0.1542","SPA - Mixed Stock Adjusted?",NA,NA
+"87",1991,"prop_age_1.2","0.75978","SPA - Mixed Stock Adjusted?",NA,NA
+"88",1991,"prop_age_1.3","0.01482","SPA - Mixed Stock Adjusted?",NA,NA
+"89",1991,"prop_age_2.1","0.06678","SPA - Mixed Stock Adjusted?",NA,NA
+"90",1991,"prop_age_2.2","0.00147","SPA - Mixed Stock Adjusted?",NA,NA
+"91",1991,"prop_age_2.3","0.00294","SPA - Mixed Stock Adjusted?",NA,NA
+"92",1991,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"93",1991,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"94",1991,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"95",1991,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"96",1992,"prop_age_1.1","0.1688","SPA - Mixed Stock Adjusted?",NA,NA
+"97",1992,"prop_age_1.2","0.73347","SPA - Mixed Stock Adjusted?",NA,NA
+"98",1992,"prop_age_1.3","0.01362","SPA - Mixed Stock Adjusted?",NA,NA
+"99",1992,"prop_age_2.1","0.06995","SPA - Mixed Stock Adjusted?",NA,NA
+"100",1992,"prop_age_2.2","0.0142","SPA - Mixed Stock Adjusted?",NA,NA
+"101",1992,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"102",1992,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"103",1992,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"104",1992,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"105",1992,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"106",1993,"prop_age_1.1","0","SPA - Mixed Stock Adjusted?",NA,NA
+"107",1993,"prop_age_1.2","0.88654","SPA - Mixed Stock Adjusted?",NA,NA
+"108",1993,"prop_age_1.3","0.05258","SPA - Mixed Stock Adjusted?",NA,NA
+"109",1993,"prop_age_2.1","0.00184","SPA - Mixed Stock Adjusted?",NA,NA
+"110",1993,"prop_age_2.2","0.05665","SPA - Mixed Stock Adjusted?",NA,NA
+"111",1993,"prop_age_2.3","0.00239","SPA - Mixed Stock Adjusted?",NA,NA
+"112",1993,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"113",1993,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"114",1993,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"115",1993,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"116",1994,"prop_age_1.1","0.14294","SPA - Mixed Stock Adjusted?",NA,NA
+"117",1994,"prop_age_1.2","0.12612","SPA - Mixed Stock Adjusted?",NA,NA
+"118",1994,"prop_age_1.3","0.69848","SPA - Mixed Stock Adjusted?",NA,NA
+"119",1994,"prop_age_2.1","0.01565","SPA - Mixed Stock Adjusted?",NA,NA
+"120",1994,"prop_age_2.2","0.01681","SPA - Mixed Stock Adjusted?",NA,NA
+"121",1994,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"122",1994,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"123",1994,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"124",1994,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"125",1994,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"126",1995,"prop_age_1.1","0.41304347826087","SPA - Mixed Stock Adjusted?",NA,NA
+"127",1995,"prop_age_1.2","0.514492753623188","SPA - Mixed Stock Adjusted?",NA,NA
+"128",1995,"prop_age_1.3","0.0144927536231884","SPA - Mixed Stock Adjusted?",NA,NA
+"129",1995,"prop_age_2.1","0.0579710144927536","SPA - Mixed Stock Adjusted?",NA,NA
+"130",1995,"prop_age_2.2","0","SPA - Mixed Stock Adjusted?",NA,NA
+"131",1995,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"132",1995,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"133",1995,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"134",1995,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"135",1995,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"136",1996,"prop_age_1.1","0.0756013745704467","SPA - Mixed Stock Adjusted?",NA,NA
+"137",1996,"prop_age_1.2","0.859106529209622","SPA - Mixed Stock Adjusted?",NA,NA
+"138",1996,"prop_age_1.3","0.0378006872852234","SPA - Mixed Stock Adjusted?",NA,NA
+"139",1996,"prop_age_2.1","0","SPA - Mixed Stock Adjusted?",NA,NA
+"140",1996,"prop_age_2.2","0.0274914089347079","SPA - Mixed Stock Adjusted?",NA,NA
+"141",1996,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"142",1996,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"143",1996,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"144",1996,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"145",1996,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"146",1997,"prop_age_1.1","0","SPA - Mixed Stock Adjusted?",NA,NA
+"147",1997,"prop_age_1.2","0.956896551724138","SPA - Mixed Stock Adjusted?",NA,NA
+"148",1997,"prop_age_1.3","0.0344827586206897","SPA - Mixed Stock Adjusted?",NA,NA
+"149",1997,"prop_age_2.1","0.00862068965517241","SPA - Mixed Stock Adjusted?",NA,NA
+"150",1997,"prop_age_2.2","0","SPA - Mixed Stock Adjusted?",NA,NA
+"151",1997,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"152",1997,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"153",1997,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"154",1997,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"155",1997,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"156",1998,"prop_age_1.1","0.0526315789473684","SPA - Mixed Stock Adjusted?",NA,NA
+"157",1998,"prop_age_1.2","0.789473684210526","SPA - Mixed Stock Adjusted?",NA,NA
+"158",1998,"prop_age_1.3","0.157894736842105","SPA - Mixed Stock Adjusted?",NA,NA
+"159",1998,"prop_age_2.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"160",1998,"prop_age_2.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"161",1998,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"162",1998,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"163",1998,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"164",1998,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"165",1998,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"166",1999,"prop_age_1.1","0.114","SPA - Mixed Stock Adjusted?",NA,NA
+"167",1999,"prop_age_1.2","0.849","SPA - Mixed Stock Adjusted?",NA,NA
+"168",1999,"prop_age_1.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"169",1999,"prop_age_2.1","0.037","SPA - Mixed Stock Adjusted?",NA,NA
+"170",1999,"prop_age_2.2","0","SPA - Mixed Stock Adjusted?",NA,NA
+"171",1999,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"172",1999,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"173",1999,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"174",1999,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"175",1999,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"176",2000,"prop_age_1.1","0.13","SPA - Mixed Stock Adjusted?",0,"Deadpitch"
+"177",2000,"prop_age_1.2","0.84","SPA - Mixed Stock Adjusted?",0.979166666666667,"Deadpitch"
+"178",2000,"prop_age_1.3","0.01","SPA - Mixed Stock Adjusted?",0,"Deadpitch"
+"179",2000,"prop_age_2.1","0.01","SPA - Mixed Stock Adjusted?",0,"Deadpitch"
+"180",2000,"prop_age_2.2","0.01","SPA - Mixed Stock Adjusted?",0.0208333333333333,"Deadpitch"
+"181",2000,"prop_age_2.3","0","SPA - Mixed Stock Adjusted?",NA,NA
+"182",2000,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"183",2000,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"184",2000,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"185",2000,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"186",2001,"prop_age_1.1","0.026","SPA - Wells Dam - similar to ONA spawning grounds",0.0333333333333333,"Deadpitch"
+"187",2001,"prop_age_1.2","0.946","SPA - Wells Dam - similar to ONA spawning grounds",0.944444444444444,"Deadpitch"
+"188",2001,"prop_age_1.3","0.022","SPA - Wells Dam - similar to ONA spawning grounds",0.0222222222222222,"Deadpitch"
+"189",2001,"prop_age_2.1","0.003","SPA - Wells Dam - similar to ONA spawning grounds",0,"Deadpitch"
+"190",2001,"prop_age_2.2","0.003","SPA - Wells Dam - similar to ONA spawning grounds",0,"Deadpitch"
+"191",2001,"prop_age_2.3","0","SPA - Wells Dam - similar to ONA spawning grounds",NA,NA
+"192",2001,"prop_age_3.1",NA,"SPA - Wells Dam - similar to ONA spawning grounds",NA,NA
+"193",2001,"prop_age_3.2",NA,"SPA - Wells Dam - similar to ONA spawning grounds",NA,NA
+"194",2001,"prop_age_3.3",NA,"SPA - Wells Dam - similar to ONA spawning grounds",NA,NA
+"195",2001,"prop_age_4.1",NA,"SPA - Wells Dam - similar to ONA spawning grounds",NA,NA
+"196",2002,"prop_age_1.1","0.013","SPA - Mixed Stock Adjusted?",0.112359550561798,"Deadpitch"
+"197",2002,"prop_age_1.2","0.497","SPA - Mixed Stock Adjusted?",0.539325842696629,"Deadpitch"
+"198",2002,"prop_age_1.3","0.148","SPA - Mixed Stock Adjusted?",0.348314606741573,"Deadpitch"
+"199",2002,"prop_age_2.1","0.013","SPA - Mixed Stock Adjusted?",0,"Deadpitch"
+"200",2002,"prop_age_2.2","0.221","SPA - Mixed Stock Adjusted?",0,"Deadpitch"
+"201",2002,"prop_age_2.3","0.00699999999999999","SPA - Mixed Stock Adjusted?",NA,NA
+"202",2002,"prop_age_3.1","0.007","SPA - Mixed Stock Adjusted?",NA,NA
+"203",2002,"prop_age_3.2","0.094","SPA - Mixed Stock Adjusted?",NA,NA
+"204",2002,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"205",2002,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"206",2003,"prop_age_1.1","0.273824212375445","SPA - Mixed Stock Adjusted?",0.0553191489361702,"Deadpitch"
+"207",2003,"prop_age_1.2","0.489801177459896","SPA - Mixed Stock Adjusted?",0.829787234042553,"Deadpitch"
+"208",2003,"prop_age_1.3","0.019","SPA - Mixed Stock Adjusted?",0.114893617021277,"Deadpitch"
+"209",2003,"prop_age_2.1","0.0533127444026282","SPA - Mixed Stock Adjusted?",0,"Deadpitch"
+"210",2003,"prop_age_2.2","0.00821292812486939","SPA - Mixed Stock Adjusted?",0,"Deadpitch"
+"211",2003,"prop_age_2.3","0.009","SPA - Mixed Stock Adjusted?",NA,NA
+"212",2003,"prop_age_3.1","0.07","SPA - Mixed Stock Adjusted?",NA,NA
+"213",2003,"prop_age_3.2","0.028","SPA - Mixed Stock Adjusted?",NA,NA
+"214",2003,"prop_age_3.3","0.001","SPA - Mixed Stock Adjusted?",NA,NA
+"215",2003,"prop_age_4.1","0.048","SPA - Mixed Stock Adjusted?",NA,NA
+"216",2004,"prop_age_1.1","0.0305343511450382","SPA - Mixed Stock Adjusted?",0.0264765784114053,"Deadpitch"
+"217",2004,"prop_age_1.2","0.933842239185751","SPA - Mixed Stock Adjusted?",0.953156822810591,"Deadpitch"
+"218",2004,"prop_age_1.3",NA,"SPA - Mixed Stock Adjusted?",0.0183299389002037,"Deadpitch"
+"219",2004,"prop_age_2.1","0.00254452926208651","SPA - Mixed Stock Adjusted?",0,"Deadpitch"
+"220",2004,"prop_age_2.2","0.0152671755725191","SPA - Mixed Stock Adjusted?",0.00203665987780041,"Deadpitch"
+"221",2004,"prop_age_2.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"222",2004,"prop_age_3.1","0.018","SPA - Mixed Stock Adjusted?",NA,NA
+"223",2004,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"224",2004,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"225",2004,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"226",2005,"prop_age_1.1","0.0149273040317686","SPA - Mixed Stock Adjusted?",0.00364963503649635,"Deadpitch"
+"227",2005,"prop_age_1.2","0.890683615875087","SPA - Mixed Stock Adjusted?",0.963503649635037,"Deadpitch"
+"228",2005,"prop_age_1.3","0.0390365514063087","SPA - Mixed Stock Adjusted?",0.0291970802919708,"Deadpitch"
+"229",2005,"prop_age_2.1","0.0228740667806708","SPA - Mixed Stock Adjusted?",0,"Deadpitch"
+"230",2005,"prop_age_2.2","0.0189010585845497","SPA - Mixed Stock Adjusted?",0.00364963503649635,"Deadpitch"
+"231",2005,"prop_age_2.3","0.014","SPA - Mixed Stock Adjusted?",NA,NA
+"232",2005,"prop_age_3.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"233",2005,"prop_age_3.2",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"234",2005,"prop_age_3.3",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"235",2005,"prop_age_4.1",NA,"SPA - Mixed Stock Adjusted?",NA,NA
+"236",2006,"prop_age_1.1","0.007","PIT/SPA",0.00238095238095238,"Deadpitch"
+"237",2006,"prop_age_1.2","0.751","PIT/SPA",0.883333333333333,"Deadpitch"
+"238",2006,"prop_age_1.3","0.073","PIT/SPA",0.10952380952381,"Deadpitch"
+"239",2006,"prop_age_2.1","0.023","PIT/SPA",0,"Deadpitch"
+"240",2006,"prop_age_2.2","0.134","PIT/SPA",0.00476190476190476,"Deadpitch"
+"241",2006,"prop_age_2.3","0","PIT/SPA",NA,NA
+"242",2006,"prop_age_3.1","0.012","PIT/SPA",NA,NA
+"243",2006,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"244",2006,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"245",2006,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"246",2007,"prop_age_1.1","0.423713754110037","PIT/SPA",0.24702380952381,"Deadpitch"
+"247",2007,"prop_age_1.2","0.382075201986249","PIT/SPA",0.523809523809524,"Deadpitch"
+"248",2007,"prop_age_1.3","0.0318399664191541","PIT/SPA",0.142857142857143,"Deadpitch"
+"249",2007,"prop_age_2.1","0.0583075155291449","PIT/SPA",0.0744047619047619,"Deadpitch"
+"250",2007,"prop_age_2.2","0.0929229274077147","PIT/SPA",0.00892857142857143,"Deadpitch"
+"251",2007,"prop_age_2.3","0.0111406345477002","PIT/SPA",NA,NA
+"252",2007,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"253",2007,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"254",2007,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"255",2007,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"256",2008,"prop_age_1.1","0.074","PIT/SPA",0.0360169491525424,"Deadpitch"
+"257",2008,"prop_age_1.2","0.864","PIT/SPA",0.949152542372881,"Deadpitch"
+"258",2008,"prop_age_1.3","0.007","PIT/SPA",0.0105932203389831,"Deadpitch"
+"259",2008,"prop_age_2.1","0.023","PIT/SPA",0,"Deadpitch"
+"260",2008,"prop_age_2.2","0.032","PIT/SPA",0.00423728813559322,"Deadpitch"
+"261",2008,"prop_age_2.3",NA,"PIT/SPA",NA,NA
+"262",2008,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"263",2008,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"264",2008,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"265",2008,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"266",2009,"prop_age_1.1","0.12509579576968","PIT/SPA",0.0239520958083832,"Deadpitch"
+"267",2009,"prop_age_1.2","0.791751375619347","PIT/SPA",0.877245508982036,"Deadpitch"
+"268",2009,"prop_age_1.3","0.0263296424024657","PIT/SPA",0.0598802395209581,"Deadpitch"
+"269",2009,"prop_age_2.1","0.01","PIT/SPA",0,"Deadpitch"
+"270",2009,"prop_age_2.2","0.046","PIT/SPA",0.0389221556886228,"Deadpitch"
+"271",2009,"prop_age_2.3","0.001","PIT/SPA",NA,NA
+"272",2009,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"273",2009,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"274",2009,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"275",2009,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"276",2010,"prop_age_1.1","0.02","PIT/SPA",0.00657894736842105,"Deadpitch"
+"277",2010,"prop_age_1.2","0.952","PIT/SPA",0.891447368421053,"Deadpitch"
+"278",2010,"prop_age_1.3","0.00514552818087011","PIT/SPA",0.0690789473684211,"Deadpitch"
+"279",2010,"prop_age_2.1","0.00630066907824839","PIT/SPA",0.0263157894736842,"Deadpitch"
+"280",2010,"prop_age_2.2","0.017","PIT/SPA",0.00657894736842105,"Deadpitch"
+"281",2010,"prop_age_2.3",NA,"PIT/SPA",NA,NA
+"282",2010,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"283",2010,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"284",2010,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"285",2010,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"286",2011,"prop_age_1.1","0.261263752493429","PIT/SPA",0.123287671232877,"Deadpitch"
+"287",2011,"prop_age_1.2","0.591579012543768","PIT/SPA",0.808219178082192,"Deadpitch"
+"288",2011,"prop_age_1.3","0.0773415159211933","PIT/SPA",0.0616438356164384,"Deadpitch"
+"289",2011,"prop_age_2.1","0.0307233872575653","PIT/SPA",0.00684931506849315,"Deadpitch"
+"290",2011,"prop_age_2.2","0.037032152713193","PIT/SPA",0,"Deadpitch"
+"291",2011,"prop_age_2.3","0.00206017907085137","PIT/SPA",NA,NA
+"292",2011,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"293",2011,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"294",2011,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"295",2011,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"296",2012,"prop_age_1.1","0.0167119858510496","PIT/SPA",0.00257731958762887,"Deadpitch"
+"297",2012,"prop_age_1.2","0.959703840573946","PIT/SPA",0.97680412371134,"Deadpitch"
+"298",2012,"prop_age_1.3","0.0167774956570993","PIT/SPA",0.0103092783505155,"Deadpitch"
+"299",2012,"prop_age_2.1","0.00122447918563716","PIT/SPA",0.0077319587628866,"Deadpitch"
+"300",2012,"prop_age_2.2","0.00558219873226797","PIT/SPA",0.00257731958762887,"Deadpitch"
+"301",2012,"prop_age_2.3","0","PIT/SPA",NA,NA
+"302",2012,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"303",2012,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"304",2012,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"305",2012,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"306",2013,"prop_age_1.1","0.243","PIT/SPA",0.181818181818182,"Deadpitch"
+"307",2013,"prop_age_1.2","0.616","PIT/SPA",0.658008658008658,"Deadpitch"
+"308",2013,"prop_age_1.3","0.087","PIT/SPA",0.0303030303030303,"Deadpitch"
+"309",2013,"prop_age_2.1",NA,"PIT/SPA",0.0303030303030303,"Deadpitch"
+"310",2013,"prop_age_2.2","0.054","PIT/SPA",0.0995670995670996,"Deadpitch"
+"311",2013,"prop_age_2.3",NA,"PIT/SPA",NA,NA
+"312",2013,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"313",2013,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"314",2013,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"315",2013,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"316",2014,"prop_age_1.1","0.174827090323133","PIT/SPA",0.0657276995305164,"Deadpitch"
+"317",2014,"prop_age_1.2","0.818906895727552","PIT/SPA",0.89906103286385,"Deadpitch"
+"318",2014,"prop_age_1.3","0.00107652209818481","PIT/SPA",0.0328638497652582,"Deadpitch"
+"319",2014,"prop_age_2.1","0.0012458208415629","PIT/SPA",0,"Deadpitch"
+"320",2014,"prop_age_2.2","0.00394367100956716","PIT/SPA",0.00234741784037559,"Deadpitch"
+"321",2014,"prop_age_2.3",NA,"PIT/SPA",NA,NA
+"322",2014,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"323",2014,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"324",2014,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"325",2014,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"326",2015,"prop_age_1.1","0.002","PIT/SPA",0,"Deadpitch"
+"327",2015,"prop_age_1.2","0.97","PIT/SPA",0.939130434782609,"Deadpitch"
+"328",2015,"prop_age_1.3","0.024","PIT/SPA",0.0434782608695652,"Deadpitch"
+"329",2015,"prop_age_2.1","0.002","PIT/SPA",0.00869565217391304,"Deadpitch"
+"330",2015,"prop_age_2.2",NA,"PIT/SPA",0.00869565217391304,"Deadpitch"
+"331",2015,"prop_age_2.3",NA,"PIT/SPA",NA,NA
+"332",2015,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"333",2015,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"334",2015,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"335",2015,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"336",2016,"prop_age_1.1","0.00949352685566569","PIT/SPA",0.0101781170483461,"Deadpitch"
+"337",2016,"prop_age_1.2","0.95981944909294","PIT/SPA",0.956743002544529,"Deadpitch"
+"338",2016,"prop_age_1.3","0.00715203620203911","PIT/SPA",0.0254452926208651,"Deadpitch"
+"339",2016,"prop_age_2.1",NA,"PIT/SPA",0.00254452926208651,"Deadpitch"
+"340",2016,"prop_age_2.2","0.0235394254477849","PIT/SPA",0.00508905852417303,"Deadpitch"
+"341",2016,"prop_age_2.3",NA,"PIT/SPA",NA,NA
+"342",2016,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"343",2016,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"344",2016,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"345",2016,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"346",2017,"prop_age_1.1","0.190266708424329","PIT/SPA",0.049645390070922,"Deadpitch"
+"347",2017,"prop_age_1.2","0.527","PIT/SPA",0.735224586288416,"Deadpitch"
+"348",2017,"prop_age_1.3","0.221","PIT/SPA",0.193853427895981,"Deadpitch"
+"349",2017,"prop_age_2.1","0.036","PIT/SPA",0.016548463356974,"Deadpitch"
+"350",2017,"prop_age_2.2","0.022","PIT/SPA",0.00472813238770686,"Deadpitch"
+"351",2017,"prop_age_2.3","0.004","PIT/SPA",NA,NA
+"352",2017,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"353",2017,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"354",2017,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"355",2017,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"356",2018,"prop_age_1.1","0.0039832778500609","PIT/SPA",0,"Deadpitch"
+"357",2018,"prop_age_1.2","0.956208106702492","PIT/SPA",0.98046875,"Deadpitch"
+"358",2018,"prop_age_1.3","0.022","PIT/SPA",0.01171875,"Deadpitch"
+"359",2018,"prop_age_2.1","0.004","PIT/SPA",0.00390625,"Deadpitch"
+"360",2018,"prop_age_2.2","0.00626975539976126","PIT/SPA",0.00390625,"Deadpitch"
+"361",2018,"prop_age_2.3",NA,"PIT/SPA",NA,NA
+"362",2018,"prop_age_3.1","0.0075892727707257","PIT/SPA",NA,NA
+"363",2018,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"364",2018,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"365",2018,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"366",2019,"prop_age_1.1","0.545","PIT/SPA",0.167155425219941,"Deadpitch"
+"367",2019,"prop_age_1.2","0.171","PIT/SPA",0.524926686217009,"Deadpitch"
+"368",2019,"prop_age_1.3","0.224","PIT/SPA",0.299120234604106,"Deadpitch"
+"369",2019,"prop_age_2.1","0.012","PIT/SPA",0.00586510263929619,"Deadpitch"
+"370",2019,"prop_age_2.2","0.046","PIT/SPA",0.00293255131964809,"Deadpitch"
+"371",2019,"prop_age_2.3","0.001","PIT/SPA",NA,NA
+"372",2019,"prop_age_3.1","0.001","PIT/SPA",NA,NA
+"373",2019,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"374",2019,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"375",2019,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"376",2020,"prop_age_1.1","0.011","PIT/SPA",0.00911854103343465,"Deadpitch"
+"377",2020,"prop_age_1.2","0.984","PIT/SPA",0.975683890577508,"Deadpitch"
+"378",2020,"prop_age_1.3","0.001","PIT/SPA",0.0151975683890578,"Deadpitch"
+"379",2020,"prop_age_2.1","0.002","PIT/SPA",0,"Deadpitch"
+"380",2020,"prop_age_2.2","0.002","PIT/SPA",0,"Deadpitch"
+"381",2020,"prop_age_2.3","0","PIT/SPA",NA,NA
+"382",2020,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"383",2020,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"384",2020,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"385",2020,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"386",2021,"prop_age_1.1","0.405","PIT/SPA",0.198697068403909,"Deadpitch"
+"387",2021,"prop_age_1.2","0.518","PIT/SPA",0.749185667752443,"Deadpitch"
+"388",2021,"prop_age_1.3","0.0505","PIT/SPA",0.0521172638436482,"Deadpitch"
+"389",2021,"prop_age_2.1","0.014","PIT/SPA",0,"Deadpitch"
+"390",2021,"prop_age_2.2","0.012","PIT/SPA",0,"Deadpitch"
+"391",2021,"prop_age_2.3","0","PIT/SPA",NA,NA
+"392",2021,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"393",2021,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"394",2021,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"395",2021,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"396",2022,"prop_age_1.1","0.024","PIT/SPA",0.019,"Deadpitch"
+"397",2022,"prop_age_1.2","0.95","PIT/SPA",0.861,"Deadpitch"
+"398",2022,"prop_age_1.3","0.012","PIT/SPA",0.12,"Deadpitch"
+"399",2022,"prop_age_2.1","0.0085","PIT/SPA",0,"Deadpitch"
+"400",2022,"prop_age_2.2","0.0055","PIT/SPA",0,"Deadpitch"
+"401",2022,"prop_age_2.3","0","PIT/SPA",NA,NA
+"402",2022,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"403",2022,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"404",2022,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"405",2022,"prop_age_4.1",NA,"PIT/SPA",NA,NA
+"406",2023,"prop_age_1.1",NA,"PIT/SPA",0.089,"Deadpitch"
+"407",2023,"prop_age_1.2",NA,"PIT/SPA",0.812,"Deadpitch"
+"408",2023,"prop_age_1.3",NA,"PIT/SPA",0.096,"Deadpitch"
+"409",2023,"prop_age_2.1",NA,"PIT/SPA",0,"Deadpitch"
+"410",2023,"prop_age_2.2",NA,"PIT/SPA",0.003,"Deadpitch"
+"411",2023,"prop_age_2.3",NA,"PIT/SPA",NA,NA
+"412",2023,"prop_age_3.1",NA,"PIT/SPA",NA,NA
+"413",2023,"prop_age_3.2",NA,"PIT/SPA",NA,NA
+"414",2023,"prop_age_3.3",NA,"PIT/SPA",NA,NA
+"415",2023,"prop_age_4.1",NA,"PIT/SPA",NA,NA

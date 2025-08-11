@@ -339,7 +339,7 @@ ggplot(Columbia_Sockeye_Dam_Counts_Adj  %>%
   geom_line() +
   geom_point(aes(color = ifelse(RRH_to_Well_Pct > 0, 'Above Zero', 'Below Zero')), size = 2) +
   scale_color_manual(values = c('Above Zero' = 'blue', 'Below Zero' = 'red')) +
-  guides(color=FALSE) +                                                         # removes legend
+  guides(color="none") +                                                         # removes legend
   # geom_text(aes(label=Return_Year), nudge_y = ifelse(Columbia_Sockeye_Dam_Counts_Adj$RRH_to_Well_Pct < 0, -0.25, NA))+
   geom_text_repel(aes(label = Return_Year),
                   nudge_y = ifelse(Columbia_Sockeye_Dam_Counts_Adj$RRH_to_Well_Pct < 0, -0.25, +0.25), # Nudge labels downward if y < 0, otherwise remove

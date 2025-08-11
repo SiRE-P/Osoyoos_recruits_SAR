@@ -1,0 +1,243 @@
+"","return_year","prop_Fryer","prop_SIRE","Age","best_source","Comments"
+"1",1980,NA,0.052,1.1,"SiRE MultiYr","Use SIRE default age comp"
+"2",1980,NA,0.825,1.2,"SiRE MultiYr","Use SIRE default age comp"
+"3",1980,NA,0.083,1.3,"SiRE MultiYr","Use SIRE default age comp"
+"4",1980,NA,0.023,2.1,"SiRE MultiYr","Use SIRE default age comp"
+"5",1980,NA,0.016,2.2,"SiRE MultiYr","Use SIRE default age comp"
+"6",1981,NA,0.052,1.1,"SiRE MultiYr","Use SIRE default age comp"
+"7",1981,NA,0.825,1.2,"SiRE MultiYr","Use SIRE default age comp"
+"8",1981,NA,0.083,1.3,"SiRE MultiYr","Use SIRE default age comp"
+"9",1981,NA,0.023,2.1,"SiRE MultiYr","Use SIRE default age comp"
+"10",1981,NA,0.016,2.2,"SiRE MultiYr","Use SIRE default age comp"
+"11",1982,NA,0.052,1.1,"SiRE MultiYr","Use SIRE default age comp"
+"12",1982,NA,0.825,1.2,"SiRE MultiYr","Use SIRE default age comp"
+"13",1982,NA,0.083,1.3,"SiRE MultiYr","Use SIRE default age comp"
+"14",1982,NA,0.023,2.1,"SiRE MultiYr","Use SIRE default age comp"
+"15",1982,NA,0.016,2.2,"SiRE MultiYr","Use SIRE default age comp"
+"16",1983,NA,0.052,1.1,"SiRE MultiYr","Use SIRE default age comp"
+"17",1983,NA,0.825,1.2,"SiRE MultiYr","Use SIRE default age comp"
+"18",1983,NA,0.083,1.3,"SiRE MultiYr","Use SIRE default age comp"
+"19",1983,NA,0.023,2.1,"SiRE MultiYr","Use SIRE default age comp"
+"20",1983,NA,0.016,2.2,"SiRE MultiYr","Use SIRE default age comp"
+"21",1984,NA,0.052,1.1,"SiRE MultiYr","Use SIRE default age comp"
+"22",1984,NA,0.825,1.2,"SiRE MultiYr","Use SIRE default age comp"
+"23",1984,NA,0.083,1.3,"SiRE MultiYr","Use SIRE default age comp"
+"24",1984,NA,0.023,2.1,"SiRE MultiYr","Use SIRE default age comp"
+"25",1984,NA,0.016,2.2,"SiRE MultiYr","Use SIRE default age comp"
+"26",1985,0.069,0.052,1.1,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"27",1985,0.88,0.825,1.2,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"28",1985,0.006,0.083,1.3,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"29",1985,0.011,0.023,2.1,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"30",1985,0.034,0.016,2.2,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"31",1986,0.052,0.052,1.1,"SiRE MultiYr","no age comp data - multi-year mean applied"
+"32",1986,0.825,0.825,1.2,"SiRE MultiYr","no age comp data - multi-year mean applied"
+"33",1986,0.083,0.083,1.3,"SiRE MultiYr","no age comp data - multi-year mean applied"
+"34",1986,0.023,0.023,2.1,"SiRE MultiYr","no age comp data - multi-year mean applied"
+"35",1986,0.016,0.016,2.2,"SiRE MultiYr","no age comp data - multi-year mean applied"
+"36",1987,0.492,0.052,1.1,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"37",1987,0.46,0.825,1.2,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"38",1987,0.028,0.083,1.3,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"39",1987,0.01,0.023,2.1,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"40",1987,0.01,0.016,2.2,"CRITFC","Fryer thesis: freshwater aged, marine ages based on length"
+"41",1988,0.002,0.00210526315789474,1.1,"CRITFC","Fryer pers. data; Schwartzberg and Fryer 1989"
+"42",1988,0.969,0.962105263157895,1.2,"CRITFC","Fryer pers. data; Schwartzberg and Fryer 1991"
+"43",1988,0.013,0.0168421052631579,1.3,"CRITFC","Fryer pers. data; Schwartzberg and Fryer 1993"
+"44",1988,0.01,0.0126315789473684,2.1,"CRITFC","Fryer pers. data; Schwartzberg and Fryer 1990"
+"45",1988,0.006,0.00631578947368421,2.2,"CRITFC","Fryer pers. data; Schwartzberg and Fryer 1992"
+"46",1989,0.03,0.0332594235033259,1.1,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1990"
+"47",1989,0.931,0.929046563192905,1.2,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1990"
+"48",1989,0.027,0.0266075388026608,1.3,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1990"
+"49",1989,0.006,0.00665188470066519,2.1,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1990"
+"50",1989,0.005,0.00443458980044346,2.2,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1990"
+"51",1990,0.452,0.58128078817734,1.1,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1991"
+"52",1990,0.262,0.251231527093596,1.2,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1991"
+"53",1990,0.226,0.105911330049261,1.3,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1991"
+"54",1990,0.019,0.0246305418719212,2.1,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1991"
+"55",1990,0.035,0.0295566502463054,2.2,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1991"
+"56",1990,0.006,0.00566502463054187,2.3,"CRITFC","Fryer pers. data: Fryer and Schwartzberg 1991"
+"57",1991,0.154,0.144970414201183,1.1,"CRITFC","Fryer pers data; Fryer et al 1992"
+"58",1991,0.76,0.784023668639053,1.2,"CRITFC","Fryer pers data; Fryer et al 1992"
+"59",1991,0.015,0.0177514792899408,1.3,"CRITFC","Fryer pers data; Fryer et al 1992"
+"60",1991,0.067,0.0502958579881657,2.1,"CRITFC","Fryer pers data; Fryer et al 1992"
+"61",1991,0.001,0.0029585798816568,2.2,"CRITFC","Fryer pers data; Fryer et al 1992"
+"62",1991,0.003,0.0177514792899408,2.3,"CRITFC","Fryer pers data; Fryer et al 1992"
+"63",1992,0.169,0.182,1.1,"CRITFC","Fryer personal data; Fryer and Schwartzberg 1993"
+"64",1992,0.733,0.722,1.2,"CRITFC","Fryer personal data; Fryer and Schwartzberg 1993"
+"65",1992,0.014,0.016,1.3,"CRITFC","Fryer personal data; Fryer and Schwartzberg 1993"
+"66",1992,0.07,0.069,2.1,"CRITFC","Fryer personal data; Fryer and Schwartzberg 1993"
+"67",1992,0.014,0.011,2.2,"CRITFC","Fryer personal data; Fryer and Schwartzberg 1993"
+"68",1993,0,0,1.1,"CRITFC","Jeff Fryer, pers.data & Fryer & Schwartzberg 1994"
+"69",1993,0.887,0.897,1.2,"CRITFC","Jeff Fryer, pers.data & Fryer & Schwartzberg 1994"
+"70",1993,0.053,0.048,1.3,"CRITFC","Jeff Fryer, pers.data & Fryer & Schwartzberg 1994"
+"71",1993,0.002,0.004,2.1,"CRITFC","Jeff Fryer, pers.data & Fryer & Schwartzberg 1994"
+"72",1993,0.057,0.05,2.2,"CRITFC","Jeff Fryer, pers.data & Fryer & Schwartzberg 1994"
+"73",1993,0.002,0.002,2.3,"CRITFC","Jeff Fryer, pers.data & Fryer & Schwartzberg 1994"
+"74",1994,0.143,0.052,1.1,"CRITFC",NA
+"75",1994,0.126,0.825,1.2,"CRITFC",NA
+"76",1994,0.698,0.083,1.3,"CRITFC",NA
+"77",1994,0.016,0.023,2.1,"CRITFC",NA
+"78",1994,0.017,0.016,2.2,"CRITFC",NA
+"79",1995,0.413,0.052,1.1,"CRITFC",NA
+"80",1995,0.514,0.825,1.2,"CRITFC",NA
+"81",1995,0.013,0.083,1.3,"CRITFC",NA
+"82",1995,0.058,0.023,2.1,"CRITFC",NA
+"83",1995,0,0.016,2.2,"CRITFC",NA
+"84",1996,0.076,0.052,1.1,"CRITFC","Fryer: pers data (Wells Dam)) used for SIRE age comps"
+"85",1996,0.859,0.825,1.2,"CRITFC","Fryer: pers data (Wells Dam)) used for SIRE age comps"
+"86",1996,0.038,0.083,1.3,"CRITFC","Fryer: pers data (Wells Dam)) used for SIRE age comps"
+"87",1996,0,0.023,2.1,"CRITFC","Fryer: pers data (Wells Dam)) used for SIRE age comps"
+"88",1996,0.027,0.016,2.2,"CRITFC","Fryer: pers data (Wells Dam)) used for SIRE age comps"
+"89",1997,0,0.052,1.1,"CRITFC",NA
+"90",1997,0.957,0.825,1.2,"CRITFC",NA
+"91",1997,0.034,0.083,1.3,"CRITFC",NA
+"92",1997,0.009,0.023,2.1,"CRITFC",NA
+"93",1997,0,0.016,2.2,"CRITFC",NA
+"94",1998,0.053,0.052,1.1,"CRITFC",NA
+"95",1998,0.789,0.825,1.2,"CRITFC",NA
+"96",1998,0.158,0.083,1.3,"CRITFC",NA
+"97",1998,0,0.023,2.1,"CRITFC",NA
+"98",1998,0,0.016,2.2,"CRITFC",NA
+"99",1999,0.114,0.052,1.1,"CRITFC",NA
+"100",1999,0.849,0.825,1.2,"CRITFC",NA
+"101",1999,0,0.083,1.3,"CRITFC",NA
+"102",1999,0.038,0.023,2.1,"CRITFC",NA
+"103",1999,0,0.016,2.2,"CRITFC",NA
+"104",2000,0.13,0.072,1.1,"CRITFC","SIRE = Fryer & Kelsey 2001 (CRITFC 01-2), but FRYER may be Sp/Grd? [hs 10/21/2020]"
+"105",2000,0.84,0.874,1.2,"CRITFC","SIRE = Fryer & Kelsey 2001 (CRITFC 01-2) (Wells Dam, Table 3)"
+"106",2000,0.01,0.036,1.3,"CRITFC","SIRE = Fryer & Kelsey 2001 (CRITFC 01-2) (Wells Dam, Table 3)"
+"107",2000,0.01,0.001,2.1,"CRITFC","SIRE = Fryer & Kelsey 2001 (CRITFC 01-2) (Wells Dam, Table 3)"
+"108",2000,0.01,0.017,2.2,"CRITFC","SIRE = Fryer & Kelsey 2001 (CRITFC 01-2) (Wells Dam, Table 3)"
+"109",2001,0.026,0.033,1.1,"SiRE","SIRE = spawning grounds; Wells = 0.031 CRITFC 02_02 Table 3"
+"110",2001,0.946,0.944,1.2,"SiRE","spawning grounds; Wells = 0.940"
+"111",2001,0.02,0.022,1.3,"SiRE","spawning grounds; Wells = 0.020"
+"112",2001,0.003,0.00049,2.1,"SiRE","spawning grounds; Wells = 0.006"
+"113",2001,0.003,0.00049,2.2,"SiRE","spawning grounds; Wells = 0.003"
+"114",2002,0.02,0.091,1.1,"CRITFC","Use Fryer; SIRE = spawning grounds no 53s; Wells = 0.015"
+"115",2002,0.497,0.554,1.2,"CRITFC","Use Fryer; SIRE = spawning grounds no 53s; Wells = 0.441"
+"116",2002,0.148,0.354,1.3,"CRITFC","Use Fryer; SIRE = spawning grounds no 53s; Wells = 0.160"
+"117",2002,0.013,0,2.1,"CRITFC","Use Fryer; SIRE = spawning grounds no 53s; Wells = 0.015"
+"118",2002,0.221,0,2.2,"CRITFC","Use Fryer; SIRE = spawning grounds no 53s; Wells = 0.236"
+"119",2002,0.101,NA,2.3,"CRITFC",NA
+"120",2003,0.274,0.27,1.1,"CRITFC","SIRE = Broodstock (hatchery highgrading?), use Fryer"
+"121",2003,0.49,0.517,1.2,"CRITFC",NA
+"122",2003,0.019,0.125,1.3,"CRITFC","Fryer age 1.3 comp (0.4%) is quite low relative to spawning ground data; Fryer age comp only adds up to 98.5%, so adding 1.5% to age 1.3 composition [2022-10-30]"
+"123",2003,0.053,0.051,2.1,"CRITFC",NA
+"124",2003,0.008,0,2.2,"CRITFC",NA
+"125",2003,0.009,NA,2.3,"CRITFC","check age comp for 2003 with Jeff? DONE [10/21/2020]"
+"126",2003,0.07,NA,3.1,"CRITFC",NA
+"127",2003,0.028,NA,3.2,"CRITFC","a lot of older fish"
+"128",2003,0.001,NA,3.3,"CRITFC",NA
+"129",2003,0.048,NA,4.1,"CRITFC",NA
+"130",2004,0.031,0.0263653483992467,1.1,"CRITFC","SIRE = broodstock?  Wells = 0.016, Use Fryer"
+"131",2004,0.934,0.952919020715631,1.2,"CRITFC","broodstock; Wells = 0.951"
+"132",2004,0,0.0188323917137476,1.3,"CRITFC","broodstock; Wells = na"
+"133",2004,0.003,0,2.1,"CRITFC","broodstock; Wells = 0.001"
+"134",2004,0.015,0.00188323917137476,2.2,"CRITFC","broodstock; Wells = 0.017"
+"135",2004,0,NA,2.3,"CRITFC",NA
+"136",2004,0.018,NA,3.1,"CRITFC",NA
+"137",2005,0.015,0.015,1.1,"CRITFC","broodstock: Wells = 0.015"
+"138",2005,0.891,0.887,1.2,"CRITFC","broodstock; Wells = 0.887"
+"139",2005,0.039,0.039,1.3,"CRITFC","broodstock; Wells = 0.039"
+"140",2005,0.023,0.023,2.1,"CRITFC","broodstock; Wells = 0.023"
+"141",2005,0.019,0.023,2.2,"CRITFC","broodstock; Wells = 0.023"
+"142",2005,0.014,NA,2.3,"CRITFC",NA
+"143",2006,0.008,0.00238095238095238,1.1,"SiRE","CNAT - deadpitch ages <-- use"
+"144",2006,0.724,0.883333333333333,1.2,"SiRE","CNAT - deadpitch ages"
+"145",2006,0.084,0.10952380952381,1.3,"SiRE","CNAT - deadpitch ages"
+"146",2006,0.017,0,2.1,"SiRE","CNAT - deadpitch ages"
+"147",2006,0.148,0.00476190476190476,2.2,"SiRE","CNAT - deadpitch ages"
+"148",2006,0.002,NA,2.3,"SiRE",NA
+"149",2007,0.424,0.283116883116883,1.1,"SiRE","CNAT - deadpitch ages <-- use"
+"150",2007,0.382,0.511688311688312,1.2,"SiRE","CNAT - deadpitch ages"
+"151",2007,0.032,0.12987012987013,1.3,"SiRE","CNAT - deadpitch ages"
+"152",2007,0.058,0.0649350649350649,2.1,"SiRE","CNAT - deadpitch ages"
+"153",2007,0.093,0.0103896103896104,2.2,"SiRE","CNAT - deadpitch ages"
+"154",2007,0.011,NA,2.3,"SiRE",NA
+"155",2008,0.074,0.0463821892393321,1.1,"SiRE","CNAT - deadpitch ages"
+"156",2008,0.864,0.940630797773655,1.2,"SiRE","CNAT - deadpitch ages"
+"157",2008,0.007,0.00927643784786642,1.3,"SiRE","CNAT - deadpitch ages"
+"158",2008,0.023,0,2.1,"SiRE","CNAT - deadpitch ages"
+"159",2008,0.032,0.00371057513914657,2.2,"SiRE","CNAT - deadpitch ages"
+"160",2009,0.125,0.0349794238683128,1.1,"SiRE","CNAT - deadpitch ages"
+"161",2009,0.792,0.878600823045268,1.2,"SiRE","CNAT - deadpitch ages"
+"162",2009,0.026,0.0534979423868313,1.3,"SiRE","CNAT - deadpitch ages"
+"163",2009,0.01,0,2.1,"SiRE","CNAT - deadpitch ages"
+"164",2009,0.046,0.0329218106995885,2.2,"SiRE","CNAT - deadpitch ages"
+"165",2009,0.001,0,2.3,"SiRE",NA
+"166",2010,0.018,0.00881834215167548,1.1,"SiRE","CNAT - deadpitch ages"
+"167",2010,0.954,0.894,1.2,"SiRE","CNAT - deadpitch ages"
+"168",2010,0.005,0.074,1.3,"SiRE","CNAT - deadpitch ages"
+"169",2010,0.006,0.017,2.1,"SiRE","CNAT - deadpitch ages"
+"170",2010,0.016,0.006,2.2,"SiRE","CNAT - deadpitch ages"
+"171",2011,0.261,0.182,1.1,"SiRE","CNAT - deadpitch ages"
+"172",2011,0.592,0.664,1.2,"SiRE","CNAT - deadpitch ages"
+"173",2011,0.077,0.071,1.3,"SiRE","CNAT - deadpitch ages"
+"174",2011,0.031,0.043,2.1,"SiRE","CNAT - deadpitch ages"
+"175",2011,0.037,0.04,2.2,"SiRE","CNAT - deadpitch ages"
+"176",2011,0.002,0,2.3,"SiRE",NA
+"177",2012,0.017,0.003,1.1,"SiRE","CNAT - deadpitch ages"
+"178",2012,0.96,0.971,1.2,"SiRE","CNAT - deadpitch ages"
+"179",2012,0.017,0.007,1.3,"SiRE","CNAT - deadpitch ages"
+"180",2012,0.001,0.007,2.1,"SiRE","CNAT - deadpitch ages"
+"181",2012,0.006,0.012,2.2,"SiRE","CNAT - deadpitch ages"
+"182",2013,0.235,0.171,1.1,"CRITFC","Using Fryer, since SIRE age comp does not add up to 100%"
+"183",2013,0.634,0.573,1.2,"CRITFC","Using Fryer, since SIRE age comp does not add up to 100%"
+"184",2013,0.081,0.024,1.3,"CRITFC","Using Fryer, since SIRE age comp does not add up to 100%"
+"185",2013,0,0.012,2.1,"CRITFC","Using Fryer, since SIRE age comp does not add up to 100%"
+"186",2013,0.05,0.11,2.2,"CRITFC","Using Fryer, since SIRE age comp does not add up to 100%"
+"187",2014,0.175,0.0822,1.1,"SiRE","CNAT - deadpitch ages"
+"188",2014,0.819,0.884,1.2,"SiRE","CNAT - deadpitch ages"
+"189",2014,0.001,0.03,1.3,"SiRE","CNAT - deadpitch ages"
+"190",2014,0.001,0,2.1,"SiRE","CNAT - deadpitch ages"
+"191",2014,0.004,0.004,2.2,"SiRE","CNAT - deadpitch ages"
+"192",2015,0.001,0.002,1.1,"CRITFC","NB: 2015 was DEATH year for Columbia sox because of high temps"
+"193",2015,0.975,0.947,1.2,"CRITFC","mortalities between BON and Wells unknown"
+"194",2015,0.001,0.03,1.3,"CRITFC",NA
+"195",2015,0,0.003,2.1,"CRITFC","~10% of Ok Sox returned to spawning grounds"
+"196",2015,0.022,0.001,2.2,"CRITFC","* sample sizes for ages extremely small - use Fryer age comp"
+"197",2016,0.009,0.01,1.1,"SiRE",NA
+"198",2016,0.96,0.957,1.2,"SiRE","presuming SIRE age comp from Sp Grds in 2016"
+"199",2016,0.007,0.025,1.3,"SiRE",NA
+"200",2016,0,0.003,2.1,"SiRE",NA
+"201",2016,0.024,0.005,2.2,"SiRE",NA
+"202",2017,0.19,0.038,1.1,"SiRE","presuming SIRE age comp from Sp Grds in 2017"
+"203",2017,0.527,0.759,1.2,"SiRE",NA
+"204",2017,0.221,0.181,1.3,"SiRE",NA
+"205",2017,0.036,0.015,2.1,"SiRE",NA
+"206",2017,0.022,0.007,2.2,"SiRE",NA
+"207",2017,0.004,0,2.3,"SiRE",NA
+"208",2018,0.004,0.0026,1.1,"SiRE","based on deadpitch of natural spawners in ""2018 Deadpiitch Adult Sockeye BioData.xlsx 10/21/2020"
+"209",2018,0.956,0.971,1.2,"SiRE","based on deadpitch of natural spawners in ""2018 Deadpiitch Adult Sockeye BioData.xlsx 10/21/2021"
+"210",2018,0.011,0.021,1.3,"SiRE","based on deadpitch of natural spawners in ""2018 Deadpiitch Adult Sockeye BioData.xlsx 10/21/2022"
+"211",2018,0.022,0.0026,2.1,"SiRE","based on deadpitch of natural spawners in ""2018 Deadpiitch Adult Sockeye BioData.xlsx 10/21/2023"
+"212",2018,0.006,0.0026,2.2,"SiRE","based on deadpitch of natural spawners in ""2018 Deadpiitch Adult Sockeye BioData.xlsx 10/21/2024"
+"213",2019,0.543,0.185,1.1,"SiRE","Mean %OK = 85.7% from CNAT_Escapement Units _2020.xlsx!%Okanagan - avg of Wells/RIS & RRH/RIS estimates [HS July 2020]"
+"214",2019,0.172,0.542,1.2,"SiRE","Fryer's sampling at BON -- 85% OK; 11% Wenatchee; 4% other [prelim. 14/09/2020]"
+"215",2019,0.224,0.267,1.3,"SiRE",NA
+"216",2019,0.012,0.002,2.1,"SiRE","Ages for 2019 Return year are from Fryer's sampling at BON [prelim, report not finalized, 14/09/2020]"
+"217",2019,0.048,0.004,2.2,"SiRE","Ages for 2019 now from deadpitch [11/3/2020]"
+"218",2019,0.001,0,2.3,"SiRE",NA
+"219",2020,0.009,0.011,1.1,"SiRE","Deadpitch age comp from ONA to AO [2024-03-23]"
+"220",2020,0.986,0.971,1.2,"SiRE","275.5298105584082"
+"221",2020,0.002,0.018,1.3,"SiRE","271396.8634000321"
+"222",2020,0.001,NA,2.1,"SiRE","0"
+"223",2020,0.002,NA,2.2,"SiRE","275.5298105584082"
+"224",2020,0,NA,2.3,"SiRE","551.0596211168164"
+"225",2021,0.253,0.178,1.1,"SiRE","Deadpitch age comp from ONA to AO [2024-03-23]"
+"226",2021,0.598,0.765,1.2,"SiRE",NA
+"227",2021,0.114,0.057,1.3,"SiRE",NA
+"228",2021,0.03,NA,2.1,"SiRE",NA
+"229",2021,0.005,NA,2.2,"SiRE",NA
+"230",2021,0,NA,2.3,"SiRE",NA
+"231",2022,0.02,0.019,1.1,"SiRE","Deadpitch age comp from ONA to AO [2024-03-23]"
+"232",2022,0.944,0.861,1.2,"SiRE",NA
+"233",2022,0.023,0.12,1.3,"SiRE",NA
+"234",2022,0.008,NA,2.1,"SiRE",NA
+"235",2022,0.004,NA,2.2,"SiRE",NA
+"236",2022,0,NA,2.3,"SiRE",NA
+"237",2023,NA,0.089,1.1,"SiRE","Deadpitch age comp from ONA to AO [2024-03-23]"
+"238",2023,NA,0.812,1.2,"SiRE",NA
+"239",2023,NA,0.096,1.3,"SiRE",NA
+"240",2023,NA,0.003,2.1,"SiRE",NA
+"241",2023,NA,NA,2.2,"SiRE",NA
+"242",2023,NA,NA,2.3,"SiRE",NA

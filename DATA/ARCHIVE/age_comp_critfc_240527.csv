@@ -1,0 +1,40 @@
+"","Year","prop_age_1.1","prop_age_1.2","prop_age_2.1","prop_age_1.3","prop_age_2.2","prop_age_2.3","prop_age_3.1","prop_age_3.2","prop_age_3.3","prop_age_4.1","Other","TOTAL","Sample_Size","Confirmed","Source","Age_Method","Notes"
+"1",1985,0.069,0.88,0.011,0.006,0.034,0,NA,NA,NA,NA,NA,"1",175,NA,NA,"Deadpitch on SG",NA
+"2",1986,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"NA",0,NA,NA,"Multi-year average","Based on what years?"
+"3",1987,0.492,0.46,0.01,0.028,0.01,0,NA,NA,NA,NA,NA,"1",508,NA,NA,"Deadpitch on SG?",NA
+"4",1988,0.00199,0.96853,0.01037,0.01273,0.00638,0,NA,NA,NA,NA,NA,"1",195,NA,NA,"Deadpitch on SG",NA
+"5",1989,0.03019,0.9312,0.00597,0.02738,0.00526,0,NA,NA,NA,NA,NA,"1",451,NA,NA,"SPA - Mixed Stock?",NA
+"6",1990,0.45208,0.26189,0.01884,0.22627,0.03506,0.00585,NA,NA,NA,NA,NA,"1",406,NA,NA,"SPA - Mixed Stock?",NA
+"7",1991,0.1542,0.75978,0.06678,0.01482,0.00147,0.00294,NA,NA,NA,NA,NA,"1",473,NA,NA,"SPA - Mixed Stock?",NA
+"8",1992,0.1688,0.73347,0.06995,0.01362,0.0142,0,NA,NA,NA,NA,NA,"1",688,NA,NA,"SPA - Mixed Stock?",NA
+"9",1993,0,0.88654,0.00184,0.05258,0.05665,0.00239,NA,NA,NA,NA,NA,"1",523,NA,NA,"SPA - Mixed Stock?",NA
+"10",1994,0.14294,0.12612,0.01565,0.69848,0.01681,0,NA,NA,NA,NA,NA,"1",99,NA,NA,"SPA - Mixed Stock?",NA
+"11",1995,0.41304347826087,0.514492753623188,0.0579710144927536,0.0144927536231884,0,0,NA,NA,NA,NA,NA,"1",138,NA,NA,"SPA - Mixed Stock?",NA
+"12",1996,0.0756013745704467,0.859106529209622,0,0.0378006872852234,0.0274914089347079,0,NA,NA,NA,NA,NA,"1",291,NA,NA,"SPA - Mixed Stock?",NA
+"13",1997,0,0.956896551724138,0.00862068965517241,0.0344827586206897,0,0,NA,NA,NA,NA,NA,"1",116,NA,NA,"SPA - Mixed Stock?",NA
+"14",1998,0.0526315789473684,0.789473684210526,NA,0.157894736842105,NA,0,NA,NA,NA,NA,NA,"1",296,NA,"Microsoft Word - 98.doc (critfc.org)","SPA - Mixed Stock Adjusted?","Mixed stock (BON) age comp in report is quite different -- 22% 1.1; 10% 1.2; 1% 2.1; 57% 1.3; 9% 2.2; 1% 2.3."
+"15",1999,0.114,0.849,0.037,0,0,0,NA,NA,NA,NA,NA,"1",NA,NA,NA,"SPA - Mixed Stock Adjusted?",NA
+"16",2000,0.13,0.84,0.01,0.01,0.01,0,NA,NA,NA,NA,NA,"1",502,NA,NA,"SPA - Mixed Stock Adjusted?",NA
+"17",2001,0.026,0.946,0.003,0.022,0.003,0,NA,NA,NA,NA,NA,"1",816,2024-05-28,"Annual Bonneville Sampling Report (critfc.org)","SPA - Mixed Stock Adjusted?","Different age comp from mixed stock report (due to limited SPA and subj. assignment as described below)"
+"18",2002,0.013,0.497,0.013,0.148,0.221,0.00699999999999999,0.007,0.094,NA,NA,NA,"1",497,2024-05-28,"Annual Bonneville Sampling Report (critfc.org)","SPA - Mixed Stock Adjusted?",NA
+"19",2003,0.273824212375445,0.489801177459896,0.0533127444026282,0.019,0.00821292812486939,0.009,0.07,0.028,0.001,0.048,NA,"1",373,2024-05-28,"Annual Bonneville Sampling Report (critfc.org)","SPA - Mixed Stock Adjusted?","Different age comp from report (due to limited SPA and subj. assignment of 1.1 and 2.1 to OKA, and larger fish to WEN?) Mixed stock SPA, but %OKA = 86%; Report indicates 1.1: 0.254 1.2: 0.324 2.1: 0.060 1.3 0.152 2.2: 0.001 3.1: 0.125 2.3: 0.009 3.2: 0.028 4.1: 0.048 3.3: 0.001"
+"20",2004,0.0305343511450382,0.933842239185751,0.00254452926208651,NA,0.0152671755725191,NA,0.018,NA,NA,NA,NA,"1",626,2024-05-28,"Microsoft Word - 2004 Annual Bonneville Report.doc (critfc.org)","SPA - Mixed Stock Adjusted?","Different age comp from report (due to limited SPA and subj. assignment of 1.1 and 2.1 to OKA, and larger fish to WEN?) Mixed stock SPA, but %OKA = 71%; Report indicates 1.1: 0.010 1.2: 0.977 1.3: 0.003 2.2: 0.007 3.1: 0.002 and 2.3 0.002"
+"21",2005,0.0149273040317686,0.890683615875087,0.0228740667806708,0.0390365514063087,0.0189010585845497,0.014,NA,NA,NA,NA,NA,"1",596,2024-05-28,"06_02.pdf (critfc.org)","SPA - Mixed Stock Adjusted?","Slight changes from 2005 report (1.1: 0.011  1.2: 0.888 2.1: 0.011 1.3: 0.073 2.2: 0.007 3.1: 0.004 3.2: 0.004 4.1: 0.002), probably due to assignment of smaller fish to OKA and larger fish to WEN?"
+"22",2006,0.007,0.751,0.023,0.073,0.134,0,0.012,NA,NA,NA,NA,"1",NA,2024-05-28,"07_01report.pdf (critfc.org)","PIT/SPA","Slight changes from JF's original data"
+"23",2007,0.423713754110037,0.382075201986249,0.0583075155291449,0.0318399664191541,0.0929229274077147,0.0111406345477002,NA,NA,NA,NA,NA,"1",122,2024-05-27,"Bonneville Sockeye PIT tag paper (critfc.org)","PIT/SPA","Pcts don't add up to 100% in report, but JF's 'adjusted' numbers (see Original Data) do! Mixed stock SPA (89% OKA) was: Sample size: 526; 1.1: 0.399; 1.2: 0.296; 2.1: 0.061; 1.3: 0.109; 2.2: 0.109 3.1: 0.000 2.3: 0.025"
+"24",2008,0.074,0.864,0.023,0.007,0.032,NA,NA,NA,NA,NA,NA,"1",598,2024-05-27,"Bonneville Sockeye PIT tag technical report 2008 final (critfc.org)","PIT/SPA","%OKA = 85%"
+"25",2009,0.12509579576968,0.791751375619347,0.01,0.0263296424024657,0.046,0.001,NA,NA,NA,NA,NA,"1",504,2024-05-27,"Microsoft Word - Final MOA sockeye report 2009 10-26-10.docx (critfc.org)","PIT/SPA","Corrected to match 2009 report Table 9 p. 29. See https://critfc.org/wp-content/uploads/2021/08/10_09report.pdf"
+"26",2010,0.02,0.952,0.00630066907824839,0.00514552818087011,0.017,NA,NA,NA,NA,NA,NA,"1",567,2024-05-27,"Microsoft Word - MOA_SockeyeReport2010_Final.docx (critfc.org)","PIT/SPA",NA
+"27",2011,0.261263752493429,0.591579012543768,0.0307233872575653,0.0773415159211933,0.037032152713193,0.00206017907085137,NA,NA,NA,NA,NA,"1",394,2024-05-27,"Bonneville Sockeye PIT tag paper (critfc.org)","PIT/SPA",NA
+"28",2012,0.0167119858510496,0.959703840573946,0.00122447918563716,0.0167774956570993,0.00558219873226797,0,NA,NA,NA,NA,NA,"1",1005,2024-05-27,"Bonneville Sockeye PIT tag paper (critfc.org)","PIT/SPA",NA
+"29",2013,0.243,0.616,NA,0.087,0.054,NA,NA,NA,NA,NA,NA,"1",395,2024-05-27,"15-01.pdf (critfc.org)","PIT/SPA",NA
+"30",2014,0.174827090323133,0.818906895727552,0.0012458208415629,0.00107652209818481,0.00394367100956716,NA,NA,NA,NA,NA,NA,"1",859,2024-05-27,"16-02.pdf (critfc.org)","PIT/SPA",NA
+"31",2015,0.002,0.97,0.002,0.024,NA,NA,NA,NA,NA,NA,NA,"0.998",143,2024-05-27,"17-06.pdf (critfc.org)","PIT/SPA",NA
+"32",2016,0.00949352685566569,0.95981944909294,NA,0.00715203620203911,0.0235394254477849,NA,NA,NA,NA,NA,NA,"1",1142,2024-05-27,"18-02.pdf (critfc.org)","PIT/SPA",NA
+"33",2017,0.190266708424329,0.527,0.036,0.221,0.022,0.004,NA,NA,NA,NA,NA,"1",631,2024-05-27,"18-02.pdf (critfc.org)","PIT/SPA",NA
+"34",2018,0.0039832778500609,0.956208106702492,0.004,0.022,0.00626975539976126,NA,0.0075892727707257,NA,NA,NA,NA,"1",1642,2024-05-27,"20_01.pdf (critfc.org)","PIT/SPA",NA
+"35",2019,0.545,0.171,0.012,0.224,0.046,0.001,0.001,NA,NA,NA,NA,"1",831,2024-05-27,"https://critfc.org/wp-content/uploads/2022/06/21_01.pdf","PIT/SPA",NA
+"36",2020,0.011,0.984,0.002,0.001,0.002,0,NA,NA,NA,NA,NA,"1",1346,2024-05-27,"22_02.pdf (critfc.org)","PIT/SPA",NA
+"37",2021,0.405,0.518,0.014,0.0505,0.012,0,NA,NA,NA,NA,NA,"1",1027,2024-05-27,"24-01.pdf (critfc.org)","PIT/SPA",NA
+"38",2022,0.024,0.95,0.0085,0.012,0.0055,0,NA,NA,NA,NA,NA,"1",1115,2024-05-27,"24-01.pdf (critfc.org)","PIT/SPA",NA
+"39",2023,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"0",NA,NA,NA,"PIT/SPA",NA
