@@ -1,235 +1,241 @@
-"","return_year","age_class","Sample_Size","CRITFC_prop_at_age","CRITFC_method","ONA_prop_at_age","ONA_method"
-"1",1985,"prop_age_1.1",175,0.069,"Deadpitch on SG",NA,NA
-"2",1985,"prop_age_1.2",175,0.88,"Deadpitch on SG",NA,NA
-"3",1985,"prop_age_1.3",175,0.006,"Deadpitch on SG",NA,NA
-"4",1985,"prop_age_2.1",175,0.011,"Deadpitch on SG",NA,NA
-"5",1985,"prop_age_2.2",175,0.034,"Deadpitch on SG",NA,NA
-"6",1985,"prop_age_2.3",175,0,"Deadpitch on SG",NA,NA
-"7",1986,"prop_age_1.1",0,NA,"use multi-year average?",NA,NA
-"8",1986,"prop_age_1.2",0,NA,"use multi-year average?",NA,NA
-"9",1986,"prop_age_1.3",0,NA,"use multi-year average?",NA,NA
-"10",1986,"prop_age_2.1",0,NA,"use multi-year average?",NA,NA
-"11",1986,"prop_age_2.2",0,NA,"use multi-year average?",NA,NA
-"12",1986,"prop_age_2.3",0,NA,"use multi-year average?",NA,NA
-"13",1987,"prop_age_1.1",508,0.492,"SPA - Mixed Stock Adjusted?",NA,NA
-"14",1987,"prop_age_1.2",508,0.46,"SPA - Mixed Stock Adjusted?",NA,NA
-"15",1987,"prop_age_1.3",508,0.028,"SPA - Mixed Stock Adjusted?",NA,NA
-"16",1987,"prop_age_2.1",508,0.01,"SPA - Mixed Stock Adjusted?",NA,NA
-"17",1987,"prop_age_2.2",508,0.01,"SPA - Mixed Stock Adjusted?",NA,NA
-"18",1987,"prop_age_2.3",508,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"19",1988,"prop_age_1.1",195,0.00199,"SPA - Mixed Stock Adjusted?",NA,NA
-"20",1988,"prop_age_1.2",195,0.96853,"SPA - Mixed Stock Adjusted?",NA,NA
-"21",1988,"prop_age_1.3",195,0.01273,"SPA - Mixed Stock Adjusted?",NA,NA
-"22",1988,"prop_age_2.1",195,0.01037,"SPA - Mixed Stock Adjusted?",NA,NA
-"23",1988,"prop_age_2.2",195,0.00638,"SPA - Mixed Stock Adjusted?",NA,NA
-"24",1988,"prop_age_2.3",195,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"25",1989,"prop_age_1.1",451,0.03019,"SPA - Mixed Stock Adjusted?",NA,NA
-"26",1989,"prop_age_1.2",451,0.9312,"SPA - Mixed Stock Adjusted?",NA,NA
-"27",1989,"prop_age_1.3",451,0.02738,"SPA - Mixed Stock Adjusted?",NA,NA
-"28",1989,"prop_age_2.1",451,0.00597,"SPA - Mixed Stock Adjusted?",NA,NA
-"29",1989,"prop_age_2.2",451,0.00526,"SPA - Mixed Stock Adjusted?",NA,NA
-"30",1989,"prop_age_2.3",451,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"31",1990,"prop_age_1.1",406,0.452084520845208,"SPA - Mixed Stock Adjusted?",NA,NA
-"32",1990,"prop_age_1.2",406,0.261892618926189,"SPA - Mixed Stock Adjusted?",NA,NA
-"33",1990,"prop_age_1.3",406,0.226272262722627,"SPA - Mixed Stock Adjusted?",NA,NA
-"34",1990,"prop_age_2.1",406,0.018840188401884,"SPA - Mixed Stock Adjusted?",NA,NA
-"35",1990,"prop_age_2.2",406,0.035060350603506,"SPA - Mixed Stock Adjusted?",NA,NA
-"36",1990,"prop_age_2.3",406,0.00585005850058501,"SPA - Mixed Stock Adjusted?",NA,NA
-"37",1991,"prop_age_1.1",473,0.15420154201542,"SPA - Mixed Stock Adjusted?",NA,NA
-"38",1991,"prop_age_1.2",473,0.759787597875979,"SPA - Mixed Stock Adjusted?",NA,NA
-"39",1991,"prop_age_1.3",473,0.014820148201482,"SPA - Mixed Stock Adjusted?",NA,NA
-"40",1991,"prop_age_2.1",473,0.0667806678066781,"SPA - Mixed Stock Adjusted?",NA,NA
-"41",1991,"prop_age_2.2",473,0.001470014700147,"SPA - Mixed Stock Adjusted?",NA,NA
-"42",1991,"prop_age_2.3",473,0.002940029400294,"SPA - Mixed Stock Adjusted?",NA,NA
-"43",1992,"prop_age_1.1",688,0.168793248270069,"SPA - Mixed Stock Adjusted?",NA,NA
-"44",1992,"prop_age_1.2",688,0.733440662373505,"SPA - Mixed Stock Adjusted?",NA,NA
-"45",1992,"prop_age_1.3",688,0.0136194552217911,"SPA - Mixed Stock Adjusted?",NA,NA
-"46",1992,"prop_age_2.1",688,0.0699472021119155,"SPA - Mixed Stock Adjusted?",NA,NA
-"47",1992,"prop_age_2.2",688,0.0141994320227191,"SPA - Mixed Stock Adjusted?",NA,NA
-"48",1992,"prop_age_2.3",688,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"49",1993,"prop_age_1.1",523,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"50",1993,"prop_age_1.2",523,0.88654,"SPA - Mixed Stock Adjusted?",NA,NA
-"51",1993,"prop_age_1.3",523,0.05258,"SPA - Mixed Stock Adjusted?",NA,NA
-"52",1993,"prop_age_2.1",523,0.00184,"SPA - Mixed Stock Adjusted?",NA,NA
-"53",1993,"prop_age_2.2",523,0.05665,"SPA - Mixed Stock Adjusted?",NA,NA
-"54",1993,"prop_age_2.3",523,0.00239,"SPA - Mixed Stock Adjusted?",NA,NA
-"55",1994,"prop_age_1.1",99,0.14294,"SPA - Mixed Stock Adjusted?",NA,NA
-"56",1994,"prop_age_1.2",99,0.12612,"SPA - Mixed Stock Adjusted?",NA,NA
-"57",1994,"prop_age_1.3",99,0.69848,"SPA - Mixed Stock Adjusted?",NA,NA
-"58",1994,"prop_age_2.1",99,0.01565,"SPA - Mixed Stock Adjusted?",NA,NA
-"59",1994,"prop_age_2.2",99,0.01681,"SPA - Mixed Stock Adjusted?",NA,NA
-"60",1994,"prop_age_2.3",99,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"61",1995,"prop_age_1.1",138,0.41304347826087,"SPA - Mixed Stock Adjusted?",NA,NA
-"62",1995,"prop_age_1.2",138,0.514492753623188,"SPA - Mixed Stock Adjusted?",NA,NA
-"63",1995,"prop_age_1.3",138,0.0144927536231884,"SPA - Mixed Stock Adjusted?",NA,NA
-"64",1995,"prop_age_2.1",138,0.0579710144927536,"SPA - Mixed Stock Adjusted?",NA,NA
-"65",1995,"prop_age_2.2",138,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"66",1995,"prop_age_2.3",138,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"67",1996,"prop_age_1.1",291,0.0756013745704467,"SPA - Mixed Stock Adjusted?",NA,NA
-"68",1996,"prop_age_1.2",291,0.859106529209622,"SPA - Mixed Stock Adjusted?",NA,NA
-"69",1996,"prop_age_1.3",291,0.0378006872852234,"SPA - Mixed Stock Adjusted?",NA,NA
-"70",1996,"prop_age_2.1",291,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"71",1996,"prop_age_2.2",291,0.0274914089347079,"SPA - Mixed Stock Adjusted?",NA,NA
-"72",1996,"prop_age_2.3",291,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"73",1997,"prop_age_1.1",116,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"74",1997,"prop_age_1.2",116,0.956896551724138,"SPA - Mixed Stock Adjusted?",NA,NA
-"75",1997,"prop_age_1.3",116,0.0344827586206897,"SPA - Mixed Stock Adjusted?",NA,NA
-"76",1997,"prop_age_2.1",116,0.00862068965517241,"SPA - Mixed Stock Adjusted?",NA,NA
-"77",1997,"prop_age_2.2",116,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"78",1997,"prop_age_2.3",116,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"79",1998,"prop_age_1.1",296,0.0526315789473684,"SPA - Mixed Stock Adjusted?",NA,NA
-"80",1998,"prop_age_1.2",296,0.789473684210527,"SPA - Mixed Stock Adjusted?",NA,NA
-"81",1998,"prop_age_1.3",296,0.157894736842105,"SPA - Mixed Stock Adjusted?",NA,NA
-"82",1998,"prop_age_2.1",296,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"83",1998,"prop_age_2.2",296,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"84",1998,"prop_age_2.3",296,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"85",1999,"prop_age_1.1",NA,0.114,"SPA - Mixed Stock Adjusted?",NA,NA
-"86",1999,"prop_age_1.2",NA,0.849,"SPA - Mixed Stock Adjusted?",NA,NA
-"87",1999,"prop_age_1.3",NA,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"88",1999,"prop_age_2.1",NA,0.037,"SPA - Mixed Stock Adjusted?",NA,NA
-"89",1999,"prop_age_2.2",NA,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"90",1999,"prop_age_2.3",NA,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"91",2000,"prop_age_1.1",502,0.13,"SPA - Mixed Stock Adjusted?",NA,NA
-"92",2000,"prop_age_1.2",502,0.84,"SPA - Mixed Stock Adjusted?",NA,NA
-"93",2000,"prop_age_1.3",502,0.01,"SPA - Mixed Stock Adjusted?",NA,NA
-"94",2000,"prop_age_2.1",502,0.01,"SPA - Mixed Stock Adjusted?",NA,NA
-"95",2000,"prop_age_2.2",502,0.01,"SPA - Mixed Stock Adjusted?",NA,NA
-"96",2000,"prop_age_2.3",502,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"97",2001,"prop_age_1.1",816,0.026,"SPA - Wells Dam - similar to ONA spawning grounds",0.043956043956044,"Deadpitch"
-"98",2001,"prop_age_1.2",816,0.946,"SPA - Wells Dam - similar to ONA spawning grounds",0.934065934065934,"Deadpitch"
-"99",2001,"prop_age_1.3",816,0.022,"SPA - Wells Dam - similar to ONA spawning grounds",0.021978021978022,"Deadpitch"
-"100",2001,"prop_age_2.1",816,0.003,"SPA - Wells Dam - similar to ONA spawning grounds",0,"Deadpitch"
-"101",2001,"prop_age_2.2",816,0.003,"SPA - Wells Dam - similar to ONA spawning grounds",0,"Deadpitch"
-"102",2001,"prop_age_2.3",816,0,"SPA - Wells Dam - similar to ONA spawning grounds",NA,NA
-"103",2002,"prop_age_1.1",476,0.0108010801080108,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0.112359550561798,"Deadpitch"
-"104",2002,"prop_age_1.2",476,0.421842184218422,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0.539325842696629,"Deadpitch"
-"105",2002,"prop_age_1.3",476,0.136913691369137,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0.348314606741573,"Deadpitch"
-"106",2002,"prop_age_2.1",476,0.0027002700270027,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0,"Deadpitch"
-"107",2002,"prop_age_2.2",476,0.416841684168417,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0,"Deadpitch"
-"108",2002,"prop_age_2.3",476,0.0109010901090109,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",NA,NA
-"109",2003,"prop_age_1.1",301,0.3147,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0.0553191489361702,"Deadpitch"
-"110",2003,"prop_age_1.2",301,0.3884,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0.829787234042553,"Deadpitch"
-"111",2003,"prop_age_1.3",301,0.1936,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0.114893617021277,"Deadpitch"
-"112",2003,"prop_age_2.1",301,0.0764,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0,"Deadpitch"
-"113",2003,"prop_age_2.2",301,0.0159,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",0,"Deadpitch"
-"114",2003,"prop_age_2.3",301,0.011,"SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111]",NA,NA
-"115",2004,"prop_age_1.1",626,0.0310880829015544,"SPA - Mixed Stock Adjusted?",0.0280777537796976,"Deadpitch"
-"116",2004,"prop_age_1.2",626,0.950777202072539,"SPA - Mixed Stock Adjusted?",0.952483801295896,"Deadpitch"
-"117",2004,"prop_age_1.3",626,0,"SPA - Mixed Stock Adjusted?",0.0172786177105832,"Deadpitch"
-"118",2004,"prop_age_2.1",626,0.00259067357512953,"SPA - Mixed Stock Adjusted?",0,"Deadpitch"
-"119",2004,"prop_age_2.2",626,0.0155440414507772,"SPA - Mixed Stock Adjusted?",0.00215982721382289,"Deadpitch"
-"120",2004,"prop_age_2.3",626,0,"SPA - Mixed Stock Adjusted?",NA,NA
-"121",2005,"prop_age_1.1",596,0.0149209984673781,"SPA - Mixed Stock Adjusted?",0.00364963503649635,"Deadpitch"
-"122",2005,"prop_age_1.2",596,0.890307374935698,"SPA - Mixed Stock Adjusted?",0.963503649635037,"Deadpitch"
-"123",2005,"prop_age_1.3",596,0.0390200616578617,"SPA - Mixed Stock Adjusted?",0.0291970802919708,"Deadpitch"
-"124",2005,"prop_age_2.1",596,0.0228644043593353,"SPA - Mixed Stock Adjusted?",0,"Deadpitch"
-"125",2005,"prop_age_2.2",596,0.0188930744340494,"SPA - Mixed Stock Adjusted?",0.00364963503649635,"Deadpitch"
-"126",2005,"prop_age_2.3",596,0.0139940861456778,"SPA - Mixed Stock Adjusted?",NA,NA
-"127",2006,"prop_age_1.1",NA,0.00708502024291498,"PIT/SPA",0.0025706940874036,"Deadpitch"
-"128",2006,"prop_age_1.2",NA,0.760121457489879,"PIT/SPA",0.889460154241645,"Deadpitch"
-"129",2006,"prop_age_1.3",NA,0.0738866396761133,"PIT/SPA",0.102827763496144,"Deadpitch"
-"130",2006,"prop_age_2.1",NA,0.0232793522267206,"PIT/SPA",0,"Deadpitch"
-"131",2006,"prop_age_2.2",NA,0.135627530364372,"PIT/SPA",0.0051413881748072,"Deadpitch"
-"132",2006,"prop_age_2.3",NA,0,"PIT/SPA",NA,NA
-"133",2007,"prop_age_1.1",122,0.423713754110037,"PIT/SPA",0.24702380952381,"Deadpitch"
-"134",2007,"prop_age_1.2",122,0.382075201986249,"PIT/SPA",0.523809523809524,"Deadpitch"
-"135",2007,"prop_age_1.3",122,0.0318399664191541,"PIT/SPA",0.142857142857143,"Deadpitch"
-"136",2007,"prop_age_2.1",122,0.0583075155291449,"PIT/SPA",0.0744047619047619,"Deadpitch"
-"137",2007,"prop_age_2.2",122,0.0929229274077147,"PIT/SPA",0.00892857142857143,"Deadpitch"
-"138",2007,"prop_age_2.3",122,0.0111406345477002,"PIT/SPA",NA,NA
-"139",2008,"prop_age_1.1",598,0.074,"PIT/SPA",0.0360169491525424,"Deadpitch"
-"140",2008,"prop_age_1.2",598,0.864,"PIT/SPA",0.949152542372881,"Deadpitch"
-"141",2008,"prop_age_1.3",598,0.007,"PIT/SPA",0.0105932203389831,"Deadpitch"
-"142",2008,"prop_age_2.1",598,0.023,"PIT/SPA",0,"Deadpitch"
-"143",2008,"prop_age_2.2",598,0.032,"PIT/SPA",0.00423728813559322,"Deadpitch"
-"144",2008,"prop_age_2.3",598,0,"PIT/SPA",NA,NA
-"145",2009,"prop_age_1.1",504,0.125073681017923,"PIT/SPA",0.0265700483091787,"Deadpitch"
-"146",2009,"prop_age_1.2",504,0.791611407804944,"PIT/SPA",0.879227053140097,"Deadpitch"
-"147",2009,"prop_age_1.3",504,0.026324987781565,"PIT/SPA",0.0555555555555556,"Deadpitch"
-"148",2009,"prop_age_2.1",504,0.00999823217466097,"PIT/SPA",0,"Deadpitch"
-"149",2009,"prop_age_2.2",504,0.0459918680034405,"PIT/SPA",0.0386473429951691,"Deadpitch"
-"150",2009,"prop_age_2.3",504,0.000999823217466097,"PIT/SPA",NA,NA
-"151",2010,"prop_age_1.1",567,0.0199910800348816,"PIT/SPA",0.00892857142857143,"Deadpitch"
-"152",2010,"prop_age_1.2",567,0.951575409660365,"PIT/SPA",0.890625,"Deadpitch"
-"153",2010,"prop_age_1.3",567,0.00514323328427566,"PIT/SPA",0.0758928571428571,"Deadpitch"
-"154",2010,"prop_age_2.1",567,0.00629785899082837,"PIT/SPA",0.0178571428571429,"Deadpitch"
-"155",2010,"prop_age_2.2",567,0.0169924180296494,"PIT/SPA",0.00669642857142857,"Deadpitch"
-"156",2010,"prop_age_2.3",567,0,"PIT/SPA",NA,NA
-"157",2011,"prop_age_1.1",394,0.261263752493429,"PIT/SPA",0.120689655172414,"Deadpitch"
-"158",2011,"prop_age_1.2",394,0.591579012543768,"PIT/SPA",0.816091954022989,"Deadpitch"
-"159",2011,"prop_age_1.3",394,0.0773415159211933,"PIT/SPA",0.0574712643678161,"Deadpitch"
-"160",2011,"prop_age_2.1",394,0.0307233872575653,"PIT/SPA",0.00574712643678161,"Deadpitch"
-"161",2011,"prop_age_2.2",394,0.037032152713193,"PIT/SPA",0,"Deadpitch"
-"162",2011,"prop_age_2.3",394,0.00206017907085137,"PIT/SPA",NA,NA
-"163",2012,"prop_age_1.1",1005,0.0167119858510496,"PIT/SPA",0.00188679245283019,"Deadpitch"
-"164",2012,"prop_age_1.2",1005,0.959703840573946,"PIT/SPA",0.971698113207547,"Deadpitch"
-"165",2012,"prop_age_1.3",1005,0.0167774956570993,"PIT/SPA",0.00754716981132075,"Deadpitch"
-"166",2012,"prop_age_2.1",1005,0.00122447918563716,"PIT/SPA",0.00754716981132075,"Deadpitch"
-"167",2012,"prop_age_2.2",1005,0.00558219873226797,"PIT/SPA",0.0113207547169811,"Deadpitch"
-"168",2012,"prop_age_2.3",1005,0,"PIT/SPA",NA,NA
-"169",2013,"prop_age_1.1",395,0.243,"PIT/SPA",0.176724137931034,"Deadpitch"
-"170",2013,"prop_age_1.2",395,0.616,"PIT/SPA",0.620689655172414,"Deadpitch"
-"171",2013,"prop_age_1.3",395,0.087,"PIT/SPA",0.0646551724137931,"Deadpitch"
-"172",2013,"prop_age_2.1",395,0,"PIT/SPA",0.021551724137931,"Deadpitch"
-"173",2013,"prop_age_2.2",395,0.054,"PIT/SPA",0.112068965517241,"Deadpitch"
-"174",2013,"prop_age_2.3",395,0,"PIT/SPA",NA,NA
-"175",2014,"prop_age_1.1",859,0.174827090323133,"PIT/SPA",0.0657276995305164,"Deadpitch"
-"176",2014,"prop_age_1.2",859,0.818906895727552,"PIT/SPA",0.89906103286385,"Deadpitch"
-"177",2014,"prop_age_1.3",859,0.00107652209818481,"PIT/SPA",0.0328638497652582,"Deadpitch"
-"178",2014,"prop_age_2.1",859,0.0012458208415629,"PIT/SPA",0,"Deadpitch"
-"179",2014,"prop_age_2.2",859,0.00394367100956716,"PIT/SPA",0.00234741784037559,"Deadpitch"
-"180",2014,"prop_age_2.3",859,0,"PIT/SPA",NA,NA
-"181",2015,"prop_age_1.1",143,0.00200400801603206,"PIT/SPA",0,"Deadpitch"
-"182",2015,"prop_age_1.2",143,0.971943887775551,"PIT/SPA",0.940740740740741,"Deadpitch"
-"183",2015,"prop_age_1.3",143,0.0240480961923848,"PIT/SPA",0.037037037037037,"Deadpitch"
-"184",2015,"prop_age_2.1",143,0.00200400801603206,"PIT/SPA",0.0148148148148148,"Deadpitch"
-"185",2015,"prop_age_2.2",143,0,"PIT/SPA",0.00740740740740741,"Deadpitch"
-"186",2015,"prop_age_2.3",143,0,"PIT/SPA",NA,NA
-"187",2016,"prop_age_1.1",1142,0.00949348472739277,"PIT/SPA",0.0101781170483461,"Deadpitch"
-"188",2016,"prop_age_1.2",1142,0.959815189818561,"PIT/SPA",0.956743002544529,"Deadpitch"
-"189",2016,"prop_age_1.3",1142,0.00715200446431533,"PIT/SPA",0.0254452926208651,"Deadpitch"
-"190",2016,"prop_age_2.1",1142,0,"PIT/SPA",0.00254452926208651,"Deadpitch"
-"191",2016,"prop_age_2.2",1142,0.023539320989731,"PIT/SPA",0.00508905852417303,"Deadpitch"
-"192",2016,"prop_age_2.3",1142,0,"PIT/SPA",NA,NA
-"193",2017,"prop_age_1.1",631,0.190215976221029,"PIT/SPA",0.0381282495667244,"Deadpitch"
-"194",2017,"prop_age_1.2",631,0.526859482137676,"PIT/SPA",0.75736568457539,"Deadpitch"
-"195",2017,"prop_age_1.3",631,0.220941073154509,"PIT/SPA",0.181975736568458,"Deadpitch"
-"196",2017,"prop_age_2.1",631,0.0359904010568432,"PIT/SPA",0.0155979202772964,"Deadpitch"
-"197",2017,"prop_age_2.2",631,0.0219941339791819,"PIT/SPA",0.00693240901213172,"Deadpitch"
-"198",2017,"prop_age_2.3",631,0.00399893345076035,"PIT/SPA",NA,NA
-"199",2018,"prop_age_1.1",1642,0.0040135353312194,"PIT/SPA",0.00274725274725275,"Deadpitch"
-"200",2018,"prop_age_1.2",1642,0.96347158413521,"PIT/SPA",0.972527472527473,"Deadpitch"
-"201",2018,"prop_age_1.3",1642,0.0221671147759569,"PIT/SPA",0.0192307692307692,"Deadpitch"
-"202",2018,"prop_age_2.1",1642,0.00403038450471944,"PIT/SPA",0.00274725274725275,"Deadpitch"
-"203",2018,"prop_age_2.2",1642,0.00631738125289471,"PIT/SPA",0.00274725274725275,"Deadpitch"
-"204",2018,"prop_age_2.3",1642,0,"PIT/SPA",NA,NA
-"205",2019,"prop_age_1.1",831,0.545545545545546,"PIT/SPA",0.184100418410042,"Deadpitch"
-"206",2019,"prop_age_1.2",831,0.171171171171171,"PIT/SPA",0.5418410041841,"Deadpitch"
-"207",2019,"prop_age_1.3",831,0.224224224224224,"PIT/SPA",0.265690376569038,"Deadpitch"
-"208",2019,"prop_age_2.1",831,0.012012012012012,"PIT/SPA",0.00418410041841004,"Deadpitch"
-"209",2019,"prop_age_2.2",831,0.046046046046046,"PIT/SPA",0.00418410041841004,"Deadpitch"
-"210",2019,"prop_age_2.3",831,0.001001001001001,"PIT/SPA",NA,NA
-"211",2020,"prop_age_1.1",1346,0.011,"PIT/SPA",0.0092378752886836,"Deadpitch"
-"212",2020,"prop_age_1.2",1346,0.984,"PIT/SPA",0.972286374133949,"Deadpitch"
-"213",2020,"prop_age_1.3",1346,0.001,"PIT/SPA",0.0184757505773672,"Deadpitch"
-"214",2020,"prop_age_2.1",1346,0.002,"PIT/SPA",0,"Deadpitch"
-"215",2020,"prop_age_2.2",1346,0.002,"PIT/SPA",0,"Deadpitch"
-"216",2020,"prop_age_2.3",1346,0,"PIT/SPA",NA,NA
-"217",2021,"prop_age_1.1",1027,0.40520260130065,"PIT/SPA",0.176744186046512,"Deadpitch"
-"218",2021,"prop_age_1.2",1027,0.518259129564782,"PIT/SPA",0.762790697674419,"Deadpitch"
-"219",2021,"prop_age_1.3",1027,0.0505252626313157,"PIT/SPA",0.0604651162790698,"Deadpitch"
-"220",2021,"prop_age_2.1",1027,0.0140070035017509,"PIT/SPA",0,"Deadpitch"
-"221",2021,"prop_age_2.2",1027,0.0120060030015008,"PIT/SPA",0,"Deadpitch"
-"222",2021,"prop_age_2.3",1027,0,"PIT/SPA",NA,NA
-"223",2022,"prop_age_1.1",1115,0.024,"PIT/SPA",0.0190735694822888,"Deadpitch"
-"224",2022,"prop_age_1.2",1115,0.95,"PIT/SPA",0.863760217983651,"Deadpitch"
-"225",2022,"prop_age_1.3",1115,0.012,"PIT/SPA",0.11716621253406,"Deadpitch"
-"226",2022,"prop_age_2.1",1115,0.0085,"PIT/SPA",0,"Deadpitch"
-"227",2022,"prop_age_2.2",1115,0.0055,"PIT/SPA",0,"Deadpitch"
-"228",2022,"prop_age_2.3",1115,0,"PIT/SPA",NA,NA
-"229",2023,"prop_age_1.1",1000,0.166,"PIT/SPA",0.0695364238410596,"Deadpitch"
-"230",2023,"prop_age_1.2",1000,0.727,"PIT/SPA",0.751655629139073,"Deadpitch"
-"231",2023,"prop_age_1.3",1000,0.004,"PIT/SPA",0.175496688741722,"Deadpitch"
-"232",2023,"prop_age_2.1",1000,0.054,"PIT/SPA",0.0033112582781457,"Deadpitch"
-"233",2023,"prop_age_2.2",1000,0.049,"PIT/SPA",0,"Deadpitch"
-"234",2023,"prop_age_2.3",1000,0,"PIT/SPA",NA,NA
+obs,return_year,age_class,Sample_Size,CRITFC_prop_at_age,CRITFC_method,ONA_prop_at_age,ONA_method
+1,1985,prop_age_1.1,175,0.069,Deadpitch on SG,NA,NA
+2,1985,prop_age_1.2,175,0.88,Deadpitch on SG,NA,NA
+3,1985,prop_age_1.3,175,0.006,Deadpitch on SG,NA,NA
+4,1985,prop_age_2.1,175,0.011,Deadpitch on SG,NA,NA
+5,1985,prop_age_2.2,175,0.034,Deadpitch on SG,NA,NA
+6,1985,prop_age_2.3,175,0,Deadpitch on SG,NA,NA
+7,1986,prop_age_1.1,0,NA,use multi-year average?,NA,NA
+8,1986,prop_age_1.2,0,NA,use multi-year average?,NA,NA
+9,1986,prop_age_1.3,0,NA,use multi-year average?,NA,NA
+10,1986,prop_age_2.1,0,NA,use multi-year average?,NA,NA
+11,1986,prop_age_2.2,0,NA,use multi-year average?,NA,NA
+12,1986,prop_age_2.3,0,NA,use multi-year average?,NA,NA
+13,1987,prop_age_1.1,508,0.492,SPA - Mixed Stock Adjusted?,NA,NA
+14,1987,prop_age_1.2,508,0.46,SPA - Mixed Stock Adjusted?,NA,NA
+15,1987,prop_age_1.3,508,0.028,SPA - Mixed Stock Adjusted?,NA,NA
+16,1987,prop_age_2.1,508,0.01,SPA - Mixed Stock Adjusted?,NA,NA
+17,1987,prop_age_2.2,508,0.01,SPA - Mixed Stock Adjusted?,NA,NA
+18,1987,prop_age_2.3,508,0,SPA - Mixed Stock Adjusted?,NA,NA
+19,1988,prop_age_1.1,195,0.00199,SPA - Mixed Stock Adjusted?,NA,NA
+20,1988,prop_age_1.2,195,0.96853,SPA - Mixed Stock Adjusted?,NA,NA
+21,1988,prop_age_1.3,195,0.01273,SPA - Mixed Stock Adjusted?,NA,NA
+22,1988,prop_age_2.1,195,0.01037,SPA - Mixed Stock Adjusted?,NA,NA
+23,1988,prop_age_2.2,195,0.00638,SPA - Mixed Stock Adjusted?,NA,NA
+24,1988,prop_age_2.3,195,0,SPA - Mixed Stock Adjusted?,NA,NA
+25,1989,prop_age_1.1,451,0.03019,SPA - Mixed Stock Adjusted?,NA,NA
+26,1989,prop_age_1.2,451,0.9312,SPA - Mixed Stock Adjusted?,NA,NA
+27,1989,prop_age_1.3,451,0.02738,SPA - Mixed Stock Adjusted?,NA,NA
+28,1989,prop_age_2.1,451,0.00597,SPA - Mixed Stock Adjusted?,NA,NA
+29,1989,prop_age_2.2,451,0.00526,SPA - Mixed Stock Adjusted?,NA,NA
+30,1989,prop_age_2.3,451,0,SPA - Mixed Stock Adjusted?,NA,NA
+31,1990,prop_age_1.1,406,0.452084521,SPA - Mixed Stock Adjusted?,NA,NA
+32,1990,prop_age_1.2,406,0.261892619,SPA - Mixed Stock Adjusted?,NA,NA
+33,1990,prop_age_1.3,406,0.226272263,SPA - Mixed Stock Adjusted?,NA,NA
+34,1990,prop_age_2.1,406,0.018840188,SPA - Mixed Stock Adjusted?,NA,NA
+35,1990,prop_age_2.2,406,0.035060351,SPA - Mixed Stock Adjusted?,NA,NA
+36,1990,prop_age_2.3,406,0.005850059,SPA - Mixed Stock Adjusted?,NA,NA
+37,1991,prop_age_1.1,473,0.154201542,SPA - Mixed Stock Adjusted?,NA,NA
+38,1991,prop_age_1.2,473,0.759787598,SPA - Mixed Stock Adjusted?,NA,NA
+39,1991,prop_age_1.3,473,0.014820148,SPA - Mixed Stock Adjusted?,NA,NA
+40,1991,prop_age_2.1,473,0.066780668,SPA - Mixed Stock Adjusted?,NA,NA
+41,1991,prop_age_2.2,473,0.001470015,SPA - Mixed Stock Adjusted?,NA,NA
+42,1991,prop_age_2.3,473,0.002940029,SPA - Mixed Stock Adjusted?,NA,NA
+43,1992,prop_age_1.1,688,0.168793248,SPA - Mixed Stock Adjusted?,NA,NA
+44,1992,prop_age_1.2,688,0.733440662,SPA - Mixed Stock Adjusted?,NA,NA
+45,1992,prop_age_1.3,688,0.013619455,SPA - Mixed Stock Adjusted?,NA,NA
+46,1992,prop_age_2.1,688,0.069947202,SPA - Mixed Stock Adjusted?,NA,NA
+47,1992,prop_age_2.2,688,0.014199432,SPA - Mixed Stock Adjusted?,NA,NA
+48,1992,prop_age_2.3,688,0,SPA - Mixed Stock Adjusted?,NA,NA
+49,1993,prop_age_1.1,523,0,SPA - Mixed Stock Adjusted?,NA,NA
+50,1993,prop_age_1.2,523,0.88654,SPA - Mixed Stock Adjusted?,NA,NA
+51,1993,prop_age_1.3,523,0.05258,SPA - Mixed Stock Adjusted?,NA,NA
+52,1993,prop_age_2.1,523,0.00184,SPA - Mixed Stock Adjusted?,NA,NA
+53,1993,prop_age_2.2,523,0.05665,SPA - Mixed Stock Adjusted?,NA,NA
+54,1993,prop_age_2.3,523,0.00239,SPA - Mixed Stock Adjusted?,NA,NA
+55,1994,prop_age_1.1,99,0.14294,SPA - Mixed Stock Adjusted?,NA,NA
+56,1994,prop_age_1.2,99,0.12612,SPA - Mixed Stock Adjusted?,NA,NA
+57,1994,prop_age_1.3,99,0.69848,SPA - Mixed Stock Adjusted?,NA,NA
+58,1994,prop_age_2.1,99,0.01565,SPA - Mixed Stock Adjusted?,NA,NA
+59,1994,prop_age_2.2,99,0.01681,SPA - Mixed Stock Adjusted?,NA,NA
+60,1994,prop_age_2.3,99,0,SPA - Mixed Stock Adjusted?,NA,NA
+61,1995,prop_age_1.1,138,0.413043478,SPA - Mixed Stock Adjusted?,NA,NA
+62,1995,prop_age_1.2,138,0.514492754,SPA - Mixed Stock Adjusted?,NA,NA
+63,1995,prop_age_1.3,138,0.014492754,SPA - Mixed Stock Adjusted?,NA,NA
+64,1995,prop_age_2.1,138,0.057971014,SPA - Mixed Stock Adjusted?,NA,NA
+65,1995,prop_age_2.2,138,0,SPA - Mixed Stock Adjusted?,NA,NA
+66,1995,prop_age_2.3,138,0,SPA - Mixed Stock Adjusted?,NA,NA
+67,1996,prop_age_1.1,291,0.075601375,SPA - Mixed Stock Adjusted?,NA,NA
+68,1996,prop_age_1.2,291,0.859106529,SPA - Mixed Stock Adjusted?,NA,NA
+69,1996,prop_age_1.3,291,0.037800687,SPA - Mixed Stock Adjusted?,NA,NA
+70,1996,prop_age_2.1,291,0,SPA - Mixed Stock Adjusted?,NA,NA
+71,1996,prop_age_2.2,291,0.027491409,SPA - Mixed Stock Adjusted?,NA,NA
+72,1996,prop_age_2.3,291,0,SPA - Mixed Stock Adjusted?,NA,NA
+73,1997,prop_age_1.1,116,0,SPA - Mixed Stock Adjusted?,NA,NA
+74,1997,prop_age_1.2,116,0.956896552,SPA - Mixed Stock Adjusted?,NA,NA
+75,1997,prop_age_1.3,116,0.034482759,SPA - Mixed Stock Adjusted?,NA,NA
+76,1997,prop_age_2.1,116,0.00862069,SPA - Mixed Stock Adjusted?,NA,NA
+77,1997,prop_age_2.2,116,0,SPA - Mixed Stock Adjusted?,NA,NA
+78,1997,prop_age_2.3,116,0,SPA - Mixed Stock Adjusted?,NA,NA
+79,1998,prop_age_1.1,296,0.052631579,SPA - Mixed Stock Adjusted?,NA,NA
+80,1998,prop_age_1.2,296,0.789473684,SPA - Mixed Stock Adjusted?,NA,NA
+81,1998,prop_age_1.3,296,0.157894737,SPA - Mixed Stock Adjusted?,NA,NA
+82,1998,prop_age_2.1,296,0,SPA - Mixed Stock Adjusted?,NA,NA
+83,1998,prop_age_2.2,296,0,SPA - Mixed Stock Adjusted?,NA,NA
+84,1998,prop_age_2.3,296,0,SPA - Mixed Stock Adjusted?,NA,NA
+85,1999,prop_age_1.1,NA,0.114,SPA - Mixed Stock Adjusted?,NA,NA
+86,1999,prop_age_1.2,NA,0.849,SPA - Mixed Stock Adjusted?,NA,NA
+87,1999,prop_age_1.3,NA,0,SPA - Mixed Stock Adjusted?,NA,NA
+88,1999,prop_age_2.1,NA,0.037,SPA - Mixed Stock Adjusted?,NA,NA
+89,1999,prop_age_2.2,NA,0,SPA - Mixed Stock Adjusted?,NA,NA
+90,1999,prop_age_2.3,NA,0,SPA - Mixed Stock Adjusted?,NA,NA
+91,2000,prop_age_1.1,502,0.13,SPA - Mixed Stock Adjusted?,NA,NA
+92,2000,prop_age_1.2,502,0.84,SPA - Mixed Stock Adjusted?,NA,NA
+93,2000,prop_age_1.3,502,0.01,SPA - Mixed Stock Adjusted?,NA,NA
+94,2000,prop_age_2.1,502,0.01,SPA - Mixed Stock Adjusted?,NA,NA
+95,2000,prop_age_2.2,502,0.01,SPA - Mixed Stock Adjusted?,NA,NA
+96,2000,prop_age_2.3,502,0,SPA - Mixed Stock Adjusted?,NA,NA
+97,2001,prop_age_1.1,816,0.026,SPA - Wells Dam - similar to ONA spawning grounds,0.043956044,Deadpitch
+98,2001,prop_age_1.2,816,0.946,SPA - Wells Dam - similar to ONA spawning grounds,0.934065934,Deadpitch
+99,2001,prop_age_1.3,816,0.022,SPA - Wells Dam - similar to ONA spawning grounds,0.021978022,Deadpitch
+100,2001,prop_age_2.1,816,0.003,SPA - Wells Dam - similar to ONA spawning grounds,0,Deadpitch
+101,2001,prop_age_2.2,816,0.003,SPA - Wells Dam - similar to ONA spawning grounds,0,Deadpitch
+102,2001,prop_age_2.3,816,0,SPA - Wells Dam - similar to ONA spawning grounds,NA,NA
+103,2002,prop_age_1.1,476,0.01080108,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0.112359551,Deadpitch
+104,2002,prop_age_1.2,476,0.421842184,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0.539325843,Deadpitch
+105,2002,prop_age_1.3,476,0.136913691,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0.348314607,Deadpitch
+106,2002,prop_age_2.1,476,0.00270027,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0,Deadpitch
+107,2002,prop_age_2.2,476,0.416841684,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0,Deadpitch
+108,2002,prop_age_2.3,476,0.01090109,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],NA,NA
+109,2003,prop_age_1.1,301,0.3147,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0.055319149,Deadpitch
+110,2003,prop_age_1.2,301,0.3884,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0.829787234,Deadpitch
+111,2003,prop_age_1.3,301,0.1936,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0.114893617,Deadpitch
+112,2003,prop_age_2.1,301,0.0764,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0,Deadpitch
+113,2003,prop_age_2.2,301,0.0159,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],0,Deadpitch
+114,2003,prop_age_2.3,301,0.011,SPA - Mixed Stock Adjusted? - see CRITFC 2002 and 2003 Sockeye Data.xlsx [241111],NA,NA
+115,2004,prop_age_1.1,626,0.031088083,SPA - Mixed Stock Adjusted?,0.028077754,Deadpitch
+116,2004,prop_age_1.2,626,0.950777202,SPA - Mixed Stock Adjusted?,0.952483801,Deadpitch
+117,2004,prop_age_1.3,626,0,SPA - Mixed Stock Adjusted?,0.017278618,Deadpitch
+118,2004,prop_age_2.1,626,0.002590674,SPA - Mixed Stock Adjusted?,0,Deadpitch
+119,2004,prop_age_2.2,626,0.015544041,SPA - Mixed Stock Adjusted?,0.002159827,Deadpitch
+120,2004,prop_age_2.3,626,0,SPA - Mixed Stock Adjusted?,NA,NA
+121,2005,prop_age_1.1,596,0.014920998,SPA - Mixed Stock Adjusted?,0.003649635,Deadpitch
+122,2005,prop_age_1.2,596,0.890307375,SPA - Mixed Stock Adjusted?,0.96350365,Deadpitch
+123,2005,prop_age_1.3,596,0.039020062,SPA - Mixed Stock Adjusted?,0.02919708,Deadpitch
+124,2005,prop_age_2.1,596,0.022864404,SPA - Mixed Stock Adjusted?,0,Deadpitch
+125,2005,prop_age_2.2,596,0.018893074,SPA - Mixed Stock Adjusted?,0.003649635,Deadpitch
+126,2005,prop_age_2.3,596,0.013994086,SPA - Mixed Stock Adjusted?,NA,NA
+127,2006,prop_age_1.1,NA,0.00708502,PIT/SPA,0.002570694,Deadpitch
+128,2006,prop_age_1.2,NA,0.760121457,PIT/SPA,0.889460154,Deadpitch
+129,2006,prop_age_1.3,NA,0.07388664,PIT/SPA,0.102827763,Deadpitch
+130,2006,prop_age_2.1,NA,0.023279352,PIT/SPA,0,Deadpitch
+131,2006,prop_age_2.2,NA,0.13562753,PIT/SPA,0.005141388,Deadpitch
+132,2006,prop_age_2.3,NA,0,PIT/SPA,NA,NA
+133,2007,prop_age_1.1,122,0.423713754,PIT/SPA,0.24702381,Deadpitch
+134,2007,prop_age_1.2,122,0.382075202,PIT/SPA,0.523809524,Deadpitch
+135,2007,prop_age_1.3,122,0.031839966,PIT/SPA,0.142857143,Deadpitch
+136,2007,prop_age_2.1,122,0.058307516,PIT/SPA,0.074404762,Deadpitch
+137,2007,prop_age_2.2,122,0.092922927,PIT/SPA,0.008928571,Deadpitch
+138,2007,prop_age_2.3,122,0.011140635,PIT/SPA,NA,NA
+139,2008,prop_age_1.1,598,0.074,PIT/SPA,0.036016949,Deadpitch
+140,2008,prop_age_1.2,598,0.864,PIT/SPA,0.949152542,Deadpitch
+141,2008,prop_age_1.3,598,0.007,PIT/SPA,0.01059322,Deadpitch
+142,2008,prop_age_2.1,598,0.023,PIT/SPA,0,Deadpitch
+143,2008,prop_age_2.2,598,0.032,PIT/SPA,0.004237288,Deadpitch
+144,2008,prop_age_2.3,598,0,PIT/SPA,NA,NA
+145,2009,prop_age_1.1,504,0.125073681,PIT/SPA,0.026570048,Deadpitch
+146,2009,prop_age_1.2,504,0.791611408,PIT/SPA,0.879227053,Deadpitch
+147,2009,prop_age_1.3,504,0.026324988,PIT/SPA,0.055555556,Deadpitch
+148,2009,prop_age_2.1,504,0.009998232,PIT/SPA,0,Deadpitch
+149,2009,prop_age_2.2,504,0.045991868,PIT/SPA,0.038647343,Deadpitch
+150,2009,prop_age_2.3,504,0.000999823,PIT/SPA,NA,NA
+151,2010,prop_age_1.1,567,0.01999108,PIT/SPA,0.008928571,Deadpitch
+152,2010,prop_age_1.2,567,0.95157541,PIT/SPA,0.890625,Deadpitch
+153,2010,prop_age_1.3,567,0.005143233,PIT/SPA,0.075892857,Deadpitch
+154,2010,prop_age_2.1,567,0.006297859,PIT/SPA,0.017857143,Deadpitch
+155,2010,prop_age_2.2,567,0.016992418,PIT/SPA,0.006696429,Deadpitch
+156,2010,prop_age_2.3,567,0,PIT/SPA,NA,NA
+157,2011,prop_age_1.1,394,0.261263752,PIT/SPA,0.120689655,Deadpitch
+158,2011,prop_age_1.2,394,0.591579013,PIT/SPA,0.816091954,Deadpitch
+159,2011,prop_age_1.3,394,0.077341516,PIT/SPA,0.057471264,Deadpitch
+160,2011,prop_age_2.1,394,0.030723387,PIT/SPA,0.005747126,Deadpitch
+161,2011,prop_age_2.2,394,0.037032153,PIT/SPA,0,Deadpitch
+162,2011,prop_age_2.3,394,0.002060179,PIT/SPA,NA,NA
+163,2012,prop_age_1.1,1005,0.016711986,PIT/SPA,0.001886792,Deadpitch
+164,2012,prop_age_1.2,1005,0.959703841,PIT/SPA,0.971698113,Deadpitch
+165,2012,prop_age_1.3,1005,0.016777496,PIT/SPA,0.00754717,Deadpitch
+166,2012,prop_age_2.1,1005,0.001224479,PIT/SPA,0.00754717,Deadpitch
+167,2012,prop_age_2.2,1005,0.005582199,PIT/SPA,0.011320755,Deadpitch
+168,2012,prop_age_2.3,1005,0,PIT/SPA,NA,NA
+169,2013,prop_age_1.1,395,0.243,PIT/SPA,0.176724138,Deadpitch
+170,2013,prop_age_1.2,395,0.616,PIT/SPA,0.620689655,Deadpitch
+171,2013,prop_age_1.3,395,0.087,PIT/SPA,0.064655172,Deadpitch
+172,2013,prop_age_2.1,395,0,PIT/SPA,0.021551724,Deadpitch
+173,2013,prop_age_2.2,395,0.054,PIT/SPA,0.112068966,Deadpitch
+174,2013,prop_age_2.3,395,0,PIT/SPA,NA,NA
+175,2014,prop_age_1.1,859,0.17482709,PIT/SPA,0.0657277,Deadpitch
+176,2014,prop_age_1.2,859,0.818906896,PIT/SPA,0.899061033,Deadpitch
+177,2014,prop_age_1.3,859,0.001076522,PIT/SPA,0.03286385,Deadpitch
+178,2014,prop_age_2.1,859,0.001245821,PIT/SPA,0,Deadpitch
+179,2014,prop_age_2.2,859,0.003943671,PIT/SPA,0.002347418,Deadpitch
+180,2014,prop_age_2.3,859,0,PIT/SPA,NA,NA
+181,2015,prop_age_1.1,143,0.002004008,PIT/SPA,0,Deadpitch
+182,2015,prop_age_1.2,143,0.971943888,PIT/SPA,0.940740741,Deadpitch
+183,2015,prop_age_1.3,143,0.024048096,PIT/SPA,0.037037037,Deadpitch
+184,2015,prop_age_2.1,143,0.002004008,PIT/SPA,0.014814815,Deadpitch
+185,2015,prop_age_2.2,143,0,PIT/SPA,0.007407407,Deadpitch
+186,2015,prop_age_2.3,143,0,PIT/SPA,NA,NA
+187,2016,prop_age_1.1,1142,0.009493485,PIT/SPA,0.010178117,Deadpitch
+188,2016,prop_age_1.2,1142,0.95981519,PIT/SPA,0.956743003,Deadpitch
+189,2016,prop_age_1.3,1142,0.007152004,PIT/SPA,0.025445293,Deadpitch
+190,2016,prop_age_2.1,1142,0,PIT/SPA,0.002544529,Deadpitch
+191,2016,prop_age_2.2,1142,0.023539321,PIT/SPA,0.005089059,Deadpitch
+192,2016,prop_age_2.3,1142,0,PIT/SPA,NA,NA
+193,2017,prop_age_1.1,631,0.190215976,PIT/SPA,0.03812825,Deadpitch
+194,2017,prop_age_1.2,631,0.526859482,PIT/SPA,0.757365685,Deadpitch
+195,2017,prop_age_1.3,631,0.220941073,PIT/SPA,0.181975737,Deadpitch
+196,2017,prop_age_2.1,631,0.035990401,PIT/SPA,0.01559792,Deadpitch
+197,2017,prop_age_2.2,631,0.021994134,PIT/SPA,0.006932409,Deadpitch
+198,2017,prop_age_2.3,631,0.003998933,PIT/SPA,NA,NA
+199,2018,prop_age_1.1,1642,0.004013535,PIT/SPA,0.002747253,Deadpitch
+200,2018,prop_age_1.2,1642,0.963471584,PIT/SPA,0.972527473,Deadpitch
+201,2018,prop_age_1.3,1642,0.022167115,PIT/SPA,0.019230769,Deadpitch
+202,2018,prop_age_2.1,1642,0.004030385,PIT/SPA,0.002747253,Deadpitch
+203,2018,prop_age_2.2,1642,0.006317381,PIT/SPA,0.002747253,Deadpitch
+204,2018,prop_age_2.3,1642,0,PIT/SPA,NA,NA
+205,2019,prop_age_1.1,831,0.545545546,PIT/SPA,0.184100418,Deadpitch
+206,2019,prop_age_1.2,831,0.171171171,PIT/SPA,0.541841004,Deadpitch
+207,2019,prop_age_1.3,831,0.224224224,PIT/SPA,0.265690377,Deadpitch
+208,2019,prop_age_2.1,831,0.012012012,PIT/SPA,0.0041841,Deadpitch
+209,2019,prop_age_2.2,831,0.046046046,PIT/SPA,0.0041841,Deadpitch
+210,2019,prop_age_2.3,831,0.001001001,PIT/SPA,NA,NA
+211,2020,prop_age_1.1,1346,0.011,PIT/SPA,0.009237875,Deadpitch
+212,2020,prop_age_1.2,1346,0.984,PIT/SPA,0.972286374,Deadpitch
+213,2020,prop_age_1.3,1346,0.001,PIT/SPA,0.018475751,Deadpitch
+214,2020,prop_age_2.1,1346,0.002,PIT/SPA,0,Deadpitch
+215,2020,prop_age_2.2,1346,0.002,PIT/SPA,0,Deadpitch
+216,2020,prop_age_2.3,1346,0,PIT/SPA,NA,NA
+217,2021,prop_age_1.1,1027,0.405202601,PIT/SPA,0.176744186,Deadpitch
+218,2021,prop_age_1.2,1027,0.51825913,PIT/SPA,0.762790698,Deadpitch
+219,2021,prop_age_1.3,1027,0.050525263,PIT/SPA,0.060465116,Deadpitch
+220,2021,prop_age_2.1,1027,0.014007004,PIT/SPA,0,Deadpitch
+221,2021,prop_age_2.2,1027,0.012006003,PIT/SPA,0,Deadpitch
+222,2021,prop_age_2.3,1027,0,PIT/SPA,NA,NA
+223,2022,prop_age_1.1,1115,0.024,PIT/SPA,0.019073569,Deadpitch
+224,2022,prop_age_1.2,1115,0.95,PIT/SPA,0.863760218,Deadpitch
+225,2022,prop_age_1.3,1115,0.012,PIT/SPA,0.117166213,Deadpitch
+226,2022,prop_age_2.1,1115,0.0085,PIT/SPA,0,Deadpitch
+227,2022,prop_age_2.2,1115,0.0055,PIT/SPA,0,Deadpitch
+228,2022,prop_age_2.3,1115,0,PIT/SPA,NA,NA
+229,2023,prop_age_1.1,1000,0.166,PIT/SPA,0.069536424,Deadpitch
+230,2023,prop_age_1.2,1000,0.727,PIT/SPA,0.751655629,Deadpitch
+231,2023,prop_age_1.3,1000,0.004,PIT/SPA,0.175496689,Deadpitch
+232,2023,prop_age_2.1,1000,0.054,PIT/SPA,0.003311258,Deadpitch
+233,2023,prop_age_2.2,1000,0.049,PIT/SPA,0,Deadpitch
+234,2023,prop_age_2.3,1000,0,PIT/SPA,NA,NA
+229,2024,prop_age_1.1,1222,0.023,PIT/SPA,,
+230,2024,prop_age_1.2,1222,0.949,PIT/SPA,,
+231,2024,prop_age_1.3,1222,0.004,PIT/SPA,,
+232,2024,prop_age_2.1,1222,0.016,PIT/SPA,,
+233,2024,prop_age_2.2,1222,0.008,PIT/SPA,,
+234,2024,prop_age_2.3,1222,0,PIT/SPA,,
