@@ -50,7 +50,7 @@ library(stringi)
 library(tidyverse)
 library(viridis)
 
-last_year <- 2023     # current last year of returns data handled or available 
+last_year <- 2024     # current last year of returns data handled or available 
 
 ```
 
@@ -98,6 +98,7 @@ make_a_sound <- function(noise, pause) {
 ```{r import harvest} 
 
 workbook <- "Columbia River sockeye harvest (Ryan Lothrop WDFW 240513).xlsx"    # raw USA harvest from WDFW and Okanagan (CAN) harvest by gear
+workbook <- "Columbia River sockeye harvest (Ryan Lothrop WDFW 251014).xlsx"    # raw USA harvest from WDFW and Okanagan (CAN) harvest by gear
 worksheet<- "SockeyeHarvestDataForR"                                            # raw data with easy column headings for R
 filename <- paste("../data/", workbook, sep = "")
 
@@ -137,7 +138,8 @@ Columbia_Sockeye_Dam_Counts_Adj <-                                              
 # read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240718.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
 # read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240908.csv") %>%            ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
 # read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_240913.csv") %>%            ### <-- no changes since 240908.csv but 240913 is a benchmark for latest draft report
-  read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_241111.csv") %>%            ### <-- no changes since 240913.csv but 241111 is a benchmark for latest draft report
+# read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_241111.csv") %>%            ### <-- no changes since 240913.csv but 241111 is a benchmark for latest draft report
+  read.csv("../data/Columbia_Sockeye_Dam_Counts_Adj_250807.csv") %>%            ### <-- no changes since 241111.csv but 250808 is a benchmark for latest draft report
   janitor::clean_names()                                                        ###     
 
 dam_counts <- Columbia_Sockeye_Dam_Counts_Adj %>%                               
@@ -149,7 +151,8 @@ Columbia_Sockeye_Stock_Comp <-
 # read.csv("../data/Columbia_Sockeye_Stock_Comp_240718.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
 # read.csv("../data/Columbia_Sockeye_Stock_Comp_240908.csv") %>%                ### <-- requires prior execution of "Download Sockeye Dam Counts from CBR-DATA.R"
 # read.csv("../data/Columbia_Sockeye_Stock_Comp_240913.csv") %>%                ### <-- no changes since 240908.csv but 240913 is a benchmark for latest draft report
-  read.csv("../data/Columbia_Sockeye_Stock_Comp_241111.csv") %>%                ### <-- no changes since 240913.csv but 241111 is a benchmark for latest draft report
+# read.csv("../data/Columbia_Sockeye_Stock_Comp_241111.csv") %>%                ### <-- no changes since 240913.csv but 241111 is a benchmark for latest draft report
+  read.csv("../data/Columbia_Sockeye_Stock_Comp_250807.csv") %>%                ### <-- no changes since 241111.csv but 250807 is a benchmark for latest draft report
   janitor::clean_names()                                                        ###     
 
 stock_comp <- Columbia_Sockeye_Stock_Comp %>% 
@@ -201,6 +204,15 @@ deadpitch_prop_natural <- ok_riv_deadpitch %>%                      # get propor
                                     testalinden_spill, NA))%>%    
   mutate(section = ifelse(section == "shingle creek", "shingle_creek", section)) %>%
   arrange(section, year)        
+
+# deadpitch_2024 <- data.frame(                                     ### append summary values for 2024 till raw data compiled [250625]
+#   year = c(2024, 2024),
+#   section = c("upper_ok_river", "shingle_creek"),                   # Penticton Channel and Shingle Creek sections
+#   n_natural = c(xxx, xx),                                         ### natural origin count NA from Nerkid Deadpitch Adult.BioData_24.xlsx (251014)
+#           n = c(yyy, yyy)) %>%                                    ### total deadpitch from Nerkid Deadpitch Adult.BioData_24.xlsx
+#   mutate(p_nat = n_natural / n) %>%
+#   mutate(testalinden_spill = NA)
+
 
 # deadpitch_2023 <- data.frame(                                     ### append summary values for 2023 till raw data compiled [250625]
 #   year = c(2023, 2023),
@@ -294,15 +306,15 @@ prop_natural <- bind_rows(deadpitch_prop_natural_filtered %>% mutate(type = "Sam
                 # data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",
                 #            p_nat = predict(pnat_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
   
-  mutate(section_label = ifelse(section == "lower_ok_river",  "Lower Okanagan River", section)) %>%
-  mutate(section_label = ifelse(section == "middle_ok_river", "Middle Okanagan River", section_label)) %>%
-  mutate(section_label = ifelse(section == "upper_ok_river",  "Penticton Channel", section_label)) %>%
-  mutate(section_label = ifelse(section == "shingle_creek",   "Shingle Creek", section_label)) %>%
-  mutate(section_label = ifelse(section == "shingle creek",   "Shingle Creek", section_label)) %>%
-  mutate(spawning_location = ifelse(section == "shingle_creek",   "Shingle Creek", "Unknown")) %>%
-  mutate(spawning_location = ifelse(section == "shingle creek",   "Shingle Creek", spawning_location)) %>%
-  mutate(spawning_location = ifelse(section == "lower_ok_river",  "Lower Ok River", spawning_location)) %>%
-  mutate(spawning_location = ifelse(section == "middle_ok_river", "Middle Ok River", spawning_location)) %>%
+  mutate(section_label     = ifelse(section == "lower_ok_river",  "Lower Okanagan River",  section)) %>%
+  mutate(section_label     = ifelse(section == "middle_ok_river", "Middle Okanagan River", section_label)) %>%
+  mutate(section_label     = ifelse(section == "upper_ok_river",  "Penticton Channel",     section_label)) %>%
+  mutate(section_label     = ifelse(section == "shingle_creek",   "Shingle Creek",         section_label)) %>%
+  mutate(section_label     = ifelse(section == "shingle creek",   "Shingle Creek",         section_label)) %>%
+  mutate(spawning_location = ifelse(section == "shingle_creek",   "Shingle Creek",    "Unknown")) %>%
+  mutate(spawning_location = ifelse(section == "shingle creek",   "Shingle Creek",     spawning_location)) %>%
+  mutate(spawning_location = ifelse(section == "lower_ok_river",  "Lower Ok River",    spawning_location)) %>%
+  mutate(spawning_location = ifelse(section == "middle_ok_river", "Middle Ok River",   spawning_location)) %>%
   mutate(spawning_location = ifelse(section == "upper_ok_river",  "Penticton Channel", spawning_location)) %>%
   mutate(prop_nat_type = type) %>%
   arrange(section_label, year)
@@ -357,7 +369,7 @@ cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river")
 cv_gam_loo(data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") %>% filter(year>2011), formula = p_sockeye ~ bs(year, 6))
 p_sock_pen_m   <- gam(p_sockeye ~ bs(year, 4), data = deadpitch_prop_sockeye %>% filter(section == "upper_ok_river") , family = binomial(link = "logit"))
 
-deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type = "Observed"),                       ### apply imputed estimate for multiple years for mid-OkR
+deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type = "Observed"),   ### apply imputed estimate for multiple years for mid-OkR
                                data.frame(year = c(2009), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2009)), type = "response")),
                                data.frame(year = c(2016), section = "middle_ok_river", type = "Assumed", 
@@ -371,7 +383,10 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
                                data.frame(year = c(2022), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2022)), type = "response")),
                                data.frame(year = c(2023), section = "middle_ok_river", type = "Assumed", 
-                               p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2023)), type = "response"))) %>%
+                               p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2023)), type = "response")),
+                               data.frame(year = c(2024), section = "middle_ok_river", type = "Assumed", 
+                               p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2024)), type = "response")),
+                               ) %>%
                                
                                # data.frame(year = c(2011), section = "upper_ok_river",  type = "Imputed",          ### apply imputed estimate for Pen Ch in 2011
                                # p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2011)), type = "response")), 
@@ -396,7 +411,7 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
 #UC_data_Import <- read.csv("../data/AUC_data_Import_xlsx_241105_AO.csv")         # AO checking nerkid estimates and providing updates (241105)    # keep for GitHub [240510]
 
 #UC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_241105_AO.xlsx", sheet = "AUC_data_Import") %>% 
-#UC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_250623_AO.xlsx", sheet = "AUC_data_Import") %>%  # back to the original AUC estimates for 2011
+#UC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_250623_AO.xlsx", sheet = "AUC_data_Import") %>%      # back to the original AUC estimates for 2011
 AUC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_2025.06.25_AO.xlsx", sheet = "AUC_data_Import") %>%  # AO updated Pen 2023 and Shingle 2021-2023 %
                    janitor::clean_names() %>% 
                    mutate_at("auc", as.numeric) %>%
@@ -422,7 +437,7 @@ AUC_data <- auc_data_import %>%
   mutate(section = ifelse(spawning_location == "Middle Ok River",   "middle_ok_river", section)) %>%   # changing mid-OkR SK rearing lake to Skaha based on direction from H. Stiff.
   mutate(section = ifelse(spawning_location == "Penticton Channel", "upper_ok_river",  section)) %>%
   mutate(section = ifelse(spawning_location == "Shingle Creek",     "shingle_creek",   section)) %>%
-  mutate(rearing_lake = ifelse(spawning_location == "Middle Ok River", "Skaha", rearing_lake)) %>%     # assigns spawners in middle channel as Skaha-reared     
+  mutate(rearing_lake = ifelse(spawning_location == "Middle Ok River", "Skaha", rearing_lake))   %>%   # assigns spawners in middle channel as Skaha-reared     
 # mutate(percent_35cm_fl = ifelse(year == 2023 & section == "upper_ok_river" & is.na(percent_35cm_fl), 0.80, percent_35cm_fl)) %>%   ### Pen Ch. fish not yet ecotyped via age, but now IMPUTED, above
   dplyr::select(section, year, spawning_location, rearing_lake, spawning_nerkids, percent_35cm_fl, spawning_sockeye, spawning_nerkids_note, -X) %>% # to Skaha (assumed rearing lake of origin) for purposes of
   arrange(section, year)                                                                               # calculating OSO vs SKA proportion [PT 240221]  
@@ -990,7 +1005,8 @@ write.csv(oka_recruits, filename)                                               
 #   filter(smolt_year >=1998, smolt_year <= last_year)
 # write.csv(j_dat,  "../data/juv_dat_xlsx_240624.csv")    # if juv data imported, re-write to CSV  ### comment out for GitHub
 
-j_dat <- read.csv("../data/juv_dat_xlsx_240624.csv")    # replaces import data from SIS-OSO xlsx workbook # keep for GitHub [240510]
+# j_dat <- read.csv("../data/juv_dat_xlsx_240624.csv")    # replaces import data from SIS-OSO xlsx workbook # keep for GitHub [240510]
+j_dat   <- read.csv("../data/juv_dat_ATS_251014.csv")     # ATS-based juv (PRESMOLT) estimates from SIS-OSO xlsx workbook - not spline-based model estimates of SMOLTS (see SIS-OSO xlsx MASTER)
 
 ```
 
@@ -1177,8 +1193,6 @@ ggsave(file = filename, width = 8, height = 6, units = "in")                    
 # ggsave(file = filename, width = 6, height = 6, units = "in")                                # saves the plot to filename
 
 ```
-
-
 
 ```{r marine survival}
 
