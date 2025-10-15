@@ -400,6 +400,10 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
   dplyr::select(-type) %>%
   arrange(section, year)
 
+filename <- paste("../output/Species_composition_", timestamp, ".csv", sep = "") # Total Nerkids, Sockeye, prop Sockeye on  Spawning Grounds  
+write.csv(deadpitch_prop_sockeye_plus, filename)                                 # before stray rate calculations
+
+
 # osoyoos vs. skaha data     ### NOTE: initial AUC_data_Import import from XLSX should be commented out for final GitHub version. ###
 
 # AUC_data_Import <- readxl::read_xlsx("../data/SIS - Data - OSOYOOS - 24.06.24.xlsx", sheet = "OK AUC and Deadpitch Results") %>%                           
@@ -446,7 +450,7 @@ spawning_location_compare <- AUC_data %>%
   mutate(old_prop_sock = 1 - percent_35cm_fl, old_total_sockeye = spawning_nerkids * old_prop_sock) %>% 
 # left_join(., deadpitch_prop_sockeye,      by = c("section", "year")) %>%
   left_join(., deadpitch_prop_sockeye_plus, by = c("section", "year")) %>%                             # use dataset with imputed mid-OkR and 2023 Pen Chan %sockeye
-  mutate(p_sockeye = ifelse(section %in% c("lower_ok_river", "middle_ok_river"), 1, p_sockeye)) %>%
+  # mutate(p_sockeye = ifelse(section %in% c("lower_ok_river", "middle_ok_river"), 1, p_sockeye)) %>%  # turned off by HS 251014 since it is overriding actual species_from_age
   mutate(total_sockeye = spawning_nerkids * p_sockeye) %>%
 # group_by(year, rearing_lake, spawning_location) %>% 
   group_by(year, rearing_lake, spawning_location, prop_sock_type) %>% 
