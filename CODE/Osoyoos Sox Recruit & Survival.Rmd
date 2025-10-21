@@ -183,9 +183,18 @@ annual_returns <- dam_counts %>%                                                
 # write.csv(ok_riv_deadpitch,  "../data/ok_riv_deadpitch_xlsx_240524.csv")                       # if OSO SOX deadpitch xlsx data imported, re-write to CSV  # comment out for GitHub
 # ok_riv_deadpitch_old <- read.csv("../data/ok_riv_deadpitch_xlsx_240524.csv")                   # replaces import data from OSO SOX deadpitch xlsx workbook # keep for GitHub [240510]
 
-filename <- ("C:/DFO-MPO/OneDrive/OneDrive - DFO-MPO/okanagan_data/deadpitch/combined_and_cleaned/okanagan_deadpitch.csv") # revised by AO and PT 2410xx
+# filename <- ("C:/DFO-MPO/OneDrive/OneDrive - DFO-MPO/okanagan_data/deadpitch/combined_and_cleaned/okanagan_deadpitch.csv") # revised by AO and PT 2410xx
+# ok_riv_deadpitch <- read.csv2(filename, sep=",")                    # read cleaned up DP data 
 
-ok_riv_deadpitch <- read.csv2(filename, sep=",")                    # read cleaned up DP data 
+filename <- ("C:/DFO-MPO/OneDrive/OneDrive - DFO-MPO/okanagan_data/deadpitch/combined_and_cleaned/okanagan_deadpitch_adj_2024_species_assignment.xlsx") # incomplete for 2024 but species assigned based on length for upper OkR and Shingle {hs 251015)
+ok_riv_deadpitch <- read_xlsx(filename, sheet="okanagan_deadpitch_adj") # read dp data with preliminary 2024 data 
+
+
+# # fix 2024 which is missing species info
+# ok_riv_deadpitch_bak <- ok_riv_deadpitch
+# 
+# ok_riv_deadpitch <- ok_riv_deadpitch %>%
+#   mutate(species = ifelse(year == 2024 & hatchery == "hatchery", "sockeye"
 
 # filename <- paste("../data/ok_riv_deadpitch_", timestamp, ".csv", sep = "")   # make a copy in the OSO recruits DATA folder...
 # write.csv(ok_riv_deadpitch, filename)                             # if *NEW* OSO SOX deadpitch data imported, re-write to CSV       ### comment out for GitHub
@@ -300,6 +309,8 @@ prop_natural <- bind_rows(deadpitch_prop_natural_filtered %>% mutate(type = "Sam
                            p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%  ### imputes to zero unless year=c(2016) in this row
                 data.frame(year = c(2023), section = "middle_ok_river", type = "Imputed",
                            p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%  ### imputes to zero unless year=c(2016) in this row
+                data.frame(year = c(2024), section = "middle_ok_river", type = "Imputed",
+                           p_nat = predict(pnat_mid_m, data.frame(year = c(2016)), type = "response")), #) %>%  ### imputes to zero unless year=c(2016) in this row
                 
                 data.frame(year = c(2011), section = "upper_ok_river", type = "Imputed", 
                            p_nat = predict(pnat_pen_m, data.frame(year = c(2011)), type = "response"))) %>%
@@ -385,8 +396,7 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
                                data.frame(year = c(2023), section = "middle_ok_river", type = "Assumed", 
                                p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2023)), type = "response")),
                                data.frame(year = c(2024), section = "middle_ok_river", type = "Assumed", 
-                               p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2024)), type = "response")),
-                               ) %>%
+                               p_sockeye = predict(p_sock_mid_m, data.frame(year = c(2024)), type = "response"))) %>%
                                
                                # data.frame(year = c(2011), section = "upper_ok_river",  type = "Imputed",          ### apply imputed estimate for Pen Ch in 2011
                                # p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2011)), type = "response")), 
@@ -394,6 +404,8 @@ deadpitch_prop_sockeye_plus <- bind_rows(deadpitch_prop_sockeye %>% mutate(type 
                                # p_sockeye = NA), 
                                # data.frame(year = c(2023), section = "upper_ok_river",  type = "Imputed",          ### imputation no longer needed for Pen Ch in 2023 [250724]
                                # p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2023)), type = "response"))) %>%
+                               # data.frame(year = c(2024), section = "upper_ok_river",  type = "Imputed",          ### imputation no longer needed for Pen Ch in 2023 [250724]
+                               # p_sockeye = predict(p_sock_pen_m, data.frame(year = c(2024)), type = "response"))) %>%
 
 # filter(!(year == 2011 & section == "upper_ok_river")) %>%                                                         # Exclude the 2011 upper_ok_river record as too sketch
   mutate(prop_sock_type = type) %>%
@@ -416,11 +428,12 @@ write.csv(deadpitch_prop_sockeye_plus, filename)                                
 
 #UC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_241105_AO.xlsx", sheet = "AUC_data_Import") %>% 
 #UC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_250623_AO.xlsx", sheet = "AUC_data_Import") %>%      # back to the original AUC estimates for 2011
-AUC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_2025.06.25_AO.xlsx", sheet = "AUC_data_Import") %>%  # AO updated Pen 2023 and Shingle 2021-2023 %
+#UC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_2025.06.25_AO.xlsx", sheet = "AUC_data_Import") %>%  # AO updated Pen 2023 and Shingle 2021-2023 %
+AUC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_2025.10.15_AO-HS.xlsx",   sheet = "AUC_data_Import") %>%  # AO updated Pen 2023-2024 and Shingle 2023-2024 %
                    janitor::clean_names() %>% 
                    mutate_at("auc", as.numeric) %>%
                    mutate_at("spawning_nerkids", as.numeric) %>%
-                   mutate_at("percent_35cm_fl", as.numeric) %>%
+                   mutate_at("percent_35cm_fl", as.numeric) %>%                                  # THIS VALUE SHOULD MEAN: "%Nerkids < 35 cm in length", i.e., %KOK
                  # mutate(bad_estimate = ifelse(year == 2011, spawning_nerkids, NA)) %>%         # store 2011 value...
                  # mutate(spawning_nerkids = ifelse(year == 2011, NA, spawning_nerkids)) %>%     # nerkids in 2011 set to NA
                    mutate(percent_35cm_fl  = ifelse(year == 2011 & spawning_location == "Penticton Channel", NA, percent_35cm_fl)) %>%
@@ -432,8 +445,8 @@ AUC_data_Import <- readxl::read_xlsx("../data/AUC_data_Import_xlsx_2025.06.25_AO
                    mutate(spawning_sockeye = ifelse(spawning_location %in% c("Lower Ok River", "Middle Ok River"), spawning_nerkids, NA)) %>%
                    dplyr::select(rearing_lake, spawning_location, year, auc, spawning_nerkids, spawning_nerkids_note, spawning_sockeye, percent_35cm_fl)
 
-write.csv(AUC_data_Import,  "../data/AUC_data_Import_250625.csv")        # if AUC_data imported from AO xlsx workbook, re-write to CSV   # comment out for GitHub
-auc_data_import <- read.csv("../data/AUC_data_Import_250625.csv")        # export and re-import (NOTE lower-case dataset name) --- keep for GitHub [241128]
+write.csv(AUC_data_Import,  "../data/AUC_data_Import_251015.csv")        # if AUC_data imported from AO xlsx workbook, re-write to CSV   # comment out for GitHub
+auc_data_import <- read.csv("../data/AUC_data_Import_251015.csv")        # export and re-import (NOTE lower-case dataset name) --- keep for GitHub [241128]
 
 AUC_data <- auc_data_import %>% 
   filter(year <= last_year) %>%                                                                        ### removing 2011 which was previously imputed, 
@@ -447,10 +460,10 @@ AUC_data <- auc_data_import %>%
   arrange(section, year)                                                                               # calculating OSO vs SKA proportion [PT 240221]  
                                                                                                        
 spawning_location_compare <- AUC_data %>% 
-  mutate(old_prop_sock = 1 - percent_35cm_fl, old_total_sockeye = spawning_nerkids * old_prop_sock) %>% 
+  mutate(old_prop_sock = 1 - percent_35cm_fl, old_total_sockeye = spawning_nerkids * old_prop_sock) %>%# get  
 # left_join(., deadpitch_prop_sockeye,      by = c("section", "year")) %>%
   left_join(., deadpitch_prop_sockeye_plus, by = c("section", "year")) %>%                             # use dataset with imputed mid-OkR and 2023 Pen Chan %sockeye
-  # mutate(p_sockeye = ifelse(section %in% c("lower_ok_river", "middle_ok_river"), 1, p_sockeye)) %>%  # turned off by HS 251014 since it is overriding actual species_from_age
+  mutate(p_sockeye = ifelse(section %in% c("lower_ok_river", "middle_ok_river"), 1, p_sockeye)) %>%    # may be turned off - since it is overriding actual species_from_age
   mutate(total_sockeye = spawning_nerkids * p_sockeye) %>%
 # group_by(year, rearing_lake, spawning_location) %>% 
   group_by(year, rearing_lake, spawning_location, prop_sock_type) %>% 
