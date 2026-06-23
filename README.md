@@ -8,4 +8,4 @@
 Some of the data for this analysis falls under a sharing agreement and so is not stored publically on Github. Contact Patrick Thompson (DFO) if you require access. 
 
 ### For more information
-See: Hyatt, K.D. and Stockwell, M.M. 2019. Chasing an Illusion? Successful Restoration of Okanagan River Sockeye Salmon in a Sea of Uncertainty. Pages 65-100 in C. C. Krueger, W. W. Taylor, and S. Youn, editors. From Catastrophe To Recovery: Stories Of Fishery Management Success. American Fisheries Society, Bethesda, Md.
+Bailey, C.J., Stiff, H.W., Thompson, P.L., Judson, B., and Ogden, A.D. 2025. Osoyoos Lake Sockeye Salmon (Oncorhynchus nerka) return abundance (1977-2023), adult age composition (1985-2023), and marine survival (1998-2021). Can. Manuscr. Rep. Fish. Aquat. Sci. 3282: vi + 49 p. https://doi.org/10.60825/v3g8-jw96
